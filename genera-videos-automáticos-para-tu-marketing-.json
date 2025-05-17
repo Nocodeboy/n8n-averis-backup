@@ -1,0 +1,575 @@
+{
+  "createdAt": "2025-05-06T21:11:48.160Z",
+  "updatedAt": "2025-05-14T16:27:09.838Z",
+  "id": "dvpIo93C59GSLBty",
+  "name": "Genera Videos AUTOMÁTICOS para tu Marketing",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Producto",
+        "formDescription": "AÑade el producto a generar imagen y video",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Nombre producto",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Descripcion del producto"
+            },
+            {
+              "fieldLabel": "correo",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Archivo",
+              "fieldType": "file"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "08535b15-0877-4266-b74e-91ac8ab266f0",
+      "name": "On form submission",
+      "webhookId": "f4584983-90b4-4a51-b6d8-1273401320ff"
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "Archivo",
+        "name": "producto",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1P46C2TQ77mRUIWUwOR9wZH8JKl0v0xT3",
+          "mode": "list",
+          "cachedResultName": "Video_Gen",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1P46C2TQ77mRUIWUwOR9wZH8JKl0v0xT3"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        220,
+        0
+      ],
+      "id": "f70d7a50-2a55-4a31-b69a-1a25ec1ac7f1",
+      "name": "Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "CmyDLQoxYdr0aKik",
+          "name": "Google Daniel Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Producto: {{ $('On form submission').item.json['Nombre producto'] }}\ndescripcion: {{ $('On form submission').item.json['Descripcion del producto'] }}",
+        "options": {
+          "systemMessage": "=\n# Descripción General\nEres un estratega de marketing de clase mundial y un experto en la ingeniería de *prompts* de texto a imagen, especializado en crear *prompts* de fotografía de producto hiperrealista y de alta calidad para modelos de generación de imágenes con IA.\n\n## Tu Objetivo:\nCuando se te proporcione una descripción de producto, tu tarea será redactar un *prompt* detallado y profesional que genere una imagen de producto hiperrealista, limpia y visualmente impactante, adecuada para materiales de marketing, campañas publicitarias o plataformas de comercio electrónico.\n\n## Requisitos Clave:\n- Enfocarse en fotografía de estudio profesional e hiperrealista.\n- Mantener un estilo visual limpio, minimalista y elegante.\n- Resaltar el producto como sujeto principal, con detalles nítidos e iluminación perfecta.\n- Usar fondos que complementen pero no opaquen al producto (por ejemplo, degradado suave, colores claros o blanco puro).\n- Incluir detalles de iluminación profesional como “iluminación con softbox”, “luces de estudio” o “sombras suaves naturales”.\n- Enfatizar el realismo, la textura y la precisión del color.\n- Mantener una apariencia premium y de alta gama.\n- Si aplica, sugerir un escenario sutil que enriquezca la historia del producto (por ejemplo, una encimera de cocina de lujo para una licuadora de gama alta).\n\n## Formato de Salida:\n- Escribe un único *prompt* de texto a imagen optimizado para un modelo de imagen profesional con IA.\n- Sé directo y descriptivo sin usar palabras innecesarias.\n- Evita repeticiones innecesarias o adjetivos que no aporten a la calidad de la imagen.\n- Asegúrate de que el *prompt* esté completo y listo para ser ingresado directamente en un modelo de IA.\n\n## Tono:\nProfesional, preciso, limpio y optimizado para máximo realismo e impacto comercial.\n\n# Ejemplo de Entrada:\n\"Un altavoz Bluetooth inalámbrico premium en negro mate, de forma cilíndrica, diseño moderno.\"\n\n# Ejemplo de Salida:\n\"Foto de producto hiperrealista de un altavoz Bluetooth inalámbrico premium en negro mate, con diseño cilíndrico moderno, centrado sobre un fondo de estudio blanco limpio, iluminación con softbox y sombras naturales, enfoque nítido en la textura y el material, toma publicitaria profesional minimalista.\"\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        440,
+        0
+      ],
+      "id": "9417259b-2d73-4b5b-a06c-9917a02ee488",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        360,
+        180
+      ],
+      "id": "586d9f19-f48e-46e1-99b6-4b4eea4b5bf6",
+      "name": "OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Google Drive').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        800,
+        0
+      ],
+      "id": "f68e4134-20ca-4964-abec-718735765ee5",
+      "name": "Google Drive1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "CmyDLQoxYdr0aKik",
+          "name": "Google Daniel Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/images/edits",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "image",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "prompt",
+              "value": "={{ $('AI Agent').item.json.output }}"
+            },
+            {
+              "name": "model",
+              "value": "gpt-image-1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1020,
+        0
+      ],
+      "id": "29c02025-ec2a-4be0-85b9-586cf6553c12",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "s6ob3o4picPojIGt",
+          "name": "Tavily"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data[0].b64_json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1240,
+        0
+      ],
+      "id": "85cfa02d-c29e-47ed-86d1-507cd24f866a",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.imgbb.com/1/upload",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "image",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        340
+      ],
+      "id": "113e5cca-b0a8-4c69-9fb6-1c33f17b401a",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.dev.runwayml.com/v1/image_to_video",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Runway-Version",
+              "value": "2024-11-06"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "promptImage",
+              "value": "={{ $json.data.url }}"
+            },
+            {
+              "name": "seed",
+              "value": "4294967295"
+            },
+            {
+              "name": "model",
+              "value": "gen4_turbo"
+            },
+            {
+              "name": "promptText",
+              "value": "=From the provided product photo, generate a premium marketing video with a smooth, continuous 360° turntable rotation around the product’s vertical axis. Ensure the product remains perfectly centered and fully visible at all times, with no zooms, pans, shakes, cuts, overlays, or flashy transitions. Focus on a clean, modern studio look—just a subtle, slow 3D rotation that highlights every detail.\n"
+            },
+            {
+              "name": "duration",
+              "value": "10"
+            },
+            {
+              "name": "ratio",
+              "value": "960:960"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        340
+      ],
+      "id": "1b2dc04d-6baa-4b66-b176-ce4f391c9b1d",
+      "name": "runway gen video",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "s6ob3o4picPojIGt",
+          "name": "Tavily"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.dev.runwayml.com/v1/tasks/{{ $json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Runway-Version",
+              "value": "2024-11-06"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        340
+      ],
+      "id": "effe1472-bc06-456e-a70c-6ec9cdbd38b6",
+      "name": "HTTP Request2",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "s6ob3o4picPojIGt",
+          "name": "Tavily"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        440,
+        340
+      ],
+      "id": "9e34e3f4-aaf8-447f-8b73-e1aa7bf2b1fb",
+      "name": "Wait",
+      "webhookId": "03cde0bb-48cc-4e4e-90c1-30e790053106"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "198c02e4-8d37-4a5b-8fa7-6edf2bea1a60",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "=RUNNING",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        940,
+        340
+      ],
+      "id": "f2a051b5-9689-4c32-9f6e-75643912cec1",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        940,
+        600
+      ],
+      "id": "97ad3c67-3628-4ef2-bc36-e91e21fb5e3d",
+      "name": "Wait1",
+      "webhookId": "1a2027c8-a974-4f82-9eb9-8db35cc76b6a"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.correo }}",
+        "subject": "video",
+        "message": "=runway: {{ $('HTTP Request2').item.json.output[0] }}\nopenai: {{ $('HTTP Request1').item.json.data.url }}\nnuestra imagen: {{ $('Google Drive').item.json.webViewLink }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1240,
+        260
+      ],
+      "id": "0eacd1bf-da21-4124-ac67-f7b7c97ae2a4",
+      "name": "Gmail",
+      "webhookId": "1135a980-42f9-47d1-a2b6-c84b0bfd6438",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BwWjplhZQVpEPVPV",
+          "name": "Gmail daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# 🛠️ Guía de Configuración\n\nSigue estos pasos para completar tu configuración:\n\n1.  **Conectar Credenciales de Google**\n    *   Permite el acceso a tu **Google Drive** y **Gmail**.\n\n2.  **Conectar Clave API de [OpenAI](https://platform.openai.com/docs/overview)**\n    *   Esto habilitará el modelo de chat para tu agente de IA.\n\n3.  **Conectar Clave API de [OpenAI](https://platform.openai.com/docs/overview)**\n    *   Requerida para la funcionalidad de la **API de Edición de Imágenes**.\n\n4.  **Conectar Clave API de [ImageBB](https://imgbb.com/)**\n    *   Necesaria para la solicitud HTTP y obtener la URL pública de la imagen.\n\n5.  **Conectar Clave API de [Runway](https://runwayml.com/api)**\n    *   Usada para **generar** y **obtener** los videos.\n\n---\n\n¡Una vez que todas las claves estén conectadas, estarás listo para comenzar a usar el sistema!",
+        "height": 620,
+        "width": 600,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        20
+      ],
+      "id": "eb807f99-f298-4c0e-a95b-0c7c5fd22d01",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Google Drive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "runway gen video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "runway gen video": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "734377c3-e00d-48b7-a495-04a0b8a30f0f",
+  "triggerCount": 0,
+  "tags": []
+}
