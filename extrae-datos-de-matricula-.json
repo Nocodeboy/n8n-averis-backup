@@ -1,0 +1,185 @@
+{
+  "createdAt": "2025-05-03T10:28:37.713Z",
+  "updatedAt": "2025-05-14T16:28:33.440Z",
+  "id": "PkmK9b5EzsdqMsmT",
+  "name": "Extrae datos de matricula",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}",
+        "messages": {
+          "messageValues": [
+            {
+              "type": "HumanMessagePromptTemplate",
+              "messageType": "imageBinary",
+              "binaryImageDataKey": "Image"
+            }
+          ]
+        }
+      },
+      "id": "c73f5edb-612a-45c1-bb42-a92f13b2ca8f",
+      "name": "Basic LLM Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        760,
+        -160
+      ],
+      "typeVersion": 1.5
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Extracted information:",
+        "completionMessage": "={{ $json.text }}",
+        "options": {
+          "formTitle": ""
+        }
+      },
+      "id": "243dd06e-4ad7-4a83-9807-04ad8bba4b31",
+      "name": "FormResultPage",
+      "type": "n8n-nodes-base.form",
+      "position": [
+        1120,
+        -160
+      ],
+      "webhookId": "218822fe-5eb9-4451-ae8a-14b8f484fdde",
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "model": "={{ $json.model }}",
+        "options": {}
+      },
+      "id": "6a3ec6ea-91a0-471f-9dab-049c7c22c4df",
+      "name": "OpenRouter LLM",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "position": [
+        840,
+        40
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "openRouterApi": {
+          "id": "TaWLwZCIMo3j9GPj",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1b8381dc-5b9a-42a2-8a67-cc706b433180",
+              "name": "model",
+              "type": "string",
+              "value": "openai/gpt-4o"
+            },
+            {
+              "id": "72aec130-ab56-4e61-b60b-9a31dd8d02e6",
+              "name": "prompt",
+              "type": "string",
+              "value": "Extract the number of the license plate on the front-most car depicted in the attached image and return only the extracted characters without any other text or structure."
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "91b65316-eabf-4684-8d3d-d2123960848d",
+      "name": "Settings",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        560,
+        -160
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "formTitle": "Analyse image",
+        "formDescription": "To analyse an image, upload it here.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Image",
+              "fieldType": "file",
+              "acceptFileTypes": ".jpg, .png",
+              "requiredField": true
+            }
+          ]
+        },
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "0324e57e-ce61-4821-9626-d43a35ece4ad",
+      "name": "FromTrigger",
+      "type": "n8n-nodes-base.formTrigger",
+      "position": [
+        340,
+        -160
+      ],
+      "webhookId": "41e3f34b-7abe-4c64-95cd-2942503d5e98",
+      "typeVersion": 2.2
+    }
+  ],
+  "connections": {
+    "Settings": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FromTrigger": {
+      "main": [
+        [
+          {
+            "node": "Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter LLM": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "FormResultPage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "88dacb8e-1372-4464-b2cf-6436e0b8518e",
+  "triggerCount": 0,
+  "tags": []
+}
