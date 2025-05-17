@@ -1,0 +1,221 @@
+{
+  "createdAt": "2025-04-29T12:59:52.129Z",
+  "updatedAt": "2025-04-30T06:34:00.962Z",
+  "id": "ZaLYXXDbD1tFexPT",
+  "name": "Tool Apertura de ticket",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7ab380a2-a8d3-421c-ab4e-748ea8fb7904",
+              "name": "response",
+              "value": "Unable to perform task. Please try again.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2cc5011c-833a-429c-8122-0b9afb376543",
+      "name": "Try Again",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "39c2f302-03be-4464-a17a-d7cc481d6d44",
+              "name": "=response",
+              "value": "={{$json.output}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "55f4a232-06f2-4260-a2df-7c00e5136b09",
+      "name": "Success",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "=daniel@averis.es",
+        "subject": "={{ $fromAI(\"subject\") }}",
+        "message": "={{ $fromAI(\"emailBody\") }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        -340,
+        320
+      ],
+      "id": "754b05bd-ea78-418c-b70e-a94cbc39462a",
+      "name": "Send Email",
+      "webhookId": "86c8c4b1-13bb-4ebe-acb9-30e1d7082d55",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BwWjplhZQVpEPVPV",
+          "name": "Gmail daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -840,
+        80
+      ],
+      "id": "2a51b6eb-12bb-4165-bfc1-4933b79fd385",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "o3-mini",
+          "mode": "list",
+          "cachedResultName": "o3-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -720,
+        320
+      ],
+      "id": "01fb8331-30bc-45ad-bb54-a3718446f397",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=# Overview\nYou are an email assistant, responsible for booking support tickets.\nTo book a support ticket you must send an email to [YOUR EMAIL] along with the details of the ticket. \n\n**Email Management Tools**   \n   - Use \"Send Email\" to send emails.  \n\n# Ticket Email Format \n\nYour ticket email should have the following format: \n\nsubject: New Support Ticket - {userName}\n\nbody: \n\n<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <title>New Support Ticket</title>\n</head>\n<body>\n  <p>A new support ticket has been created:</p>\n  <ul>\n    <li><strong>Name:</strong> {userName}</li>\n    <li><strong>Email Address:</strong> {emailAddress}</li>\n    <li><strong>Details:</strong> {userRequest}</li>\n  </ul>\n  <p>Please respond to the customer as soon as possible.</p>\n</body>\n</html>\n\n"
+        }
+      },
+      "id": "d66d77b2-a30b-4983-a1ba-29edabd9b476",
+      "name": "ticketAgent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        -600,
+        80
+      ],
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "connections": {
+    "Send Email": {
+      "ai_tool": [
+        [
+          {
+            "node": "ticketAgent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "ticketAgent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "ticketAgent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ticketAgent": {
+      "main": [
+        [
+          {
+            "node": "Success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Try Again",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "query": "Name: Johnson, Email: Johnson@gmail.com, Details: I'm looking for a job, can you hire me?"
+        }
+      }
+    ]
+  },
+  "versionId": "91b2ffe5-2125-4f43-9208-ed25430318d6",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-04-23T20:59:57.136Z",
+      "updatedAt": "2025-04-23T20:59:57.136Z",
+      "id": "Xq0NhXBZ2HnDESQS",
+      "name": "Agente"
+    },
+    {
+      "createdAt": "2025-04-29T11:53:17.305Z",
+      "updatedAt": "2025-04-29T11:53:17.305Z",
+      "id": "eThUEtA7WBZMFCSS",
+      "name": "Worker"
+    }
+  ]
+}
