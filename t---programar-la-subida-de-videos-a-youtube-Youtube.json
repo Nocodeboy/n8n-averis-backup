@@ -1,0 +1,373 @@
+{
+  "createdAt": "2025-04-29T17:30:00.677Z",
+  "updatedAt": "2025-04-29T17:30:39.298Z",
+  "id": "lMnpZwz8HvgV7Egh",
+  "name": "T - Programar la subida de Videos a Youtube",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "18sdSUo4_DAN6qKvcje8POwYJ7-uat32r_nZVqq31Rjg",
+          "mode": "list",
+          "cachedResultName": "YouTube Schedule",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18sdSUo4_DAN6qKvcje8POwYJ7-uat32r_nZVqq31Rjg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18sdSUo4_DAN6qKvcje8POwYJ7-uat32r_nZVqq31Rjg/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Date",
+              "lookupValue": "={{ DateTime.now().format('yyyy-MM-dd') }}"
+            },
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "Scheduled"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -680,
+        -160
+      ],
+      "id": "f6560dcc-f811-495d-8e41-9f1589880c12",
+      "name": "Google Sheets"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{ $json['Video Filename'] }}",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "1en0IFoCMpubibA1JxdWVH_SfA4krqNcl",
+            "mode": "list",
+            "cachedResultName": "Videos",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1en0IFoCMpubibA1JxdWVH_SfA4krqNcl"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -460,
+        -160
+      ],
+      "id": "6dc885a1-1873-4273-9ecd-9d3bb773856d",
+      "name": "Get Video File Id"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -900,
+        60
+      ],
+      "id": "d3f80de4-0977-4f19-bfa5-425b95fef244",
+      "name": "Download Video Data"
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "upload",
+        "title": "={{ $('Google Sheets').item.json.Title }}",
+        "regionCode": "US",
+        "categoryId": "28",
+        "options": {
+          "description": "={{ $('Google Sheets').item.json.Description }}",
+          "privacyStatus": "unlisted"
+        }
+      },
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        -680,
+        60
+      ],
+      "id": "00822aa4-8cb2-429d-b720-7529e9d4fc20",
+      "name": "Upload to YouTube"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "18sdSUo4_DAN6qKvcje8POwYJ7-uat32r_nZVqq31Rjg",
+          "mode": "list",
+          "cachedResultName": "YouTube Schedule",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18sdSUo4_DAN6qKvcje8POwYJ7-uat32r_nZVqq31Rjg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18sdSUo4_DAN6qKvcje8POwYJ7-uat32r_nZVqq31Rjg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Google Sheets').item.json.row_number }}",
+            "Status": "Uploaded"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Video Filename",
+              "displayName": "Video Filename",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -460,
+        60
+      ],
+      "id": "b10bb139-df4e-4165-9636-114a95bccee1",
+      "name": "Update Status"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "Videos - Posted",
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -900,
+        280
+      ],
+      "id": "b504b859-41b2-418a-a02f-a1b579aa1154",
+      "name": "Get Folder Name"
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Download Video Data').item.json.id }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -680,
+        280
+      ],
+      "id": "6c306d2a-39ee-4443-98d5-d296e7d474ce",
+      "name": "Move Video File to Folder"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9,12,15 * * 1-5"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -900,
+        -160
+      ],
+      "id": "561b4e07-2677-4659-8d70-af3d6ba6aa1f",
+      "name": "M-F 9am,12pm,3pm"
+    }
+  ],
+  "connections": {
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Get Video File Id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Video File Id": {
+      "main": [
+        [
+          {
+            "node": "Download Video Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Video Data": {
+      "main": [
+        [
+          {
+            "node": "Upload to YouTube",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to YouTube": {
+      "main": [
+        [
+          {
+            "node": "Update Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Status": {
+      "main": [
+        [
+          {
+            "node": "Get Folder Name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Folder Name": {
+      "main": [
+        [
+          {
+            "node": "Move Video File to Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "M-F 9am,12pm,3pm": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "064b5946-cf42-4b3a-af19-222a0cc6e5cb",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-04-29T17:30:10.868Z",
+      "updatedAt": "2025-04-29T17:30:10.868Z",
+      "id": "e3fgSwFGMK2mFM4N",
+      "name": "Youtube"
+    }
+  ]
+}
