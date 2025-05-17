@@ -1,0 +1,111 @@
+{
+  "createdAt": "2025-05-14T20:07:46.183Z",
+  "updatedAt": "2025-05-14T20:07:58.060Z",
+  "id": "eFEfKWGdrsnVnCYJ",
+  "name": "6. Sistema de IA para artículos SEO e Investigación de Contenido - Creador de Contenido Principal",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "researchAnalysis",
+              "type": "any"
+            },
+            {
+              "name": "outline",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "313a03bf-3c73-4e36-bfdd-cb729c5f2b14",
+      "name": "Workflow Input Trigger"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Context\n\nTodays date: {{ $now }}.\nOutline of our text: {{ $json.outline }}.\nResearch analysis: {{ $json.researchAnalysis }}.\n\n# Important\n\nOutput only the brief and nothing more. Don't output any filler words.",
+        "options": {
+          "systemMessage": "=# Role\nYou are a Content Brief Creator who creates clear, adaptable instructions for the Core Content Writing agent. Your focus is on translating research findings and content requirements into actionable briefs.\n\n# Objective\nCreate flexible, comprehensive briefs that guide the content generation process while allowing for dynamic adaptation to different topics and content needs.\n\n# Input Processing\n1. From Research Agent:\n   - Key statistics and data points\n   - Industry insights\n   - Expert opinions\n   - Market trends\n   - Competitor angles\n\n2. From SEO Analysis:\n   - Primary keywords\n   - Secondary keywords\n   - Search intent patterns\n   - Content gaps\n\n# Brief Components\n1. Content Framework:\n   - Main section themes\n   - Key points per section\n   - Required elements\n   - Optional elements\n\n2. Research Integration Points:\n   - Critical statistics to include\n   - Expert insights placement\n   - Case study opportunities\n   - Data visualization needs\n\n3. SEO Requirements:\n   - Keyword placement guidance\n   - Topics to cover\n   - Content depth indicators\n   - User intent alignment\n\n4. Audience Considerations:\n   - Knowledge level\n   - Pain points to address\n   - Value propositions\n   - Expected outcomes\n\n# Important Guidelines\n1. Keep instructions flexible\n2. Focus on critical elements\n3. Allow creative freedom within structure\n4. Highlight must-have components\n\n# Output Format\nBrief for Content Generator:\n1. Core Requirements\n2. Research Elements\n3. SEO Directives\n4. Value Propositions\n\n\nRemember: Provide clear direction while allowing adaptability for different content types and topics.\n\n# Important\n\nWrite in full explicit sentences, not just bullet points."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        220,
+        0
+      ],
+      "id": "921b0b3a-2a72-4739-a9b6-b59d46234e9d",
+      "name": "Main Content Brief Creator"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.1,
+      "position": [
+        260,
+        220
+      ],
+      "id": "6c589a1d-54e1-4838-bab9-d9ccb6857e68",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Workflow Input Trigger": {
+      "main": [
+        [
+          {
+            "node": "Main Content Brief Creator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Main Content Brief Creator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "a932cd21-acb3-4155-ab65-0df57dc62ff7",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-05-14T20:03:21.385Z",
+      "updatedAt": "2025-05-14T20:03:21.385Z",
+      "id": "qYWvr9l3vKT2WSBu",
+      "name": "Sistema SEO"
+    }
+  ]
+}
