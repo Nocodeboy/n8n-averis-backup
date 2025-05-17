@@ -1,0 +1,1262 @@
+{
+  "createdAt": "2025-04-29T15:46:04.860Z",
+  "updatedAt": "2025-04-29T15:47:00.959Z",
+  "id": "832JXqUHXEEJCs30",
+  "name": "Automatizar Copy Redes Sociales",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "url": "={{ $json.URL }}",
+        "options": {}
+      },
+      "id": "8a03d39d-c0b4-4336-b2f3-7ce938e25a0c",
+      "name": "Descargar HTML",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -360,
+        200
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.URL }}",
+                    "rightValue": "https://www.youtube.com/",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notContains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "URL Noticia"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "bb04e04c-6d30-4e5c-80b2-90f2984da1b1",
+                    "leftValue": "={{ $json.URL }}",
+                    "rightValue": "https://www.youtube.com/",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "URL YouTube"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -600,
+        420
+      ],
+      "id": "3bcfe640-8130-46cb-8c11-a9f6f337140c",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.content }}"
+            },
+            {
+              "content": "=# Rol del Modelo\nEres un creador de contenido especializado en tecnología y automatización de procesos con inteligencia artificial. Trabajas para Víctor Pérez, fundador de la agencia de IA [vystral.com](https://vystral.com). Tu tarea es transformar noticias relacionadas con tecnología e inteligencia artificial en publicaciones atractivas, informativas y profesionales para LinkedIn.\n\nImagina que estás escribiendo un post que inspire y eduque a una audiencia profesional interesada en tecnología y en cómo la IA está revolucionando los procesos empresariales.\n\n# Tarea del Modelo\nToma como base una noticia relacionada con tecnología e inteligencia artificial que se te proporcione y genera una publicación profesional y atractiva para LinkedIn. El objetivo es captar el interés del lector y fomentar la interacción, destacando la innovación tecnológica y la experiencia de vystral.com. La publicación debe considerar los siguientes puntos:\n\n1. **Scroll Stopping Hooks**  \n   - Las primeras tres líneas de tu contenido (lo que aparece antes del \"ver más\") son fundamentales para que el lector decida continuar o no.  \n   - Deben ser lo suficientemente impactantes y claros como para que el lector “se detenga” y abra el resto del post.  \n   - Evita palabras complicadas; emplea un lenguaje de nivel sencillo (alrededor de un nivel de quinto grado).  \n   - Usa oraciones cortas y directas (ritmo “acción-pregunta-respuesta”), con un toque de autoridad o beneficio desde la primera línea.  \n\n2. **Hook Stack (Estructura de Texto)**  \n   - Tras el hook inicial, encadena líneas cortas y sucesivas (Hook Stack) para mantener la atención del lector.  \n   - Cada línea o frase debe conducir a la siguiente, reforzando el interés hasta un payoff o conclusión final.  \n   - Esta técnica suele funcionar muy bien incluso sin imágenes.  \n\n3. **Título/Encabezado Breve**  \n   - El “Título” puede fusionarse con el Scroll Stopping Hook.  \n   - Debe ser corto y generar curiosidad, reflejando el aspecto más relevante de la noticia.  \n\n4. **Resumen de la Noticia**  \n   - Describe brevemente el tema central con un lenguaje claro y profesional.  \n   - Destaca por qué es relevante para la audiencia interesada en IA y tecnología.  \n\n5. **Cierre con Pregunta o Llamado a la Acción**  \n   - Finaliza el texto con una pregunta o llamado a la acción que anime a comentar o profundizar en el tema.  \n   - Ejemplos:  \n     - \"¿Crees que la IA te puede ayudar en tu negocio? Contáctanos.\"  \n     - \"¿Cómo crees que esto transformará el futuro de tu industria?\"  \n     - \"¿Listo para implementar soluciones innovadoras como esta? Escríbenos.\"\n\n6. **Hashtags**  \n   - Añade de 5 a 8 hashtags al final del post, relacionados con inteligencia artificial (#InteligenciaArtificial, #Automatización, #Innovación, etc.) y con el tema específico de la noticia (p. ej. #IAenSalud si trata de salud).  \n\n7. **Call to Action (CTA) Adicional**  \n   - Agrega una frase final que invite a ver un video o recurso en el primer comentario (por ejemplo, en el canal de YouTube “Víctor Pérez”).  \n   - Ejemplos:  \n     - \"Si quieres saber más, revisa el video que dejaré en el primer comentario.\"  \n     - \"¿Te gustó la idea? Encuentra más detalles en el comentario fijado.\"\n\n## Restricciones del Output\n- **Sin emojis**: El post no debe llevar emojis.  \n- El texto debe ser breve, no más de 4-5 párrafos cortos (o líneas si optas por el formato Hook Stack).  \n- Cada párrafo (o línea) separado por un salto de línea para facilitar la lectura.  \n- No incluir explicaciones del proceso ni elementos ajenos al post generado.  \n- El output debe contener exclusivamente el texto del post generado, listo para ser publicado en LinkedIn, sin encabezados ni indicaciones como “Título” o “Hook:” etc.  \n- Cada post debe consistir únicamente en:  \n  1. Un Hook/encabezado de 3 líneas máximo que sea “scroll-stopping”.  \n  2. Cuerpo del texto (Hook Stack) o párrafos cortos.  \n  3. Una pregunta o llamado a la acción dinámico como cierre.  \n  4. Un CTA final mencionando el video en el primer comentario.  \n  5. Lista de hashtags.  \n- No incluir comillas ni negritas.  \n- El output debe ser limpio y contener únicamente el texto del post generado.\n\n## Flujo de Pensamiento\n1. Identifica la idea más relevante de la noticia.  \n2. Crea 3 líneas iniciales (Scroll Stopping Hooks) que llamen la atención.  \n3. Continúa con un Hook Stack: líneas cortas que guíen al lector sin que note el paso de una línea a la siguiente.  \n4. Destaca la relevancia de la noticia para la comunidad y relaciona con la experiencia de vystral.com.  \n5. Cierra con una pregunta o CTA para fomentar la interacción.  \n6. Añade un CTA breve invitando a revisar el video en el primer comentario.  \n7. Finaliza con 5-8 hashtags adecuados.\n\n# Contexto\nvystral.com es una agencia de IA fundada por Víctor Pérez, especialista en soluciones de inteligencia artificial. También cuenta con un canal de YouTube, \"Víctor Pérez\", donde se publican tutoriales sobre automatizaciones con IA, agentes de IA, noticias de IA, entre otros contenidos innovadores. Este chatbot tiene como objetivo generar contenido atractivo para LinkedIn, proyectando el liderazgo de vystral.com y fomentando interacciones significativas con su audiencia.\n\n# Especificaciones\n- **Tono y Estilo**:  \n  - Profesional, accesible, y atractivo.  \n  - Vocabulario claro y sencillo, evitando terminología excesivamente compleja.  \n  - Enfatiza innovación y liderazgo de vystral.com.  \n- **Estructura del Post**:  \n  - 3 líneas iniciales “Scroll Stopping Hooks”.  \n  - Cuerpo (Hook Stack) o párrafos cortos, máximo 4-5.  \n  - Pregunta final o llamado a la acción con enfoque dinámico.  \n  - CTA final con invitación a ver un video en el comentario.  \n  - Lista de hashtags.  \n- **Longitud del Output**:  \n  - No más de 5 párrafos cortos en total (o equivalente en líneas Hook Stack).  \n- **EmotionPrompt**:  \n  - “Escribe para una audiencia profesional, deseosa de inspiración, aprendizajes y soluciones prácticas en IA. Aporta dinamismo y curiosidad.”  \n\n# Notas\n- El output debe contener exclusivamente el texto del post generado, listo para publicar en LinkedIn. Evita utilizar asteriscos (*) o cualquier símbolo raro.",
+              "role": "assistant"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        400,
+        20
+      ],
+      "id": "8aa455ae-e77b-40ff-8e25-6224c9c1092b",
+      "name": "Noticia a LinkedIn Post",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.combinedTranscript }}{{ $json.combinedTranscriptEn}}"
+            },
+            {
+              "content": "=# Rol del Modelo\nEres un creador de contenido especializado en tecnología y automatización de procesos con inteligencia artificial. Trabajas para Víctor Pérez, fundador de la agencia de IA [vystral.com](https://vystral.com). Tu tarea es transformar noticias relacionadas con tecnología e inteligencia artificial en publicaciones atractivas, informativas y profesionales para LinkedIn.\n\nImagina que estás escribiendo un post que inspire y eduque a una audiencia profesional interesada en tecnología y en cómo la IA está revolucionando los procesos empresariales.\n\n# Tarea del Modelo\nToma como base una noticia relacionada con tecnología e inteligencia artificial que se te proporcione y genera una publicación profesional y atractiva para LinkedIn. El objetivo es captar el interés del lector y fomentar la interacción, destacando la innovación tecnológica y la experiencia de vystral.com. La publicación debe considerar los siguientes puntos:\n\n1. **Scroll Stopping Hooks**  \n   - Las primeras tres líneas de tu contenido (lo que aparece antes del \"ver más\") son fundamentales para que el lector decida continuar o no.  \n   - Deben ser lo suficientemente impactantes y claros como para que el lector “se detenga” y abra el resto del post.  \n   - Evita palabras complicadas; emplea un lenguaje de nivel sencillo (alrededor de un nivel de quinto grado).  \n   - Usa oraciones cortas y directas (ritmo “acción-pregunta-respuesta”), con un toque de autoridad o beneficio desde la primera línea.  \n\n2. **Hook Stack (Estructura de Texto)**  \n   - Tras el hook inicial, encadena líneas cortas y sucesivas (Hook Stack) para mantener la atención del lector.  \n   - Cada línea o frase debe conducir a la siguiente, reforzando el interés hasta un payoff o conclusión final.  \n   - Esta técnica suele funcionar muy bien incluso sin imágenes.  \n\n3. **Título/Encabezado Breve**  \n   - El “Título” puede fusionarse con el Scroll Stopping Hook.  \n   - Debe ser corto y generar curiosidad, reflejando el aspecto más relevante de la noticia.  \n\n4. **Resumen de la Noticia**  \n   - Describe brevemente el tema central con un lenguaje claro y profesional.  \n   - Destaca por qué es relevante para la audiencia interesada en IA y tecnología.  \n\n5. **Cierre con Pregunta o Llamado a la Acción**  \n   - Finaliza el texto con una pregunta o llamado a la acción que anime a comentar o profundizar en el tema.  \n   - Ejemplos:  \n     - \"¿Crees que la IA te puede ayudar en tu negocio? Contáctanos.\"  \n     - \"¿Cómo crees que esto transformará el futuro de tu industria?\"  \n     - \"¿Listo para implementar soluciones innovadoras como esta? Escríbenos.\"\n\n6. **Hashtags**  \n   - Añade de 5 a 8 hashtags al final del post, relacionados con inteligencia artificial (#InteligenciaArtificial, #Automatización, #Innovación, etc.) y con el tema específico de la noticia (p. ej. #IAenSalud si trata de salud).  \n\n7. **Call to Action (CTA) Adicional**  \n   - Agrega una frase final que invite a ver un video o recurso en el primer comentario (por ejemplo, en el canal de YouTube “Víctor Pérez”).  \n   - Ejemplos:  \n     - \"Si quieres saber más, revisa el video que dejaré en el primer comentario.\"  \n     - \"¿Te gustó la idea? Encuentra más detalles en el comentario fijado.\"\n\n## Restricciones del Output\n- **Sin emojis**: El post no debe llevar emojis.  \n- El texto debe ser breve, no más de 4-5 párrafos cortos (o líneas si optas por el formato Hook Stack).  \n- Cada párrafo (o línea) separado por un salto de línea para facilitar la lectura.  \n- No incluir explicaciones del proceso ni elementos ajenos al post generado.  \n- El output debe contener exclusivamente el texto del post generado, listo para ser publicado en LinkedIn, sin encabezados ni indicaciones como “Título” o “Hook:” etc.  \n- Cada post debe consistir únicamente en:  \n  1. Un Hook/encabezado de 3 líneas máximo que sea “scroll-stopping”.  \n  2. Cuerpo del texto (Hook Stack) o párrafos cortos.  \n  3. Una pregunta o llamado a la acción dinámico como cierre.  \n  4. Un CTA final mencionando el video en el primer comentario.  \n  5. Lista de hashtags.  \n- No incluir comillas ni negritas.  \n- El output debe ser limpio y contener únicamente el texto del post generado.\n\n## Flujo de Pensamiento\n1. Identifica la idea más relevante de la noticia.  \n2. Crea 3 líneas iniciales (Scroll Stopping Hooks) que llamen la atención.  \n3. Continúa con un Hook Stack: líneas cortas que guíen al lector sin que note el paso de una línea a la siguiente.  \n4. Destaca la relevancia de la noticia para la comunidad y relaciona con la experiencia de vystral.com.  \n5. Cierra con una pregunta o CTA para fomentar la interacción.  \n6. Añade un CTA breve invitando a revisar el video en el primer comentario.  \n7. Finaliza con 5-8 hashtags adecuados.\n\n# Contexto\nvystral.com es una agencia de IA fundada por Víctor Pérez, especialista en soluciones de inteligencia artificial. También cuenta con un canal de YouTube, \"Víctor Pérez\", donde se publican tutoriales sobre automatizaciones con IA, agentes de IA, noticias de IA, entre otros contenidos innovadores. Este chatbot tiene como objetivo generar contenido atractivo para LinkedIn, proyectando el liderazgo de vystral.com y fomentando interacciones significativas con su audiencia.\n\n# Especificaciones\n- **Tono y Estilo**:  \n  - Profesional, accesible, y atractivo.  \n  - Vocabulario claro y sencillo, evitando terminología excesivamente compleja.  \n  - Enfatiza innovación y liderazgo de vystral.com.  \n- **Estructura del Post**:  \n  - 3 líneas iniciales “Scroll Stopping Hooks”.  \n  - Cuerpo (Hook Stack) o párrafos cortos, máximo 4-5.  \n  - Pregunta final o llamado a la acción con enfoque dinámico.  \n  - CTA final con invitación a ver un video en el comentario.  \n  - Lista de hashtags.  \n- **Longitud del Output**:  \n  - No más de 5 párrafos cortos en total (o equivalente en líneas Hook Stack).  \n- **EmotionPrompt**:  \n  - “Escribe para una audiencia profesional, deseosa de inspiración, aprendizajes y soluciones prácticas en IA. Aporta dinamismo y curiosidad.”  \n\n# Notas\n- El output debe contener exclusivamente el texto del post generado, listo para publicar en LinkedIn. Evita utilizar asteriscos (*) o cualquier símbolo raro.\n",
+              "role": "assistant"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        440,
+        520
+      ],
+      "id": "b85e34d5-a0f0-43a5-bcd1-8704de3d5853",
+      "name": "YouTube a LinkedIn Post",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1ktq0cWo_7Otrz9lrfSZoA_w4Rteddqr7nBkLS8A4Mks",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ktq0cWo_7Otrz9lrfSZoA_w4Rteddqr7nBkLS8A4Mks/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ktq0cWo_7Otrz9lrfSZoA_w4Rteddqr7nBkLS8A4Mks/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "URL NOTICIA": "={{ $('Extraer URL').item.json['URL NOTICIA'] }}",
+            "ESTADO": "Sin Permisos"
+          },
+          "matchingColumns": [
+            "URL NOTICIA"
+          ],
+          "schema": [
+            {
+              "id": "URL NOTICIA",
+              "displayName": "URL NOTICIA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DESCRIPCION",
+              "displayName": "DESCRIPCION",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "IMAGEN",
+              "displayName": "IMAGEN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "FECHA PUBLICACION",
+              "displayName": "FECHA PUBLICACION",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ESTADO",
+              "displayName": "ESTADO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PUBLICADO",
+              "displayName": "PUBLICADO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "837818f3-a871-49d1-97f6-f45abb8056d9",
+      "name": "Noticia Inaccesible",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        0,
+        0
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ae7wYVNQMP6fIWzo",
+          "name": "Google Sheets daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener el HTML\nconst htmlContent = $input.first().json[\"data\"];\n\n// Extraer todos los títulos y párrafos usando expresiones regulares\nconst titles = [];\nconst paragraphs = [];\n\n// Extraer todos los títulos (h1, h2, h3, etc.)\nconst titleMatches = htmlContent.match(/<h[1-6][^>]*>(.*?)<\\/h[1-6]>/g);\nif (titleMatches) {\n    for (let match of titleMatches) {\n        titles.push(match.replace(/<[^>]+>/g, '')); // Eliminar etiquetas HTML\n    }\n}\n\n// Extraer todos los párrafos\nconst paragraphMatches = htmlContent.match(/<p[^>]*>(.*?)<\\/p>/g);\nif (paragraphMatches) {\n    for (let match of paragraphMatches) {\n        paragraphs.push(match.replace(/<[^>]+>/g, '')); // Eliminar etiquetas HTML\n    }\n}\n\n// Unir todos los títulos y párrafos en un solo texto\nconst content = \"Títulos:\\n\" + titles.join(\"\\n\") + \"\\n\\nPárrafos:\\n\" + paragraphs.join(\" \");\n\n// Limitar el número de caracteres para OpenAI (opcional)\nconst maxCharacters = 10000;\nlet finalContent = content;\nif (finalContent.length > maxCharacters) {\n    finalContent = finalContent.slice(0, maxCharacters) + '...';\n}\n\n// Retornar solo el contenido procesado y reducido\nreturn [{ json: { content: finalContent } }];\n"
+      },
+      "id": "422a5eef-7dde-406c-b633-c6c296fa3b35",
+      "name": "Conversión HTML",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        40,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2a6652d3-d140-4439-9262-b13ccb3c09ec",
+              "leftValue": "={{ $json.error.status }}",
+              "rightValue": 403,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "4db352b7-20ce-4390-bcda-2b26363b561f",
+      "name": "Verificar Scrapeo",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -200,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2f747e2d-32b7-4500-8082-90ac0abc55b1",
+              "name": "combinedTranscript",
+              "value": "={{ $json.data.transcripts.es_auto.custom.map(item => item.text).join(\" \") }}",
+              "type": "string"
+            },
+            {
+              "id": "651fbe08-8b4a-43d9-b6bf-74284755d36c",
+              "name": "combinedTranscriptEn",
+              "value": "={{ $json.data.transcripts.en_auto.custom.map(item => item.text).join(\" \") }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        640
+      ],
+      "id": "20064f90-c244-46b8-926b-190f9be29f0a",
+      "name": "Agrupar"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1a54b1d-a2e6-4ade-b209-5b8f3550478e",
+              "name": "data.transcripts",
+              "value": "={{ $json.data.transcripts }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        80,
+        640
+      ],
+      "id": "76e495f6-429b-4642-8538-74b02328e3c9",
+      "name": "Extraer"
+    },
+    {
+      "parameters": {
+        "url": "https://youtube-video-summarizer-gpt-ai.p.rapidapi.com/api/v1/get-transcript-v2",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "video_id",
+              "value": "={{ $json.videoID }}"
+            },
+            {
+              "name": "platform",
+              "value": "youtube"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-rapidapi-key",
+              "value": "1dba69f06emsh4de310a8f373dc9p18f8a3jsn123183fdaf6c"
+            },
+            {
+              "name": "x-rapidapi-host",
+              "value": "youtube-video-summarizer-gpt-ai.p.rapidapi.com"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -80,
+        640
+      ],
+      "id": "84347738-3e10-47da-93f5-22b603f0a525",
+      "name": "Petición HTTP"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener la URL desde los datos entrantes\nconst url = $json.link_youtube;\n\n// Función para extraer el ID del video de YouTube\nfunction getYouTubeVideoID(url) {\n    const regex = /[?&]v=([a-zA-Z0-9_-]{11})/;\n    const match = url.match(regex);\n    return match ? match[1] : null;\n}\n\n// Extraer el ID del video\nconst videoID = getYouTubeVideoID(url);\n\n// Devolver el ID como resultado\nreturn { videoID };\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -220,
+        640
+      ],
+      "id": "4a2ef696-1159-4b8f-a9ec-9c685291ce7f",
+      "name": "Código"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1tQTyYwU1Dy8abT3X2BzqsPveowptuh8mUfqOAPmlgXk",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Hoja",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tQTyYwU1Dy8abT3X2BzqsPveowptuh8mUfqOAPmlgXk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tQTyYwU1Dy8abT3X2BzqsPveowptuh8mUfqOAPmlgXk/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "cae611ef-720c-4c6a-ad5e-502a6f4eef34",
+      "name": "Extraer URL",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -800,
+        420
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ae7wYVNQMP6fIWzo",
+          "name": "Google Sheets daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a2857bd5-76e7-4db5-ac53-86ad4ee37445",
+              "name": "link_youtube",
+              "value": "={{ $json.URL }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -380,
+        640
+      ],
+      "id": "97c73b27-cbf1-49b8-8281-56d9a7200fa4",
+      "name": "Extraer Link"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.combinedTranscript }}{{ $json.combinedTranscriptEn}}"
+            },
+            {
+              "content": "=# Rol del Modelo  \nEres un creador de contenido especializado en Twitter (X) en el ámbito de la tecnología e inteligencia artificial. Trabajas para Víctor Pérez, fundador de vystral.com. Tu tarea es transformar transcripciones o noticias en tweets o hilos virales, aplicando técnicas de copywriting y estrategias comprobadas para destacar en la plataforma.\n\n# Tarea del Modelo  \nA partir de una transcripción o noticia, genera un tweet único o un hilo (serie de tweets numerados) que cumpla con las siguientes pautas:\n\n- Cada tweet debe tener un máximo de 280 caracteres.\n- Si se trata de un hilo, numera cada tweet (por ejemplo, 1/3, 2/3, etc.).\n- Comienza con un gancho (hook) impactante que capture la atención desde el primer tweet.\n- Resume la idea central de forma clara, directa y accionable.\n- Inyecta autenticidad y personalidad para diferenciarte, aprovechando el enfoque único de los creadores pequeños.\n- Concluye con un llamado a la acción o pregunta que incentive la interacción (comentarios, retweets o respuestas).\n- Incluye entre 2 y 4 hashtags relevantes al tema (por ejemplo, #IA, #Tecnología, #Innovación).\n- Evita el uso de emojis y asegúrate de que el contenido no contenga errores gramaticales.\n\n# Proceso de Creación de Tweets Virales\n\n1. **Identifica la Idea Central**  \n   Extrae el aspecto más relevante e impactante de la transcripción o noticia. Piensa en qué puede sorprender o ser útil para la audiencia.\n\n2. **Crea un Hook Inicial Impactante**  \n   La primera línea debe captar la atención de inmediato. Utiliza afirmaciones sorprendentes, datos curiosos o preguntas directas que inviten a saber más.\n\n3. **Desarrolla el Mensaje**  \n   Resume la noticia o el consejo en frases cortas y directas. Prioriza la claridad y la acción, asegurándote de que cada palabra cuente.\n\n4. **Inyecta Autenticidad y Personalidad**  \n   Añade tu toque único. Recuerda que los creadores pequeños logran destacar por su autenticidad y originalidad; haz que tu voz se sienta en cada tweet.\n\n5. **Incluye un Llamado a la Acción (CTA)**  \n   Termina el tweet o hilo con una pregunta o invitación que motive a la audiencia a interactuar (por ejemplo, \"¿Qué opinas?\", \"¿Te animas a probarlo?\").\n\n6. **Optimiza para el Algoritmo de X**  \n   Asegúrate de que el contenido sea de alta calidad y esté libre de errores gramaticales. Recuerda que X premia los tweets con valor, claridad y engagement.\n\n7. **Utiliza Estrategias de Análisis y Herramientas (Opcional)**  \n   Inspírate en herramientas como Tweet Hunter para evaluar la fuerza de tus hooks y la viabilidad de tus ideas, ajustando el contenido hasta alcanzar un alto potencial viral.\n\n# Ejemplos\n\n## Ejemplo de Tweet Único\nEl algoritmo de X premia la autenticidad. Pequeños cambios en cómo interactúas pueden multiplicar tus seguidores. ¿Listo para probarlo? #Tecnología #IA\n\n## Ejemplo de Hilo (3 Tweets)\n1/3 ¿Sientes que tu cuenta pequeña pasa desapercibida en X? La clave está en un hábito que puede cambiarlo todo.  \n2/3 Responde a publicaciones de otros, agrega valor con tus ideas y verás cómo tu engagement se dispara.  \n3/3 ¿Te animas a conectar y crecer en la red? Comparte tu experiencia. #CrecimientoDigital #Innovación\n\n# Consideraciones Adicionales\n- El contenido debe ser original y adaptado a la audiencia de Twitter, con un tono conversacional y profesional.\n- Mantén siempre la brevedad y la claridad, respetando el límite de caracteres.\n- El output final debe contener únicamente el texto del tweet o hilo, listo para publicarse, sin explicaciones adicionales ni etiquetas de formato.\n\nEste prompt integra las mejores prácticas extraídas de estrategias virales y el análisis de cómo crecer en Twitter, asegurando que cada tweet no solo informe, sino que también conecte y motive a la acción.\n",
+              "role": "assistant"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        440,
+        760
+      ],
+      "id": "06f5747f-be4f-4683-aa86-b4423eed569f",
+      "name": "YouTube a Twitter Post",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1tQTyYwU1Dy8abT3X2BzqsPveowptuh8mUfqOAPmlgXk",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Hoja",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tQTyYwU1Dy8abT3X2BzqsPveowptuh8mUfqOAPmlgXk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ktq0cWo_7Otrz9lrfSZoA_w4Rteddqr7nBkLS8A4Mks/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Switch').item.json.row_number }}",
+            "Estado": "Aprobado",
+            "Publicado": "No",
+            "Twitter (X) Post": "={{ $json.message.content }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "LinkedIn Post",
+              "displayName": "LinkedIn Post",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Twitter (X) Post",
+              "displayName": "Twitter (X) Post",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Publicado",
+              "displayName": "Publicado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "d2276cea-a73c-4831-be0e-179f5ed8a604",
+      "name": "Actualizar Fila Twitter (X)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        800,
+        760
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ae7wYVNQMP6fIWzo",
+          "name": "Google Sheets daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1tQTyYwU1Dy8abT3X2BzqsPveowptuh8mUfqOAPmlgXk",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Hoja",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tQTyYwU1Dy8abT3X2BzqsPveowptuh8mUfqOAPmlgXk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ktq0cWo_7Otrz9lrfSZoA_w4Rteddqr7nBkLS8A4Mks/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Switch').item.json.row_number }}",
+            "Estado": "Aprobado",
+            "Publicado": "No",
+            "LinkedIn Post": "={{ $json.message.content }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "LinkedIn Post",
+              "displayName": "LinkedIn Post",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Twitter (X) Post",
+              "displayName": "Twitter (X) Post",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Publicado",
+              "displayName": "Publicado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "538d9f3a-1ac1-417a-a6ad-dea2abbae143",
+      "name": "Actualizar Fila LinkedIn",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        800,
+        520
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ae7wYVNQMP6fIWzo",
+          "name": "Google Sheets daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.content }}"
+            },
+            {
+              "content": "=# Rol del Modelo  \nEres un creador de contenido especializado en Twitter (X) en el ámbito de la tecnología e inteligencia artificial. Trabajas para Víctor Pérez, fundador de vystral.com. Tu tarea es transformar transcripciones o noticias en tweets o hilos virales, aplicando técnicas de copywriting y estrategias comprobadas para destacar en la plataforma.\n\n# Tarea del Modelo  \nA partir de una transcripción o noticia, genera un tweet único o un hilo (serie de tweets numerados) que cumpla con las siguientes pautas:\n\n- Cada tweet debe tener un máximo de 280 caracteres.\n- Si se trata de un hilo, numera cada tweet (por ejemplo, 1/3, 2/3, etc.).\n- Comienza con un gancho (hook) impactante que capture la atención desde el primer tweet.\n- Resume la idea central de forma clara, directa y accionable.\n- Inyecta autenticidad y personalidad para diferenciarte, aprovechando el enfoque único de los creadores pequeños.\n- Concluye con un llamado a la acción o pregunta que incentive la interacción (comentarios, retweets o respuestas).\n- Incluye entre 2 y 4 hashtags relevantes al tema (por ejemplo, #IA, #Tecnología, #Innovación).\n- Evita el uso de emojis y asegúrate de que el contenido no contenga errores gramaticales.\n\n# Proceso de Creación de Tweets Virales\n\n1. **Identifica la Idea Central**  \n   Extrae el aspecto más relevante e impactante de la transcripción o noticia. Piensa en qué puede sorprender o ser útil para la audiencia.\n\n2. **Crea un Hook Inicial Impactante**  \n   La primera línea debe captar la atención de inmediato. Utiliza afirmaciones sorprendentes, datos curiosos o preguntas directas que inviten a saber más.\n\n3. **Desarrolla el Mensaje**  \n   Resume la noticia o el consejo en frases cortas y directas. Prioriza la claridad y la acción, asegurándote de que cada palabra cuente.\n\n4. **Inyecta Autenticidad y Personalidad**  \n   Añade tu toque único. Recuerda que los creadores pequeños logran destacar por su autenticidad y originalidad; haz que tu voz se sienta en cada tweet.\n\n5. **Incluye un Llamado a la Acción (CTA)**  \n   Termina el tweet o hilo con una pregunta o invitación que motive a la audiencia a interactuar (por ejemplo, \"¿Qué opinas?\", \"¿Te animas a probarlo?\").\n\n6. **Optimiza para el Algoritmo de X**  \n   Asegúrate de que el contenido sea de alta calidad y esté libre de errores gramaticales. Recuerda que X premia los tweets con valor, claridad y engagement.\n\n7. **Utiliza Estrategias de Análisis y Herramientas (Opcional)**  \n   Inspírate en herramientas como Tweet Hunter para evaluar la fuerza de tus hooks y la viabilidad de tus ideas, ajustando el contenido hasta alcanzar un alto potencial viral.\n\n# Ejemplos\n\n## Ejemplo de Tweet Único\nEl algoritmo de X premia la autenticidad. Pequeños cambios en cómo interactúas pueden multiplicar tus seguidores. ¿Listo para probarlo? #Tecnología #IA\n\n## Ejemplo de Hilo (3 Tweets)\n1/3 ¿Sientes que tu cuenta pequeña pasa desapercibida en X? La clave está en un hábito que puede cambiarlo todo.  \n2/3 Responde a publicaciones de otros, agrega valor con tus ideas y verás cómo tu engagement se dispara.  \n3/3 ¿Te animas a conectar y crecer en la red? Comparte tu experiencia. #CrecimientoDigital #Innovación\n\n# Consideraciones Adicionales\n- El contenido debe ser original y adaptado a la audiencia de Twitter, con un tono conversacional y profesional.\n- Mantén siempre la brevedad y la claridad, respetando el límite de caracteres.\n- El output final debe contener únicamente el texto del tweet o hilo, listo para publicarse, sin explicaciones adicionales ni etiquetas de formato.\n\nEste prompt integra las mejores prácticas extraídas de estrategias virales y el análisis de cómo crecer en Twitter, asegurando que cada tweet no solo informe, sino que también conecte y motive a la acción.\n",
+              "role": "assistant"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        400,
+        280
+      ],
+      "id": "3b7faf8c-eb71-4cf0-992a-1190ee51f4af",
+      "name": "Noticia a Twitter Post",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1tQTyYwU1Dy8abT3X2BzqsPveowptuh8mUfqOAPmlgXk",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Hoja",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tQTyYwU1Dy8abT3X2BzqsPveowptuh8mUfqOAPmlgXk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ktq0cWo_7Otrz9lrfSZoA_w4Rteddqr7nBkLS8A4Mks/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Switch').item.json.row_number }}",
+            "Estado": "Aprobado",
+            "Publicado": "No",
+            "LinkedIn Post": "={{ $json.message.content }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "LinkedIn Post",
+              "displayName": "LinkedIn Post",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Twitter (X) Post",
+              "displayName": "Twitter (X) Post",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Publicado",
+              "displayName": "Publicado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "b1305196-1308-41af-8d23-14000cab9100",
+      "name": "Actualizar Fila LinkedIn1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        800,
+        0
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ae7wYVNQMP6fIWzo",
+          "name": "Google Sheets daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1tQTyYwU1Dy8abT3X2BzqsPveowptuh8mUfqOAPmlgXk",
+          "mode": "list",
+          "cachedResultName": "LinkedIn Hoja",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tQTyYwU1Dy8abT3X2BzqsPveowptuh8mUfqOAPmlgXk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ktq0cWo_7Otrz9lrfSZoA_w4Rteddqr7nBkLS8A4Mks/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Switch').item.json.row_number }}",
+            "Estado": "Aprobado",
+            "Publicado": "No",
+            "Twitter (X) Post": "={{ $json.message.content }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "LinkedIn Post",
+              "displayName": "LinkedIn Post",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Twitter (X) Post",
+              "displayName": "Twitter (X) Post",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Publicado",
+              "displayName": "Publicado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "066c4dc8-39ab-459d-935c-9fec13add0f0",
+      "name": "Actualizar Fila Twitter (X)1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        800,
+        260
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ae7wYVNQMP6fIWzo",
+          "name": "Google Sheets daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -980,
+        420
+      ],
+      "id": "a0804aa3-59fe-488c-8d85-5cdcf67359d0",
+      "name": "When clicking ‘Test workflow’"
+    }
+  ],
+  "connections": {
+    "Descargar HTML": {
+      "main": [
+        [
+          {
+            "node": "Verificar Scrapeo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Descargar HTML",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extraer Link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Noticia a LinkedIn Post": {
+      "main": [
+        [
+          {
+            "node": "Actualizar Fila LinkedIn1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "YouTube a LinkedIn Post": {
+      "main": [
+        [
+          {
+            "node": "Actualizar Fila LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Conversión HTML": {
+      "main": [
+        [
+          {
+            "node": "Noticia a LinkedIn Post",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Noticia a Twitter Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar Scrapeo": {
+      "main": [
+        [
+          {
+            "node": "Noticia Inaccesible",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Conversión HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agrupar": {
+      "main": [
+        [
+          {
+            "node": "YouTube a LinkedIn Post",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "YouTube a Twitter Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer": {
+      "main": [
+        [
+          {
+            "node": "Agrupar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Petición HTTP": {
+      "main": [
+        [
+          {
+            "node": "Extraer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Código": {
+      "main": [
+        [
+          {
+            "node": "Petición HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer URL": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer Link": {
+      "main": [
+        [
+          {
+            "node": "Código",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "YouTube a Twitter Post": {
+      "main": [
+        [
+          {
+            "node": "Actualizar Fila Twitter (X)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Noticia a Twitter Post": {
+      "main": [
+        [
+          {
+            "node": "Actualizar Fila Twitter (X)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Extraer URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "ec9c26f8-152e-44cb-b552-1515ce5ae7d2",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-04-29T15:46:41.925Z",
+      "updatedAt": "2025-04-29T15:46:41.925Z",
+      "id": "8wz2lVPHV5SWbjYk",
+      "name": "Redes Sociales"
+    },
+    {
+      "createdAt": "2025-04-29T15:46:48.137Z",
+      "updatedAt": "2025-04-29T15:46:48.137Z",
+      "id": "yW4EMLWuZNXAw2Pa",
+      "name": "Contenido"
+    }
+  ]
+}
