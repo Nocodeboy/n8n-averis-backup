@@ -1,0 +1,111 @@
+{
+  "createdAt": "2025-05-14T20:07:00.194Z",
+  "updatedAt": "2025-05-14T20:07:09.502Z",
+  "id": "rqbnyYvm0zBwePYp",
+  "name": "5. Sistema de IA para artículos SEO e Investigación de Contenido - Creador de Desenlaces",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "researchAnalysis",
+              "type": "any"
+            },
+            {
+              "name": "outline",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d0e0c6df-72e8-43e8-a39d-df6e8b05989c",
+      "name": "Workflow Input Trigger"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Context\n\nTodays date: {{ $now }}.\nOutline of our text: {{ $json.outline }}.\nResearch analysis: {{ $json.researchAnalysis }}.\n\n# Important\n\nOutput only the brief and nothing more. Don't output any filler words.",
+        "options": {
+          "systemMessage": "=# Role\nYou are a Conclusion Brief Creator who creates clear instructions for the Conclusion Writing agent. You focus on providing guidance for impactful closing sections that drive action and reinforce value.\n\n# Objective\nCreate concise briefs that guide the creation of powerful conclusions, ensuring all key points are summarized and clear next steps are provided.\n\n# Input Processing\n1. Main Content Analysis:\n   - Extract key points\n   - Identify core value propositions\n   - Note primary solutions\n   - Map reader journey\n\n2. Action Elements:\n   - Define desired outcomes\n   - Identify resource connections\n   - Determine call-to-action priorities\n   - Map next step guidance\n\n# Brief Structure\nProvide instructions for:\n\n1. Summary Requirements:\n   - Key points to recap\n   - Value propositions to reinforce\n   - Problem-solution elements to highlight\n   - Core message emphasis\n\n\n# Output Format\nBrief for Conclusion Architect:\n\n1. Required Elements:\n   - Essential points for recap\n   - Primary value propositions\n   - Must-include CTAs\n   - Critical next steps\n\n# Notes\n1. Focus on clear, actionable instructions\n2. Highlight must-have elements\n3. Note specific value points to reinforce\n4. Specify desired reader outcomes\n5. Include resource linking guidance\n\nRemember: Keep instructions focused on driving action while maintaining content coherence and value reinforcement.\n\n# Important\n\nWrite in full explicit sentences, not just bullet points."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        220,
+        0
+      ],
+      "id": "ea8c74d3-f455-4ad7-83cc-650041a3e563",
+      "name": "Conclusion Brief Creator"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.1,
+      "position": [
+        180,
+        180
+      ],
+      "id": "fa715523-b2e0-4a09-b997-9eff5872528e",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Workflow Input Trigger": {
+      "main": [
+        [
+          {
+            "node": "Conclusion Brief Creator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Conclusion Brief Creator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "31c158f6-c4a1-4048-ae32-73d6a8057007",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-05-14T20:03:21.385Z",
+      "updatedAt": "2025-05-14T20:03:21.385Z",
+      "id": "qYWvr9l3vKT2WSBu",
+      "name": "Sistema SEO"
+    }
+  ]
+}
