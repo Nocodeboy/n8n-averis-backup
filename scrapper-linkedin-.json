@@ -1,0 +1,920 @@
+{
+  "createdAt": "2025-05-08T19:25:16.643Z",
+  "updatedAt": "2025-05-14T16:27:02.398Z",
+  "id": "bm53a6QSpfCA6ISt",
+  "name": "Scrapper Linkedin",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        40,
+        100
+      ],
+      "id": "432d9dfa-4296-4c1f-beae-c27429322b0b",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://api.apify.com/v2/acts/bebity~linkedin-premium-actor/run-sync-get-dataset-items",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "{{Your_token}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"action\": \"get-companies\",\n    \"isName\": false,\n    \"isUrl\": false,\n    \"keywords\": [\n        \"{{ $json.keyword }}\"\n    ],\n    \"limit\": 5,\n    \"location\": [\n        \"{{ $json.location }}\"\n    ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        400,
+        100
+      ],
+      "id": "0f149385-892d-4be9-9675-c9975ef189cd",
+      "name": "Scrape Companies"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1M9Bi6imp_XheaI6A40cweiXmMWFWRct719Tqsxv9KWU",
+          "mode": "list",
+          "cachedResultName": "My Leads ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1M9Bi6imp_XheaI6A40cweiXmMWFWRct719Tqsxv9KWU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1M9Bi6imp_XheaI6A40cweiXmMWFWRct719Tqsxv9KWU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Website": "={{ $json.websiteUrl }}",
+            "Industry": "={{ $json.industry.map(item => item) }}",
+            "Company": "={{ $json.name }}",
+            "LinkedIn URL": "={{ $json.url }}",
+            "Description": "={{ $json.description }}",
+            "Found Year": "={{ $json.foundedOn.year }}",
+            "EmployeeCount": "={{ $json.employeeCount }}",
+            "keyword": "[key word]",
+            "Location": "[location]"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "keyword",
+              "displayName": "keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LinkedIn URL",
+              "displayName": "LinkedIn URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Industry",
+              "displayName": "Industry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Website",
+              "displayName": "Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Found Year",
+              "displayName": "Found Year",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "EmployeeCount",
+              "displayName": "EmployeeCount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        580,
+        100
+      ],
+      "id": "e2035e7b-3df4-4a3c-b269-e72e4bd1b60b",
+      "name": "Save to my leads"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json['LinkedIn URL'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        40,
+        400
+      ],
+      "id": "e6472bab-e768-4dba-b91e-fa46da82853e",
+      "name": "Company LinkedIn Scrape"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        400,
+        580
+      ],
+      "id": "20e57fc0-1bc8-43c8-99d8-194928d1da6e",
+      "name": "DeepSeek Chat Model"
+    },
+    {
+      "parameters": {
+        "html": "={{ $json.data }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        280,
+        400
+      ],
+      "id": "2282371b-28e0-425a-952d-047892f60fa6",
+      "name": "Markdown"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"email\": \"California@gmail.com\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        580,
+        580
+      ],
+      "id": "92a338ee-ec76-4465-9f95-f0fda86b606d",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1M9Bi6imp_XheaI6A40cweiXmMWFWRct719Tqsxv9KWU",
+          "mode": "list",
+          "cachedResultName": "My Leads ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1M9Bi6imp_XheaI6A40cweiXmMWFWRct719Tqsxv9KWU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1M9Bi6imp_XheaI6A40cweiXmMWFWRct719Tqsxv9KWU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "LinkedIn URL": "={{ $('Save to my leads').item.json['LinkedIn URL'] }}",
+            "Email": "={{ $json.output.email }}"
+          },
+          "matchingColumns": [
+            "LinkedIn URL"
+          ],
+          "schema": [
+            {
+              "id": "keyword",
+              "displayName": "keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LinkedIn URL",
+              "displayName": "LinkedIn URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Industry",
+              "displayName": "Industry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Website",
+              "displayName": "Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Found Year",
+              "displayName": "Found Year",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "EmployeeCount",
+              "displayName": "EmployeeCount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        940,
+        400
+      ],
+      "id": "3727cdbc-823c-48a7-9668-03b84e1c9506",
+      "name": "Update Email"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        400
+      ],
+      "id": "06279ee8-e9bf-4649-b43d-8cdce5d7d3d5",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1M9Bi6imp_XheaI6A40cweiXmMWFWRct719Tqsxv9KWU",
+          "mode": "list",
+          "cachedResultName": "My Leads ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1M9Bi6imp_XheaI6A40cweiXmMWFWRct719Tqsxv9KWU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1M9Bi6imp_XheaI6A40cweiXmMWFWRct719Tqsxv9KWU/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        40,
+        820
+      ],
+      "id": "9863818e-099a-47f6-bad5-5453c9767224",
+      "name": "Get Missing Emails"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.first().json.candidates[0].content.parts[0].text;\nconst cleaned = items.replace('```json', '').replace('```', '')\nconst parsed = JSON.parse(cleaned);\n\nreturn {data: parsed}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        840
+      ],
+      "id": "53277189-deab-4373-aa4b-34ffd6dad270",
+      "name": "Parse json1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "49866817-15e2-44c4-bbcb-f675b9b91a86",
+              "leftValue": "={{ $json.Email }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        220,
+        820
+      ],
+      "id": "f19f24b9-9147-4760-ac89-28de48a460f2",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        440,
+        820
+      ],
+      "id": "efa111de-eb81-41fe-93b4-81a08797fe5b",
+      "name": "Loop Over Items2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "{{your_gemini_api_key}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"Research email for this company {{ $('Loop Over Items2').item.json.Company }} located at {{ $('Loop Over Items2').item.json.Location }} you can also use their website {{ $('Loop Over Items2').item.json.Website }} to find the company's email ,return an json object containing the given companyName and the email and the phoneNumber\"\n        }\n      ]\n    }\n  ],\n  \"tools\": [\n    {\n      \"google_search\": {}\n    }\n  ],\n    \"generationConfig\": { \"response_mime_type\": \"application/json\" }\n\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        680,
+        840
+      ],
+      "id": "8ead2f34-4e74-45fe-91ec-0a92ff744ab7",
+      "name": "Google Gemini research email"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1M9Bi6imp_XheaI6A40cweiXmMWFWRct719Tqsxv9KWU",
+          "mode": "list",
+          "cachedResultName": "My Leads ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1M9Bi6imp_XheaI6A40cweiXmMWFWRct719Tqsxv9KWU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1M9Bi6imp_XheaI6A40cweiXmMWFWRct719Tqsxv9KWU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Company": "={{ $('Loop Over Items2').item.json.Company }}",
+            "Email": "={{ $json.data[0].email }}"
+          },
+          "matchingColumns": [
+            "Company"
+          ],
+          "schema": [
+            {
+              "id": "keyword",
+              "displayName": "keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LinkedIn URL",
+              "displayName": "LinkedIn URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Industry",
+              "displayName": "Industry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Website",
+              "displayName": "Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Found Year",
+              "displayName": "Found Year",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "EmployeeCount",
+              "displayName": "EmployeeCount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1080,
+        840
+      ],
+      "id": "098dafa0-e77f-4523-a03c-8f651f8579e9",
+      "name": "Update emails"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.data }} I need you to analyze the linkedIn company page data and retrieve the email address\n\nreturn a json of email\nexample:\n\n{\n  \"email\": \"company@gmail.com\"\n}\n\nIf the email is not retrieved return empty string\n\nOnly return the stringified JSON without break lines and without the ' quotes, that I can parse directly using JSON.parse(result), don't add any other message.\n",
+        "hasOutputParser": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        520,
+        400
+      ],
+      "id": "99222bad-2eab-4325-afe0-4f42734890cf",
+      "name": "Get Email from Company LinkedIn"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ca5e95c3-6aac-4a85-b2ac-9cb7a5c4c503",
+              "name": "keyword",
+              "value": "Software",
+              "type": "string"
+            },
+            {
+              "id": "c44d6e6b-583f-4b6a-bc28-fcf90f8891aa",
+              "name": "location",
+              "value": "Rwanda",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        100
+      ],
+      "id": "3281c529-c17e-4ce4-8304-2b97c41b899b",
+      "name": "Search Area"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Search Area",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape Companies": {
+      "main": [
+        [
+          {
+            "node": "Save to my leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to my leads": {
+      "main": [
+        [
+          {
+            "node": "Company LinkedIn Scrape",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Company LinkedIn Scrape": {
+      "main": [
+        [
+          {
+            "node": "Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Get Email from Company LinkedIn",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Markdown": {
+      "main": [
+        [
+          {
+            "node": "Get Email from Company LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Get Email from Company LinkedIn",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Email": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Get Missing Emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Missing Emails": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse json1": {
+      "main": [
+        [
+          {
+            "node": "Update emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items2": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Google Gemini research email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini research email": {
+      "main": [
+        [
+          {
+            "node": "Parse json1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update emails": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Email from Company LinkedIn": {
+      "main": [
+        [
+          {
+            "node": "Update Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Area": {
+      "main": [
+        [
+          {
+            "node": "Scrape Companies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "2b49617e-faac-485f-848d-ce16cf571f1b",
+  "triggerCount": 0,
+  "tags": []
+}
