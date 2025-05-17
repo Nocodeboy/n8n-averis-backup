@@ -1,0 +1,352 @@
+{
+  "createdAt": "2025-04-29T12:37:34.916Z",
+  "updatedAt": "2025-04-29T12:56:12.000Z",
+  "id": "VQ31EQHajBtaOKFG",
+  "name": "Seguimiento de compromiso",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "sendTo": "={{ $json[\"Email \"] }}",
+        "subject": "Reschedule Consultation #1",
+        "message": "=No pudimos contar con tu asistencia a la consulta de ayer.<br><br>\n\n¿Te gustaría reprogramarla para la próxima semana?<br><br>\n\nQuedo a la espera de tus noticias.<br><br>\n\nUn cordial saludo,<br><br>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        740,
+        0
+      ],
+      "id": "d182b480-7ab5-4ef7-a843-1dc045351380",
+      "name": "Gmail",
+      "webhookId": "02ba7ca8-d245-46f1-b449-efcd37f50c22",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BwWjplhZQVpEPVPV",
+          "name": "Gmail daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        440,
+        0
+      ],
+      "id": "d8a05e11-50e6-48d0-9531-d8bb0701d2ba",
+      "name": "Wait",
+      "webhookId": "8297fbcb-a392-4fad-bcf0-4bad417378f0"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Google Sheets').item.json[\"Email \"] }}",
+        "subject": "Reschedule Consultation #2",
+        "message": "=Vimos que no pudiste asistir a la consulta el otro día.<br><br>\n\n¿Te gustaría que la reprogramáramos para la próxima semana?<br><br>\n\nQuedo atento a tus noticias.<br><br>\n\nUn cordial saludo,<br><br>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1140,
+        0
+      ],
+      "id": "0a311c67-544f-4efa-aa94-6bf566c76e5c",
+      "name": "Gmail1",
+      "webhookId": "02ba7ca8-d245-46f1-b449-efcd37f50c22",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BwWjplhZQVpEPVPV",
+          "name": "Gmail daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Google Sheets').item.json[\"Email \"] }}",
+        "subject": "Reschedule Consultation #3",
+        "message": "=Hemos notado que no pudiste asistir a la consulta el otro día.<br><br>\n\nSi sigues interesado, podemos reprogramarla para la próxima semana. Por favor, confírmanos tu disponibilidad a la mayor brevedad.<br><br>\n\nEn caso de no recibir respuesta, entenderemos que ya no deseas continuar.<br><br>\n\nUn cordial saludo,<br><br>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1660,
+        0
+      ],
+      "id": "cb7640a4-d362-4787-a2ba-328905b21eec",
+      "name": "Gmail2",
+      "webhookId": "02ba7ca8-d245-46f1-b449-efcd37f50c22",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BwWjplhZQVpEPVPV",
+          "name": "Gmail daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        900,
+        0
+      ],
+      "id": "10d846aa-010f-4d21-b11d-db582a295280",
+      "name": "Wait1",
+      "webhookId": "8297fbcb-a392-4fad-bcf0-4bad417378f0"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1320,
+        0
+      ],
+      "id": "96a5a89f-7442-4636-a0db-d1d566b1296c",
+      "name": "Wait2",
+      "webhookId": "8297fbcb-a392-4fad-bcf0-4bad417378f0"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 11 * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ceb63dc9-e0ac-4efd-a676-31aa3ca7dd9c",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1vhggdw5kpmZUO9UxTu2yGVs9wvNHs0emmAH3B7Ksiyk",
+          "mode": "list",
+          "cachedResultName": "Lead Followup",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vhggdw5kpmZUO9UxTu2yGVs9wvNHs0emmAH3B7Ksiyk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 450508166,
+          "mode": "list",
+          "cachedResultName": "Llamadas perdidas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vhggdw5kpmZUO9UxTu2yGVs9wvNHs0emmAH3B7Ksiyk/edit#gid=450508166"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        220,
+        0
+      ],
+      "id": "146cd1b4-099b-4801-9f3c-13029cd7dc32",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ae7wYVNQMP6fIWzo",
+          "name": "Google Sheets daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1vhggdw5kpmZUO9UxTu2yGVs9wvNHs0emmAH3B7Ksiyk",
+          "mode": "list",
+          "cachedResultName": "Lead Followup",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vhggdw5kpmZUO9UxTu2yGVs9wvNHs0emmAH3B7Ksiyk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 450508166,
+          "mode": "list",
+          "cachedResultName": "Llamadas perdidas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vhggdw5kpmZUO9UxTu2yGVs9wvNHs0emmAH3B7Ksiyk/edit#gid=450508166"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email ": "={{ $('Google Sheets').item.json[\"Email \"] }}",
+            "Sequence Completed": "=Yes"
+          },
+          "matchingColumns": [
+            "Email "
+          ],
+          "schema": [
+            {
+              "id": "Email ",
+              "displayName": "Email ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Sequence Completed",
+              "displayName": "Sequence Completed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1880,
+        0
+      ],
+      "id": "6cdb2077-d811-4be0-8005-0887859710ac",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ae7wYVNQMP6fIWzo",
+          "name": "Google Sheets daniel@averis.es"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail1": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Gmail1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Gmail2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "f8130201-b329-4e1d-b809-c82c39b2db08",
+  "triggerCount": 0,
+  "tags": []
+}
