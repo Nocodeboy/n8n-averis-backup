@@ -1,0 +1,342 @@
+{
+  "createdAt": "2025-04-29T16:23:12.815Z",
+  "updatedAt": "2025-04-29T16:23:52.849Z",
+  "id": "0DyljQP8X1n01D56",
+  "name": "Creación de Mockups a partir de foto",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Image",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Upload Product",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Tagline",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        20,
+        -160
+      ],
+      "id": "36682c92-bad4-4adb-96c7-4d4db712c3fb",
+      "name": "On form submission",
+      "webhookId": "91a3add1-c195-4ee5-80c1-abc782711f4b"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/images/edits",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "prompt",
+              "value": "={{ $json.Prompt }} Make sure product is centered. Put In Bold 3d text below the product  with {{ $('Google Sheets').item.json['Text Theme'] }} theme the words \"{{ $('On form submission').item.json.Tagline }}\""
+            },
+            {
+              "name": "model",
+              "value": "gpt-image-1"
+            },
+            {
+              "name": "size",
+              "value": "1024x1536"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "image",
+              "inputDataFieldName": "=data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        160
+      ],
+      "id": "6d10c8c0-2766-43f3-9542-2f05270f8cf3",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1uPJdadn6TQbCQmV466Fr6SVghUl9eEKybqfzRrsj7uU",
+          "mode": "list",
+          "cachedResultName": "Creatives",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1uPJdadn6TQbCQmV466Fr6SVghUl9eEKybqfzRrsj7uU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Prompts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1uPJdadn6TQbCQmV466Fr6SVghUl9eEKybqfzRrsj7uU/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "Todo"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        900,
+        -160
+      ],
+      "id": "ff16b764-2f39-4ccd-a25a-1035b23db188",
+      "name": "Google Sheets"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.imgbb.com/1/upload?key=YOURKEY",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "image",
+              "inputDataFieldName": "Upload_Product"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        460,
+        -160
+      ],
+      "id": "f788568a-77a3-4f14-a66f-964733645c67",
+      "name": "Upload Image"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Upload Image').item.json.data.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        100
+      ],
+      "id": "68d68420-82a6-4e46-baec-8a5f63e8eeb0",
+      "name": "Get IMAGE"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $json[\"data\"].map((item, index) => ({\n  binary: {\n    [`image_${index + 1}`]: {\n      data: Buffer.from(item.b64_json, 'base64'),\n      mimeType: 'image/png',\n      fileName: `image_${index + 1}.png`,\n    }\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        260
+      ],
+      "id": "bde230fd-6310-4fdb-b488-8460bc2113a1",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "sendDocument",
+        "chatId": "YOURID",
+        "binaryData": true,
+        "binaryPropertyName": "image_1",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        780,
+        320
+      ],
+      "id": "aa8d88d4-bbd3-489b-8ae9-2d98d03453b1",
+      "name": "Telegram",
+      "webhookId": "2fa3e7fc-3c76-44bd-af96-d2d3998c0d37"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        40,
+        80
+      ],
+      "id": "988ffe2e-03d4-41ff-9c7f-b530dd5440f1",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "915e18f3-dfd2-46c4-bbdb-688bc1721cf5",
+              "leftValue": "=1",
+              "rightValue": "1",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        920,
+        420
+      ],
+      "id": "fa91c03d-ca9f-43f9-8c77-b30a98034a3d",
+      "name": "If"
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Upload Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Image": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get IMAGE": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Get IMAGE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "ac871fd8-c66c-4737-b380-f9989d84cb84",
+  "triggerCount": 0,
+  "tags": []
+}
