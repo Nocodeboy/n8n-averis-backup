@@ -1,0 +1,101 @@
+{
+  "createdAt": "2025-04-29T11:51:15.889Z",
+  "updatedAt": "2025-05-15T20:00:30.258Z",
+  "id": "VYEYLiM5Q4XzhRDO",
+  "name": "MCP Agente Trigger",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "path": "c9bd59cd-9561-4d07-b194-7652d6765978"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        -160
+      ],
+      "id": "dc2cd8cc-9cd4-4e4c-ad98-8781832604d5",
+      "name": "MCP Server Trigger",
+      "webhookId": "c9bd59cd-9561-4d07-b194-7652d6765978"
+    },
+    {
+      "parameters": {
+        "name": "personalAssistant",
+        "description": "This tool is a multi agent system capable of the following: \n\n1. Completing email tasks \n2. Get, update or adding contacts \n3. Completing tasks with calendar events \n4. Searching the web \n\nThis agent understands natural language, so you must command it to perform tasks via the query. Make the query detailed so the agent knows what it's meant to achieve. Make sure to not add additional info from what the user prompted you.  ",
+        "workflowId": {
+          "__rl": true,
+          "value": "PXL9KgjHutxi63bK",
+          "mode": "list",
+          "cachedResultName": "Ultimate Personal Assistant"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('query', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "query"
+          ],
+          "schema": [
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.1,
+      "position": [
+        180,
+        40
+      ],
+      "id": "7615d39c-548e-4c39-8cf4-ab5ca8548065",
+      "name": "Personal Assistant"
+    }
+  ],
+  "connections": {
+    "Personal Assistant": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "8c6431b3-f997-45b8-beff-5619153406dd",
+  "triggerCount": 1,
+  "tags": [
+    {
+      "createdAt": "2025-04-23T20:54:17.048Z",
+      "updatedAt": "2025-04-23T20:54:17.048Z",
+      "id": "YX2hAUIknxeDH192",
+      "name": "MCP"
+    },
+    {
+      "createdAt": "2025-04-29T11:59:29.898Z",
+      "updatedAt": "2025-04-29T11:59:29.898Z",
+      "id": "KdL7yVRV0hd5A0Io",
+      "name": "Trigger"
+    }
+  ]
+}
