@@ -1,0 +1,731 @@
+{
+  "createdAt": "2025-05-14T21:00:43.747Z",
+  "updatedAt": "2025-05-15T07:55:25.006Z",
+  "id": "H2t3ysz5FIh23JG8",
+  "name": "Análisis de sentimiento",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "fieldToSplitOut": "data.issues.nodes",
+        "options": {}
+      },
+      "id": "13e39bbe-e2f2-4a36-a95b-17ffb17eb066",
+      "name": "Issues to List",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        980,
+        620
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "3148953a-a531-43c9-bb88-542c1bd50fe3",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        1300,
+        800
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{\n{\n  ...$('Issues to List').item.json,\n  ...$json.output\n}\n}}",
+        "options": {}
+      },
+      "id": "cdcac915-c559-456d-9cb3-1f70d1f6b0ab",
+      "name": "Combine Sentiment Analysis",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1640,
+        640
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "text": "={{\n$json.comments.nodes.map(node => [\n  `${node.user.displayName} commented on ${node.createdAt}:`,\n   node.body\n].join('\\n')).join('---\\n')\n}}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "sentiment",
+              "description": "One of positive, negative or neutral",
+              "required": true
+            },
+            {
+              "name": "sentimentSummary",
+              "description": "Describe the sentiment of the conversation"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b70a1c28-2140-4bb6-8ba4-833a757be308",
+      "name": "Sentiment over Issue Comments",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "position": [
+        1300,
+        640
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ $json }}",
+        "options": {}
+      },
+      "id": "49f218ee-ac1b-4f94-a1d6-15fa74afab45",
+      "name": "Copy of Issue",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2140,
+        660
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "00e421f4-60fb-4811-9ae0-98bb8d2943f8",
+      "name": "For Each Issue...",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        1960,
+        660
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "mode": "list",
+          "value": "appViDaeaFw4qv9La",
+          "cachedResultUrl": "https://airtable.com/appViDaeaFw4qv9La",
+          "cachedResultName": "Sentiment Analysis over Issue Comments"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "tblhO0sfRhKP6ibS8",
+          "cachedResultUrl": "https://airtable.com/appViDaeaFw4qv9La/tblhO0sfRhKP6ibS8",
+          "cachedResultName": "Table 1"
+        },
+        "filterByFormula": "={Issue ID} = '{{ $json.identifier || 'XYZ' }}'",
+        "options": {
+          "fields": [
+            "Issue ID",
+            "Current Sentiment"
+          ]
+        }
+      },
+      "id": "9acbf856-510a-472b-a9c6-20edc29bd37a",
+      "name": "Get Existing Sentiment",
+      "type": "n8n-nodes-base.airtable",
+      "position": [
+        2320,
+        660
+      ],
+      "typeVersion": 2.1,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "mode": "list",
+          "value": "appViDaeaFw4qv9La",
+          "cachedResultUrl": "https://airtable.com/appViDaeaFw4qv9La",
+          "cachedResultName": "Sentiment Analysis over Issue Comments"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "list",
+          "value": "tblhO0sfRhKP6ibS8",
+          "cachedResultUrl": "https://airtable.com/appViDaeaFw4qv9La/tblhO0sfRhKP6ibS8",
+          "cachedResultName": "Table 1"
+        },
+        "columns": {
+          "value": {
+            "Summary": "={{ $('Copy of Issue').item.json.sentimentSummary || '' }}",
+            "Assigned": "={{ $('Copy of Issue').item.json.assignee.name }}",
+            "Issue ID": "={{ $('Copy of Issue').item.json.identifier }}",
+            "Issue Title": "={{ $('Copy of Issue').item.json.title }}",
+            "Issue Created": "={{ $('Copy of Issue').item.json.createdAt }}",
+            "Issue Updated": "={{ $('Copy of Issue').item.json.updatedAt }}",
+            "Current Sentiment": "={{ $('Copy of Issue').item.json.sentiment.toSentenceCase() }}",
+            "Previous Sentiment": "={{ !$json.isEmpty() ? $json['Current Sentiment'] : 'N/A' }}"
+          },
+          "schema": [
+            {
+              "id": "id",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": true,
+              "required": false,
+              "displayName": "id",
+              "defaultMatch": true
+            },
+            {
+              "id": "Issue ID",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Issue ID",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Previous Sentiment",
+              "type": "options",
+              "display": true,
+              "options": [
+                {
+                  "name": "Positive",
+                  "value": "Positive"
+                },
+                {
+                  "name": "Negative",
+                  "value": "Negative"
+                },
+                {
+                  "name": "Neutral",
+                  "value": "Neutral"
+                },
+                {
+                  "name": "N/A",
+                  "value": "N/A"
+                }
+              ],
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Previous Sentiment",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Current Sentiment",
+              "type": "options",
+              "display": true,
+              "options": [
+                {
+                  "name": "Positive",
+                  "value": "Positive"
+                },
+                {
+                  "name": "Negative",
+                  "value": "Negative"
+                },
+                {
+                  "name": "Neutral",
+                  "value": "Neutral"
+                },
+                {
+                  "name": "N/A",
+                  "value": "N/A"
+                }
+              ],
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Current Sentiment",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Summary",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Summary",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Issue Title",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Issue Title",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Issue Created",
+              "type": "dateTime",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Issue Created",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Issue Updated",
+              "type": "dateTime",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Issue Updated",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Assigned",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "readOnly": false,
+              "required": false,
+              "displayName": "Assigned",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Created",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": true,
+              "required": false,
+              "displayName": "Created",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Last Modified",
+              "type": "string",
+              "display": true,
+              "removed": true,
+              "readOnly": true,
+              "required": false,
+              "displayName": "Last Modified",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "Issue ID"
+          ]
+        },
+        "options": {}
+      },
+      "id": "b2c7c0b6-54b4-448c-a77b-d01f4061fe3e",
+      "name": "Update Row",
+      "type": "n8n-nodes-base.airtable",
+      "position": [
+        2500,
+        660
+      ],
+      "typeVersion": 2.1
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour"
+            }
+          ]
+        },
+        "authentication": "airtableTokenApi",
+        "baseId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "appViDaeaFw4qv9La"
+        },
+        "tableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "tblhO0sfRhKP6ibS8"
+        },
+        "triggerField": "Current Sentiment",
+        "additionalFields": {}
+      },
+      "id": "d6db430f-8a13-43eb-88dc-99398c506d89",
+      "name": "Airtable Trigger",
+      "type": "n8n-nodes-base.airtableTrigger",
+      "position": [
+        2840,
+        680
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "leftValue": "={{ $json.fields[\"Previous Sentiment\"] !== 'Negative' && $json.fields[\"Current Sentiment\"] === 'Negative' }}",
+                    "rightValue": ""
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "NON-NEGATIVE to NEGATIVE"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "none"
+        }
+      },
+      "id": "dd9b62e5-f0c4-4f5e-8f29-64a43573c5b4",
+      "name": "Sentiment Transition",
+      "type": "n8n-nodes-base.switch",
+      "position": [
+        3020,
+        680
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "authentication": "headerAuth",
+        "endpoint": "https://api.linear.app/graphql",
+        "requestFormat": "json",
+        "query": "=query (\n  $filter: IssueFilter\n) {\n  issues(\n    filter: $filter\n  ) {\n    nodes {\n      id\n      identifier\n      title\n      description\n      url\n      createdAt\n      updatedAt\n      assignee {\n        name\n      }\n      comments {\n        nodes {\n          id\n          createdAt\n          user {\n            displayName\n          }\n          body\n        }\n      }\n    }\n  }\n}",
+        "variables": "={{\n{\n  \"filter\": {\n    updatedAt: { gte: $now.minus(30, 'minutes').toISO() }\n  }\n}\n}}"
+      },
+      "id": "361e5dd0-7616-4021-a867-a697b1bf56f6",
+      "name": "Fetch Active Linear Issues",
+      "type": "n8n-nodes-base.graphql",
+      "position": [
+        800,
+        620
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 30
+            }
+          ]
+        }
+      },
+      "id": "536d48d8-9e64-44e0-bfb3-8e9f95334c0e",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        600,
+        620
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "operation": "removeItemsSeenInPreviousExecutions",
+        "dedupeValue": "={{ $json.fields[\"Issue ID\"] }}:{{ $json.fields['Last Modified'] }}",
+        "options": {}
+      },
+      "id": "fd10d405-08cd-44e3-a590-e9a0775c85f1",
+      "name": "Deduplicate Notifications",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "position": [
+        3220,
+        680
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "C0749JVFERK",
+          "cachedResultName": "n8n-tickets"
+        },
+        "messageType": "block",
+        "blocksUi": "={{\n{\n  \"blocks\": [\n    {\n      \"type\": \"section\",\n      \"text\": {\n          \"type\": \"mrkdwn\",\n          \"text\": \":rotating_light: The following Issues transitioned to Negative Sentiment\"\n      }\n    },\n    {\n        \"type\": \"divider\"\n    },\n    ...($('Deduplicate Notifications').all().map(item => (\n      {\n        \"type\": \"section\",\n        \"text\": {\n            \"type\": \"mrkdwn\",\n            \"text\": `*<https://linear.app/myOrg/issue/${$json.fields['Issue ID']}|${$json.fields['Issue ID']} ${$json.fields['Issue Title']}>*\\n${$json.fields.Summary}`\n        }\n      }\n    )))\n  ]\n}\n}}",
+        "text": "={{ $('Deduplicate Notifications').all().length }} Issues have transitions to Negative Sentiment",
+        "otherOptions": {}
+      },
+      "id": "1b4e42a6-8952-4f68-b877-17db1d98e485",
+      "name": "Report Issue Negative Transition",
+      "type": "n8n-nodes-base.slack",
+      "position": [
+        3420,
+        680
+      ],
+      "webhookId": "612f1001-3fcc-480b-a835-05f9e2d56a5f",
+      "executeOnce": true,
+      "typeVersion": 2.3
+    },
+    {
+      "parameters": {
+        "content": "## 1. Continuously Monitor Active Linear Issues\n[Learn more about the GraphQL node](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.graphql)\n\nTo keep up with the latest changes in our active Linear tickets, we'll need to use Linear's GraphQL endpoint because filtering is currently unavailable in the official Linear.app node.\n\nFor this demonstration, we'll check for updated tickets every 30mins.",
+        "height": 440,
+        "width": 660,
+        "color": 7
+      },
+      "id": "b3ad50cb-49fc-4c75-adfe-e87ad8335bf5",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        520,
+        400
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 2. Sentiment Analysis on Current Issue Activity\n[Learn more about the Information Extractor node](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.information-extractor)\n\nWith our recently updated posts, we can use our AI to perform a quick sentiment analysis on the ongoing conversation to check the overall mood of the support issue. This is a great way to check how things are generally going in the support queue; positive should be normal but negative could indicate some uncomfortableness or even frustration.",
+        "height": 560,
+        "width": 640,
+        "color": 7
+      },
+      "id": "6f348ea2-3c93-4790-ae59-5cc506223097",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1180,
+        420
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 3. Capture and Track Results in Airtable\n[Learn more about the Airtable node](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.airtable)\n\nNext, we can capture this analysis in our insights database as means for human review. When the issue is new, we can create a new row but if the issue exists, we will update it's existing row instead.\n\nWhen updating an existing row, we move its previous \"current sentiment\" value into the \"previous sentiment\" column and replace with our new current sentiment. This gives us a \"sentiment transition\" which will be useful in the next step.\n\nCheck out the Airtable here: https://airtable.com/appViDaeaFw4qv9La/shrq6HgeYzpW6uwXL",
+        "height": 560,
+        "width": 840,
+        "color": 7
+      },
+      "id": "f9f374f9-dc60-4ea8-8304-a3a2e94bbcde",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1860,
+        400
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 4. Get Notified when Sentiment becomes Negative\n[Learn more about the Slack node](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.slack/)\n\nA good use-case for tracking sentiment transitions could be to be alerted if ever an issue moves from a non-negative sentiment to a negative one. This could be a signal of issue handling troubles which may require attention before it escalates.\n\nIn this demonstration, we use the Airtable trigger to catch rows which have their sentiment column updated and check for the non-negative-to-negative sentiment transition using the switch node. For those matching rows, we combine add send a notification via slack. A cool trick is to use the \"remove duplication\" node to prevent repeat notifications for the same updates - here we combine the Linear issue key and the row's last modified date.",
+        "height": 560,
+        "width": 920,
+        "color": 7
+      },
+      "id": "48de3556-1df8-4a30-a13f-1313fe6ce5e3",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2740,
+        400
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Try It Out!\n### This n8n template performs continous monitoring on Linear Issue conversations performing sentiment analysis and alerting when the sentiment becomes negative.\nThis is helpful to quickly identify difficult customer support situations early and prioritising them before they get out of hand.\n\n## How it works\n* A scheduled trigger is used to fetch recently updated issues in Linear using the GraphQL node.\n* Each issue's comments thread is passed into a simple Information Extractor node to identify the overall sentiment.\n* The resulting sentiment analysis combined with the some issue details are uploaded to Airtable for review.\n* When the template is re-run at a later date, each issue is re-analysed for sentiment\n* Each issue's new sentiment state is saved to the airtable whilst its previous state is moved to the \"previous sentiment\" column.\n* An Airtable trigger is used to watch for recently updated rows\n* Each matching Airtable row is filtered to check if it has a previous non-negative state but now has a negative state in its current sentiment.\n* The results are sent via notification to a team slack channel for priority.\n\n**Check out the sample Airtable here**: https://airtable.com/appViDaeaFw4qv9La/shrq6HgeYzpW6uwXL\n\n## How to use\n* Modify the GraphQL filter to fetch issues to a relevant issue type, team or person.\n* Update the Slack channel to ensure messages are sent to the correct location.\n\n### Need Help?\nJoin the [Discord](https://discord.com/invite/XPKeKXeB7d) or ask in the [Forum](https://community.n8n.io/)!\n\nHappy Hacking!",
+        "height": 840,
+        "width": 480
+      },
+      "id": "d87d6436-41cc-4a4f-b472-467216d967b4",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1
+    }
+  ],
+  "connections": {
+    "Update Row": {
+      "main": [
+        [
+          {
+            "node": "For Each Issue...",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy of Issue": {
+      "main": [
+        [
+          {
+            "node": "Get Existing Sentiment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Issues to List": {
+      "main": [
+        []
+      ]
+    },
+    "Airtable Trigger": {
+      "main": [
+        [
+          {
+            "node": "Sentiment Transition",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Active Linear Issues",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "For Each Issue...": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Copy of Issue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Sentiment over Issue Comments",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sentiment Transition": {
+      "main": [
+        [
+          {
+            "node": "Deduplicate Notifications",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Existing Sentiment": {
+      "main": [
+        [
+          {
+            "node": "Update Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deduplicate Notifications": {
+      "main": [
+        [
+          {
+            "node": "Report Issue Negative Transition",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Sentiment Analysis": {
+      "main": [
+        [
+          {
+            "node": "For Each Issue...",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Active Linear Issues": {
+      "main": [
+        [
+          {
+            "node": "Issues to List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sentiment over Issue Comments": {
+      "main": [
+        [
+          {
+            "node": "Combine Sentiment Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "05fb7666-f5a9-4c58-8996-db5ef16f66a1",
+  "triggerCount": 0,
+  "tags": []
+}
