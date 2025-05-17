@@ -1,0 +1,602 @@
+{
+  "createdAt": "2025-05-15T20:11:21.786Z",
+  "updatedAt": "2025-05-15T20:11:21.786Z",
+  "id": "LLmpfKGHceN1VN1l",
+  "name": "My workflow 3",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -400,
+        140
+      ],
+      "id": "c04cc480-1ca2-4274-991c-0aac06d080e3",
+      "name": "Telegram Trigger",
+      "webhookId": "1725249b-113c-44e5-a98a-ef291c3aba5b",
+      "credentials": {
+        "telegramApi": {
+          "id": "tz1fYz1snqttWLEg",
+          "name": "Telegram Mi Asistente Personal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "=You are a helpful personal assistant.\n\nYou have access to the following tools:\n\n1. Airtable contacts. It stores all of the relevant contacts you I need.\n2. Send Emails tool. This tool is used when I need to send emails to one of my contacts.\n3. Get Emails/Message. This tool is used to fetch messages from my Gmail.\n4. Create event tool without attendees. This tool is used to create Google Calendar events when there are no attendees required.\n5. Create event tool with attendees. This tool is used to create Google Calendar events when there are attendees required in the event.\n6. Get Google Calendar events tool. This tool is used to get my Google Calendar events.\n7. Wikipedia tool. This is used when we need to know information about facts.\n8. Serp API tool. This is used when we need to search information in Google.\n\n# Notes\n- I live at the Lvivo street in Vilnius.\n- Today is {{$now}}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        680,
+        160
+      ],
+      "id": "ae9ad5cd-3f15-4d49-8ffa-f06d7f0cf6d6",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.1,
+      "position": [
+        -20,
+        540
+      ],
+      "id": "27481095-418e-4b3f-9aff-60a033da4898",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        200,
+        540
+      ],
+      "id": "c6945cde-b89a-4a0e-87d9-aad2fe1660b5",
+      "name": "Window Buffer Memory"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1120,
+        160
+      ],
+      "id": "ea50cc60-112d-4518-9f62-ee207d4461d6",
+      "name": "Telegram",
+      "webhookId": "3926b628-50f3-4bf9-9a0f-251b79cba307",
+      "credentials": {
+        "telegramApi": {
+          "id": "tz1fYz1snqttWLEg",
+          "name": "Telegram Mi Asistente Personal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Send Emails Gmail tool is used to send emails to the relevant contacts from the contact database.",
+        "sendTo": "={{ $fromAI('contactEmail', 'the email adress from the Airtable to which we are sending the email') }}",
+        "subject": "={{$fromAI('emailSubject', 'email subject for the email that we are sending out')}}",
+        "emailType": "text",
+        "message": "={{ $fromAI('emailBody') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        380,
+        560
+      ],
+      "id": "1d324142-7793-488f-8864-17a745b5c099",
+      "name": "Send Emails",
+      "webhookId": "72aa2d1a-2c28-4a15-912d-7aaf2fe7765c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BwWjplhZQVpEPVPV",
+          "name": "Gmail daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get Messages Gmail tool is used to get messages based on the query.",
+        "operation": "getAll",
+        "limit": "={{ $fromAI('limit') }}",
+        "filters": {
+          "sender": "={{ $fromAI('senderName') }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        520,
+        560
+      ],
+      "id": "21a23dcd-c666-4155-b477-04b6f19fd2de",
+      "name": "Get Messages",
+      "webhookId": "4637bf06-31c1-4aab-b227-fd1628f7cc24",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BwWjplhZQVpEPVPV",
+          "name": "Gmail daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "justas@justasvee.com",
+          "mode": "id"
+        },
+        "options": {
+          "timeMin": "={{ $fromAI('afterDate', 'Date from which to start looking for events') }}",
+          "timeMax": "={{ $fromAI('beforeDate', 'Date up to which you check for the events') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.2,
+      "position": [
+        940,
+        560
+      ],
+      "id": "79051921-9704-499b-ab56-edf348da8ffd",
+      "name": "Get Events",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "PjIIfi9LOQkzzoCD",
+          "name": "Google Calendar daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolWikipedia",
+      "typeVersion": 1,
+      "position": [
+        1060,
+        580
+      ],
+      "id": "9e736667-aec0-434e-acc4-d980c8b682d2",
+      "name": "Wikipedia"
+    },
+    {
+      "parameters": {
+        "options": {
+          "gl": "Es"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        580
+      ],
+      "id": "a9406dda-76a0-4f22-9d26-7544ac578ae7",
+      "name": "SerpAPI",
+      "credentials": {
+        "serpApi": {
+          "id": "GLMopJMQgeKTffnR",
+          "name": "SerpAPI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "This Google calendar tool is used to set up events when there are no attendees required.",
+        "calendar": {
+          "__rl": true,
+          "value": "justas@justasvee.com",
+          "mode": "id"
+        },
+        "start": "={{ $fromAI('startTime') }}",
+        "end": "={{ $fromAI('endTime') }}",
+        "additionalFields": {
+          "attendees": [],
+          "summary": "={{ $fromAI('eventTitle') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.2,
+      "position": [
+        660,
+        560
+      ],
+      "id": "262674d6-08c1-4f9f-b75a-d1f29703567b",
+      "name": "Event no-attendees",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "PjIIfi9LOQkzzoCD",
+          "name": "Google Calendar daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "This Google calendar tool is used to set up events when there are attendees required in the event.",
+        "calendar": {
+          "__rl": true,
+          "value": "justas@justasvee.com",
+          "mode": "id"
+        },
+        "start": "={{ $fromAI('startTime') }}",
+        "end": "={{ $fromAI('endTime') }}",
+        "additionalFields": {
+          "attendees": [
+            "={{ $fromAI('attendees', 'If there are any attendees that should be included in the event. If there are no attendees and empty array should be returned.') }}"
+          ],
+          "summary": "={{ $fromAI('eventTitle') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.2,
+      "position": [
+        800,
+        560
+      ],
+      "id": "0f80f276-3c71-471f-949f-1fd0deffaaba",
+      "name": "Event with attendees",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "PjIIfi9LOQkzzoCD",
+          "name": "Google Calendar daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.voice }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Voice"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f8ddd9fb-143a-424f-9913-02a1aa21981e",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -200,
+        140
+      ],
+      "id": "de9dff48-3b73-409e-ab2a-ab46248b1d17",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bf6621bc-8872-4b83-80c8-5f7852b77103",
+              "name": "text",
+              "value": "={{ $('Telegram Trigger').item.json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        160
+      ],
+      "id": "375a1320-d3dc-44e3-ae99-faeccdfccd79",
+      "name": "Text Field"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        -40
+      ],
+      "id": "f2644206-3c9c-4d6a-83c8-f0a6d023f6e4",
+      "name": "Telegram1",
+      "webhookId": "23637a63-e973-4695-bd91-11983167027e",
+      "credentials": {
+        "telegramApi": {
+          "id": "tz1fYz1snqttWLEg",
+          "name": "Telegram Mi Asistente Personal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        280,
+        -40
+      ],
+      "id": "6a2d00a5-9eba-46fa-a1e6-e29546989b19",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Emails": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Messages": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Events": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wikipedia": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Event no-attendees": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Event with attendees": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Text Field",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Field": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram1": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "4b31b157-d07b-4607-9158-2e34dad583a2",
+  "triggerCount": 0,
+  "tags": []
+}
