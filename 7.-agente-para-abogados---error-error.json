@@ -1,0 +1,97 @@
+{
+  "createdAt": "2025-04-29T14:17:43.696Z",
+  "updatedAt": "2025-04-29T14:17:53.148Z",
+  "id": "0m50A2ZCwgpyvnbk",
+  "name": "7. Agente para Abogados - Error",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e1b562ae-5671-4c70-9751-f37abd9500b9",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "subject": "=Error flujo:  {{ $json.workflow.name }}",
+        "emailType": "text",
+        "message": "=Ha ocurrido un error en uno de los flujos de N8N.\n\nURL: {{ $json.execution.url }}\n\nWorkFlow: {{ $json.workflow.name }}\n\nError: {{ $json.execution.error.message }}\n\nStack: {{ $json.execution.error.stack }}\n\nÚltimo nodo Ejecutado: {{ $json.execution.lastNodeExecuted }}\n\nModo: {{ $json.execution.mode }}\n\nFecha y Hora: {{ $now }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        220,
+        0
+      ],
+      "id": "f05e0bcd-60c2-4d9d-b08d-581c58b5e754",
+      "name": "Gmail",
+      "webhookId": "cf3996f5-f734-434f-847d-bdcf24a71e9b"
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_266544359644828928"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        440,
+        0
+      ],
+      "id": "09352d70-4b07-4c86-9fcd-0e9a13e35ff2",
+      "name": "Gmail1",
+      "webhookId": "12a5f187-a88c-4241-b060-1b50b734644f"
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "Gmail1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "d2399503-4e4b-4a01-ae54-504b4b3154b1",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-04-29T14:17:29.321Z",
+      "updatedAt": "2025-04-29T14:17:29.321Z",
+      "id": "gELvW2GnWsWutsZZ",
+      "name": "error"
+    }
+  ]
+}
