@@ -1,0 +1,2537 @@
+{
+  "createdAt": "2025-05-01T18:35:48.380Z",
+  "updatedAt": "2025-05-14T16:30:10.532Z",
+  "id": "a6Hv3CvWvFHPfYm3",
+  "name": "Scrapeador Anuncios Meta Ads",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -600,
+        840
+      ],
+      "id": "1f824d1f-598f-4849-a810-8256429ca391",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "content": "## Obtener competidores",
+        "height": 300,
+        "width": 500,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        140,
+        -140
+      ],
+      "id": "b36f5abc-9dbc-439d-b71d-ba323273bde3",
+      "name": "Nota adhesiva: Obtener competidores"
+    },
+    {
+      "parameters": {
+        "url": "=https://website-social-scraper-api.p.rapidapi.com/contacts",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "website",
+              "value": "={{ $json.MARCA_URL }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-rapidapi-host",
+              "value": "website-social-scraper-api.p.rapidapi.com"
+            },
+            {
+              "name": "x-rapidapi-key",
+              "value": "dce40e8348msha3af6b7ddcf0b3ep196017jsn029a43d7c10b"
+            }
+          ]
+        },
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        -20
+      ],
+      "id": "8cfa6ba5-e1b3-4f06-b170-6f1eea3c8074",
+      "name": "Extraer datos de Facebook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "26efd7fb-2b4c-4444-9eb3-cec998168a9d",
+              "name": "Facebook_URL",
+              "value": "={{ $node['Extraer datos de Facebook'].json.facebook }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        940,
+        -20
+      ],
+      "id": "828538ac-2f75-4ca2-80cc-292a04d258da",
+      "name": "Asignar URL Facebook"
+    },
+    {
+      "parameters": {
+        "content": "## Scrapeo de perfiles",
+        "height": 300,
+        "width": 1120,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        680,
+        -140
+      ],
+      "id": "fc2abfad-a170-454a-830a-43b89b04379a",
+      "name": "Nota adhesiva: Scrapeo de perfiles"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A",
+          "mode": "list",
+          "cachedResultName": "Scrapeo Marcas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Competidores_Web",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Facebook URL": "={{ $json.facebookUrl }}",
+            "Pagina web URL": "={{ $('Establecer URLs de Marca').item.json.MARCA_URL }}",
+            "Ad Library ID": "={{ $json.pageAdLibrary.id }}"
+          },
+          "matchingColumns": [
+            "Pagina web URL"
+          ],
+          "schema": [
+            {
+              "id": "Pagina web URL",
+              "displayName": "Pagina web URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Facebook URL",
+              "displayName": "Facebook URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Ad Library ID",
+              "displayName": "Ad Library ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SheetID",
+              "displayName": "SheetID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1600,
+        -20
+      ],
+      "id": "a3d703bd-abdb-40ed-9c10-f3bd00d32f41",
+      "name": "Actualizar URL en Google Sheets"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a07d5467-f862-45fb-9d4d-e9274a6caec7",
+              "name": "MARCA_URL",
+              "value": "={{ $json['Pagina web URL'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        440,
+        -20
+      ],
+      "id": "bbf309c7-245f-4e93-9315-ee2ec33ac2b8",
+      "name": "Establecer URLs de Marca"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2ae76608-4b50-4146-a9c3-3e30edfcc1ac",
+              "leftValue": "={{ $json.Facebook_URL }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1160,
+        -20
+      ],
+      "id": "1eb251d7-0d1c-442c-bc9f-90f689215632",
+      "name": "Comprobar Facebook_URL"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.apify.com/v2/acts/apify~facebook-url-to-id/run-sync-get-dataset-items?token=apify_api_Wh78wKTqnzvMmeHEjG8cJPMwkdiF1d3e7Izp",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"fbUrls\": [\n        {\n            \"url\": \"{{ $json.Facebook_URL }}\",\n            \"method\": \"GET\"\n        }\n    ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1380,
+        -20
+      ],
+      "id": "f8a141a0-f36d-4c06-88db-61f1f0830d28",
+      "name": "Obtener ID de Facebook"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A",
+          "mode": "list",
+          "cachedResultName": "Scrapeo Marcas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Competidores_Web",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        240,
+        -20
+      ],
+      "id": "cdfe83b9-ea25-4a28-a397-a8e8d551fb9e",
+      "name": "Obtener perfil desde Google Sheets"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A",
+          "mode": "list",
+          "cachedResultName": "Scrapeo Marcas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Competidores_Web",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        240,
+        580
+      ],
+      "id": "205dc647-aab4-4e41-8916-b82f903aa6e1",
+      "name": "ObtenerPerfiles"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        680,
+        580
+      ],
+      "id": "ad550929-4706-43ed-9515-0ec45e801ca4",
+      "name": "RecorrerElementos"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2f7605b9-516c-4176-acc0-c2f687c30107",
+              "leftValue": "={{ $json['Ad Library ID'].toString() }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        460,
+        580
+      ],
+      "id": "5e3925b8-b98d-44d2-8d6f-95586c136d98",
+      "name": "SiNoVacio"
+    },
+    {
+      "parameters": {
+        "url": "https://ad-libraries.p.rapidapi.com/meta/page/ads",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "page_id",
+              "value": "={{ $json['Ad Library ID'] }}"
+            },
+            {
+              "name": "platform",
+              "value": "facebook,instagram"
+            },
+            {
+              "name": "media_types",
+              "value": "all"
+            },
+            {
+              "name": "active_status",
+              "value": "active"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-rapidapi-host",
+              "value": "ad-libraries.p.rapidapi.com"
+            },
+            {
+              "name": "x-rapidapi-key",
+              "value": "a2e5d621f8msh02a1f5cec81eadap150238jsn597d8c68efb2"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        920,
+        560
+      ],
+      "id": "53f88d0d-4273-412c-a778-427a6812a827",
+      "name": "BuscarAnunciosVideo"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "documentId": {
+          "__rl": true,
+          "value": "14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A",
+          "mode": "list",
+          "cachedResultName": "Scrapeo Marcas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A/edit?usp=drivesdk"
+        },
+        "title": "={{ $('RecorrerElementos').item.json['Pagina web URL']\n   .replaceAll(\"https://\", \"\")\n   .replaceAll(\".com/\", \"\")\n   .replaceAll(\".es/\", \"\") }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1580,
+        360
+      ],
+      "id": "fae04767-7e7b-46db-85c2-2ed63783ec59",
+      "name": "CrearHoja",
+      "executeOnce": true,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A",
+          "mode": "list",
+          "cachedResultName": "Scrapeo Marcas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('CrearHoja').first().json.sheetId }}",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "adArchiveId",
+              "displayName": "adArchiveId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "adBody",
+              "displayName": "adBody",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "original_image_url",
+              "displayName": "original_image_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "video_sd_url",
+              "displayName": "video_sd_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "caption",
+              "displayName": "caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "cta",
+              "displayName": "cta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "link_url",
+              "displayName": "link_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "created",
+              "displayName": "created",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "test",
+              "displayName": "test",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2020,
+        560
+      ],
+      "id": "3ac92ab5-1d7c-4b72-891a-100dbb114e99",
+      "name": "AñadirAnuncios"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2eb11db4-d0de-4249-bb3d-69f7dff6a1d6",
+              "name": "adArchiveId",
+              "value": "={{ $('SepararResultados').item.json['0'].adArchiveID }}",
+              "type": "string"
+            },
+            {
+              "id": "3b68fa91-1556-41f4-baf4-93aff6dfbdee",
+              "name": "title",
+              "value": "={{ $('SepararResultados').item.json['0'].snapshot.cards[0].title }}",
+              "type": "string"
+            },
+            {
+              "id": "0c9ec339-8fc9-41ff-9ee6-4fcd1832b7b1",
+              "name": "adBody",
+              "value": "={{ $('SepararResultados').item.json['0'].snapshot.cards[0].body }}",
+              "type": "string"
+            },
+            {
+              "id": "ffc76b05-398f-46f1-8456-799dfa5361c4",
+              "name": "original_image_url",
+              "value": "={{ $('SepararResultados').item.json['0'].snapshot.cards[0].original_image_url }}",
+              "type": "string"
+            },
+            {
+              "id": "9823c7cb-4415-472a-b1e9-a08acac80271",
+              "name": "video_sd_url",
+              "value": "={{ $('SepararResultados').item.json['0'].snapshot.cards[0].video_sd_url }}",
+              "type": "string"
+            },
+            {
+              "id": "380f45ca-45a7-40de-889a-6cfe54fbaf78",
+              "name": "caption",
+              "value": "={{ $('SepararResultados').item.json['0'].snapshot.cards[0].caption }}",
+              "type": "string"
+            },
+            {
+              "id": "d8fc0050-55d0-4784-a6cc-1b595de4a2a4",
+              "name": "cta",
+              "value": "={{ $('SepararResultados').item.json['0'].snapshot.cards[0].cta_text }}",
+              "type": "string"
+            },
+            {
+              "id": "62382eec-d12d-428c-9eea-72468a843cc7",
+              "name": "link_url",
+              "value": "={{ $('SepararResultados').item.json['0'].snapshot.cards[0].link_url }}",
+              "type": "string"
+            },
+            {
+              "id": "53fb885a-f212-4084-8a0f-dedd3986d2d5",
+              "name": "created",
+              "value": "={{ $json['0'].snapshot.creation_time.toDateTime('s').format('dd-MM-yyyy') }}",
+              "type": "string"
+            },
+            {
+              "id": "d0e8bdae-706d-4a4b-b6b8-f944987298d0",
+              "name": "test",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1580,
+        760
+      ],
+      "id": "44ce4c58-60f6-45c4-be46-b031fb2686b9",
+      "name": "ConfigurarDatos"
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch",
+        "useDataOfInput": 2
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        1800,
+        560
+      ],
+      "id": "1bbe43fa-1398-47e2-9d07-efa5856626f8",
+      "name": "Esperar"
+    },
+    {
+      "parameters": {
+        "content": "## Obtenemos perfiles del competidor",
+        "height": 280,
+        "width": 460,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        140,
+        480
+      ],
+      "id": "d42d953d-2ba2-416c-b3f5-32f3751cfbd8",
+      "name": "NotaObtenerPerfiles"
+    },
+    {
+      "parameters": {
+        "content": "## Scrapeamos anuncios de Meta",
+        "height": 280,
+        "width": 880,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        620,
+        480
+      ],
+      "id": "b61bfaca-7073-47a6-8a8b-543e73c15558",
+      "name": "NotaScrapeMeta"
+    },
+    {
+      "parameters": {
+        "content": "## Crear hoja resumen de anuncios",
+        "height": 620,
+        "width": 1160,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        300
+      ],
+      "id": "2fa321c7-0b6c-446c-a077-fb26ad877e99",
+      "name": "NotaCrearResumen"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "results",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        560
+      ],
+      "id": "6be25ad1-3783-4f59-8720-da4c85de4153",
+      "name": "SepararResultados",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A",
+          "mode": "list",
+          "cachedResultName": "Scrapeo Marcas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Competidores_Web",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "Completado",
+            "SheetID": "={{ $('CrearHoja').first().json.sheetId }}",
+            "Pagina web URL": "={{ $('RecorrerElementos').item.json['Pagina web URL'] }}"
+          },
+          "matchingColumns": [
+            "Pagina web URL"
+          ],
+          "schema": [
+            {
+              "id": "Pagina web URL",
+              "displayName": "Pagina web URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Facebook URL",
+              "displayName": "Facebook URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Ad Library ID",
+              "displayName": "Ad Library ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SheetID",
+              "displayName": "SheetID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2260,
+        560
+      ],
+      "id": "048bc8c2-264a-476d-b6a7-65983d24a64f",
+      "name": "AñadirIdHoja"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2a52516b-3453-4ca7-91ad-91f9ffe22bcf",
+              "leftValue": "={{ $json}}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1360,
+        560
+      ],
+      "id": "a2a39db3-eb27-4025-ab42-c52a42695d74",
+      "name": "SiAlguno"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A",
+          "mode": "list",
+          "cachedResultName": "Scrapeo Marcas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Competidores_Web",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Ad Library ID": "={{ $('BuscarAnunciosVideo').item.json.page_id }}",
+            "Status": "Sin anuncios"
+          },
+          "matchingColumns": [
+            "Ad Library ID"
+          ],
+          "schema": [
+            {
+              "id": "Pagina web URL",
+              "displayName": "Pagina web URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Facebook URL",
+              "displayName": "Facebook URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Ad Library ID",
+              "displayName": "Ad Library ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SheetID",
+              "displayName": "SheetID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1580,
+        540
+      ],
+      "id": "b4652d92-a47a-4217-be84-7698fa4c2149",
+      "name": "ActualizarHoja"
+    },
+    {
+      "parameters": {
+        "content": "## Analizar anuncios de la competencia\nAuditoría completa de competidores\n",
+        "height": 500,
+        "width": 440,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        1040
+      ],
+      "id": "5e574b20-4a7b-46bb-bea6-e724eacffcff",
+      "name": "Nota Pegajosa–AnunciosCompetencia"
+    },
+    {
+      "parameters": {
+        "content": "## Obtener perfiles de marca\n",
+        "height": 280,
+        "width": 380,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        120,
+        1040
+      ],
+      "id": "c35e75e3-be15-467c-b7b8-151b6ff265a1",
+      "name": "Nota Pegajosa–PerfilesMarca"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A",
+          "mode": "list",
+          "cachedResultName": "Scrapeo Marcas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Competidores_Web",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "Completado"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        320,
+        1140
+      ],
+      "id": "8f04da8e-01b3-4592-9b58-9e4d1d5be425",
+      "name": "ObtenerIDHoja"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A",
+          "mode": "list",
+          "cachedResultName": "Scrapeo Marcas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $json.SheetID }}",
+          "mode": "id"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "test",
+              "lookupValue": "Si"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        800,
+        1140
+      ],
+      "id": "88d7eac0-3517-4d5a-8f38-4e702229933f",
+      "name": "ObtenerAnuncios"
+    },
+    {
+      "parameters": {
+        "content": "## Extraer anuncios para probar\n",
+        "height": 280,
+        "width": 380,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        540,
+        1040
+      ],
+      "id": "bcf3a295-8f93-4604-97b4-1fe620c05df3",
+      "name": "Nota Pegajosa–ProbarAnuncios"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Rol:\nEres un estratega creativo senior especializado en descomponer anuncios publicitarios para identificar las claves de su éxito, debilidades ocultas y oportunidades de mejora. Tu experiencia combina neuroventa, storytelling, targeting avanzado y psicología del consumidor.\n\nObjetivo:\nAuditar en profundidad un anuncio en vídeo de un competidor para extraer aprendizajes accionables que mejoren significativamente nuestra estrategia creativa, tanto en formato como en segmentación y narrativa.\n\nEntrada:\n- Transcripción completa del vídeo del competidor: {{ $json.text }}\n\nInstrucciones:\nAnaliza la transcripción publicitaria y proporciona un informe detallado dividido en los siguientes apartados:\n\n1. Gancho inicial\n   - Tipo de gancho utilizado: pregunta retórica, afirmación disruptiva, contraste, prueba social, etc.\n   - Emoción o impulso psicológico que activa: miedo a perderse algo, validación, humor, urgencia, aspiración, etc.\n   - Evaluación: ¿Es memorable? ¿Tiene potencial viral?\n\n2. Perfil de audiencia objetivo\n   - Demografía estimada: edad, género, ubicación, ocupación, nivel adquisitivo.\n   - Psicografía: deseos profundos, frustraciones habituales, estilo de vida, valores dominantes.\n   - ¿El mensaje conecta realmente con ese perfil?\n\n3. Ángulo de comunicación\n   - Problema específico que ataca el anuncio.\n   - Solución propuesta y promesa principal.\n   - Insight poderoso: la verdad emocional o cultural que subyace al mensaje.\n\n4. Segmentación sugerida\n   - Lista de 5 segmentos de público recomendados, optimizados para campañas de Meta o Google Ads.\n   - Cada segmento debe incluir: nombre del segmento, intereses clave, tipo de mensaje que más le impacta.\n\n5. Ángulos de venta detectados\n   - Extrae 5 enfoques usados o sugeridos (por ejemplo, confianza en la marca, transformación rápida, ahorro, exclusividad, prueba social).\n   - Añade para cada uno un ejemplo textual del anuncio que lo ilustre.\n\n6. Auditoría creativa\n   - Formatos y recursos usados: voz en off, subtítulos, UGC, testimonios, efectos visuales, ritmo.\n   - Fortalezas del anuncio: ¿Qué lo hace destacar?\n   - Debilidades: ¿Dónde pierde impacto o credibilidad?\n   - Oportunidades: ¿Qué podríamos hacer diferente para sobresalir en este mismo terreno?\n\nFormato de salida:\nDevuelve únicamente el informe completo, estructurado por apartados y usando viñetas. Sin introducciones, sin explicaciones fuera del análisis. Clara, directa y accionable."
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        1440,
+        1160
+      ],
+      "id": "ee770947-9d27-46d8-b8ad-294a7b209a88",
+      "name": "AnálisisVideoCompetencia"
+    },
+    {
+      "parameters": {
+        "content": "## Generar guion de anuncio\nCrear ideas de guion y añadirlas a la hoja\n",
+        "height": 500,
+        "width": 740,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1820,
+        1040
+      ],
+      "id": "f3b88dc9-528e-42b3-bc15-40f2663dbb69",
+      "name": "Nota Pegajosa–GenerarGuion"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Rol:\nEres un guionista publicitario senior, especializado en voz en off de máximo 40 segundos. Combinas técnicas de neuroventa, storytelling y economía de palabras para conectar al instante.\n\nObjetivo:\nCrear un guion de voz en off que emocione y persuada, integrando:\n- Insights de nuestra auditoría creativa\n- Elementos destacados de los anuncios de la competencia\n- Datos clave de nuestra marca\n\nEntradas:\n- Transcripción UGC del competidor: {{ $('TranscribirAudioUGC').item.json.text }}\n\n- Resultado de la auditoría creativa: {{ $json.text }}\n\nDatos de la marca:\n- Nombre: ImplantIA Solutions\n- Público objetivo: hombres 35–55 años con pérdida de cabello que buscan una solución natural y tecnológica\n- Tono: cercano, empático, esperanzador\n- Propuestas únicas: tecnología de vanguardia, cirujanos especialistas, resultados naturales, apoyo emocional integral\n\nEstructura del guion:\n1. Gancho (5–8 s)\n   • Frase breve que despierte curiosidad o emoción  \n2. Desarrollo (20–25 s)\n   • Mensaje principal en lenguaje coloquial  \n   • Breve historia o testimonio real  \n3. Cierre y CTA (5–8 s)\n   • Llamada a la acción concreta (visitar web, agendar cita, diagnóstico gratis)\n\nRestricciones:\n- Duración máxima de lectura: 40 segundos  \n- Máximo 1000 caracteres  \n- Solo el texto del guion, sin instrucciones ni notas adicionales  ",
+        "hasOutputParser": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        1880,
+        1160
+      ],
+      "id": "486bb318-ee33-483b-a720-24e8a72daf55",
+      "name": "GenerarGuionAnuncio"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.video_sd_url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1000,
+        1160
+      ],
+      "id": "a1e650fc-ba92-4df9-a08f-af080079a828",
+      "name": "ObtenerAudio"
+    },
+    {
+      "parameters": {
+        "content": "## Transcribir audio de anuncios UGC\n",
+        "height": 280,
+        "width": 360,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        980,
+        1040
+      ],
+      "id": "78fcaacb-db9f-406c-9129-712b6753b95b",
+      "name": "Nota Pegajosa–TranscribirUGC"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1220,
+        1160
+      ],
+      "id": "864f3c9b-b537-44eb-b621-c87df39d6cb9",
+      "name": "TranscribirAudioUGC"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A",
+          "mode": "list",
+          "cachedResultName": "Scrapeo Marcas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 72562002,
+          "mode": "list",
+          "cachedResultName": "Guiones_Ads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A/edit#gid=72562002"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Titulo": "={{ $json.output.titulo }}",
+            "Guion entero": "={{ $json.output.gancho }} {{ $json.output.cuerpo_del_mensaje }} {{ $json.output.llamada_a_la_accion }}",
+            "Estado": "Idea",
+            "Ad Referencia": "={{ $('ObtenerAnuncios').item.json.video_sd_url }}",
+            "Audiencia": "={{ $json.output.audiencia_objetivo }}",
+            "Angulo": "={{ $json.output.angulo }}",
+            "Hook": "={{ $json.output.gancho }}",
+            "Cuerpo": "={{ $json.output.cuerpo_del_mensaje }}",
+            "CTA": "={{ $json.output.llamada_a_la_accion }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Titulo",
+              "displayName": "Titulo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Guion entero",
+              "displayName": "Guion entero",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Ad Referencia",
+              "displayName": "Ad Referencia",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Audiencia",
+              "displayName": "Audiencia",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Angulo",
+              "displayName": "Angulo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hook",
+              "displayName": "Hook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Cuerpo",
+              "displayName": "Cuerpo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CTA",
+              "displayName": "CTA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2300,
+        1140
+      ],
+      "id": "076340b8-f915-4b20-a9c5-f416c9cfd10c",
+      "name": "ActualizarBorradorAnuncios"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        560,
+        1140
+      ],
+      "id": "d802c369-d455-464a-acbf-bf5820bee6af",
+      "name": "BuclePorElementos1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserAutofixing",
+      "typeVersion": 1,
+      "position": [
+        2120,
+        1340
+      ],
+      "id": "efe60cc1-9e0e-4878-ac28-ed8a6cc130fd",
+      "name": "ParserAutoCorrección"
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-3.5-sonnet",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1860,
+        1400
+      ],
+      "id": "60f556aa-c109-445b-b853-9032316cae97",
+      "name": "ModeloChat OpenRouter"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1420,
+        1380
+      ],
+      "id": "645c752d-96c5-43df-9273-037574222ad1",
+      "name": "OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2480,
+        560
+      ],
+      "id": "93369908-daf8-4f9d-8d75-c0b5895d7aa3",
+      "name": "Wait",
+      "webhookId": "ce6c304e-c81e-42f3-9afe-3224ca3de1e6"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"titulo\": \"Transforma tu energía cada mañana\",\n  \"audiencia_objetivo\": \"Emprendedores con rutinas exigentes\",\n  \"angulo\": \"Cambio real con una rutina sencilla\",\n  \"gancho\": \"¡Nunca imaginé empezar con tanta energía!\",\n  \"cuerpo_del_mensaje\": \"Buenos días, familia. Antes necesitaba tres cafés para arrancar el día. Con Energy Flow me siento enfocado y con ánimo de sobra. Ahora es parte de mi rutina.\",\n  \"llamada_a_la_accion\": \"Descubre tu mejor versión: haz clic abajo y pruébalo hoy.\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        2180,
+        1460
+      ],
+      "id": "a9298f39-5cce-49ab-ba12-575fecb07662",
+      "name": "ParserSalidaEstructurada"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A",
+          "mode": "list",
+          "cachedResultName": "Scrapeo Marcas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 72562002,
+          "mode": "list",
+          "cachedResultName": "Guiones_Ads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A/edit#gid=72562002"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        240,
+        1800
+      ],
+      "id": "9529283e-688d-44ec-ab7e-86a19cdff7e5",
+      "name": "ObtenerAnunciosAprobados"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2f7605b9-516c-4176-acc0-c2f687c30107",
+              "leftValue": "={{ $json.Estado }}",
+              "rightValue": "Crear",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "9eaad0ce-d4ee-4b8f-b661-4cd2fec38e7f",
+              "leftValue": "={{ $json['Video Avatar'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        420,
+        1800
+      ],
+      "id": "5908858a-282a-4535-b377-bf5111ffb174",
+      "name": "SiAprobado"
+    },
+    {
+      "parameters": {
+        "url": "https://api.heygen.com/v1/video_status.get",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "video_id",
+              "value": "={{ $('ObtenerIdVideo').item.json.video_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6083753c-2293-4bd2-8373-cc312b52d02d",
+      "name": "ObtenerVideo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1320,
+        1800
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $('ObtenerVideo').item.json.data.video_url }}",
+        "options": {}
+      },
+      "id": "f61771be-a2fe-4211-87e9-e0d21bf02809",
+      "name": "DescargarVideo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2040,
+        1800
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b33d55b4-a2e2-404a-9dfe-38d13f1ae59f",
+              "leftValue": "={{ $json.data.status }}",
+              "rightValue": "completed",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1560,
+        1800
+      ],
+      "id": "69786933-2f8c-4c9d-80e2-611950ff4b58",
+      "name": "SiProcesamientoVideoCompleto"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "027964fd-a653-4fbd-8e90-b86a35423b6a",
+              "name": "video_id",
+              "value": "={{ $json.data.video_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        820,
+        1800
+      ],
+      "id": "16332d32-acf6-449a-813a-e4f5f2a38ce9",
+      "name": "ObtenerIdVideo"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.heygen.com/v2/video/generate",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"video_inputs\": [\n    {\n      \"character\": {\n        \"type\": \"avatar\",\n        \"avatar_id\": \"ab8ce28135da44908bb0ae66bbf6ed7a\",\n        \"avatar_style\": \"normal\"\n      },\n      \"voice\": {\n        \"type\": \"text\",\n        \"input_text\": \"{{ $json['Guion entero'] }}\",\n        \"voice_id\": \"29d36a2c7ebf417f84176fc7fc4a8a1f\",\n        \"speed\": 1.4\n      }\n    }\n  ],\n  \"dimension\": {\n    \"width\": 720,\n    \"height\": 1280\n  }\n} ",
+        "options": {}
+      },
+      "id": "bf787e78-ecdb-41e5-b87b-628c31214cde",
+      "name": "GenerarVideoIntro",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        640,
+        1800
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5117b0d9-31e8-4e10-93af-be73cd8e82ac",
+              "name": "video_name",
+              "value": "={{ $('SiAprobado').item.json.Titulo }} - {{ $('GenerarVideoIntro').item.json.data.video_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1820,
+        1800
+      ],
+      "id": "6c7910f3-c36a-47b7-875d-2fd4f34a4f93",
+      "name": "EstablecerNombreVideo"
+    },
+    {
+      "parameters": {
+        "amount": 20
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1100,
+        1800
+      ],
+      "id": "fb38701c-dcf1-4df9-b51c-2f09169b1c23",
+      "name": "Esperar2minProcesamiento",
+      "webhookId": "ccbb2ca1-9d44-451e-aba8-df49567f794d"
+    },
+    {
+      "parameters": {
+        "name": "={{ $('EstablecerNombreVideo').item.json.video_name }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1sJqM61k7jvXd7Y3_tdXhExH2EJWQdKZw",
+          "mode": "list",
+          "cachedResultName": "Pruebas",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1sJqM61k7jvXd7Y3_tdXhExH2EJWQdKZw"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2300,
+        1800
+      ],
+      "id": "11e0d450-4bc5-41e5-9193-f2eda08c6fbf",
+      "name": "UnidadGoogle"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A",
+          "mode": "list",
+          "cachedResultName": "Scrapeo Marcas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 72562002,
+          "mode": "list",
+          "cachedResultName": "Guiones_Ads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14AMWRHMB2Fi60ZiHfl8ix226MvhNj1s9l74XLm6Bs6A/edit#gid=72562002"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Video Avatar": "={{ $json.webViewLink }}",
+            "Guion entero": "={{ $('ObtenerAnunciosAprobados').item.json['Guion entero'] }}"
+          },
+          "matchingColumns": [
+            "Guion entero"
+          ],
+          "schema": [
+            {
+              "id": "Titulo",
+              "displayName": "Titulo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Guion entero",
+              "displayName": "Guion entero",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Ad Referencia",
+              "displayName": "Ad Referencia",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Audiencia",
+              "displayName": "Audiencia",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Angulo",
+              "displayName": "Angulo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Hook",
+              "displayName": "Hook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Cuerpo",
+              "displayName": "Cuerpo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CTA",
+              "displayName": "CTA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Video Avatar",
+              "displayName": "Video Avatar",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2480,
+        1800
+      ],
+      "id": "dc0b7c33-c511-40f5-af3a-d0f6690cf763",
+      "name": "ActualizarVideoUGC"
+    },
+    {
+      "parameters": {
+        "content": "## Extraer Anuncios Aprobados",
+        "height": 280,
+        "width": 380,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        180,
+        1720
+      ],
+      "id": "ccb756ff-09fc-4e02-b899-eeab17f0d3b7",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Esperar a que se complete el video de IA",
+        "height": 400,
+        "width": 760,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        980,
+        1700
+      ],
+      "typeVersion": 1,
+      "id": "6e340496-6cc5-4b7c-b9d3-fa2d062e4e26",
+      "name": "Sticky Note17"
+    },
+    {
+      "parameters": {
+        "content": "## Crear Anuncio de Video",
+        "height": 280,
+        "width": 380,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        580,
+        1720
+      ],
+      "id": "b084ffa6-0fd5-4a5e-9ad4-41f0aae4a0fd",
+      "name": "Sticky Note36"
+    },
+    {
+      "parameters": {
+        "content": "## Subir\nEspera a que HeyGen genere el video de IA. Puede tardar hasta 15 minutos",
+        "height": 400,
+        "width": 840,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1760,
+        1700
+      ],
+      "typeVersion": 1,
+      "id": "b3eaadb4-1dd2-4087-90ea-8d27a927fdf1",
+      "name": "Sticky Note37"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "ObtenerAnunciosAprobados",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Obtener perfil desde Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "ObtenerPerfiles",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "ObtenerIDHoja",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer datos de Facebook": {
+      "main": [
+        [
+          {
+            "node": "Asignar URL Facebook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Asignar URL Facebook": {
+      "main": [
+        [
+          {
+            "node": "Comprobar Facebook_URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Establecer URLs de Marca": {
+      "main": [
+        [
+          {
+            "node": "Extraer datos de Facebook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Comprobar Facebook_URL": {
+      "main": [
+        [
+          {
+            "node": "Obtener ID de Facebook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener ID de Facebook": {
+      "main": [
+        [
+          {
+            "node": "Actualizar URL en Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener perfil desde Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Establecer URLs de Marca",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ObtenerPerfiles": {
+      "main": [
+        [
+          {
+            "node": "SiNoVacio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RecorrerElementos": {
+      "main": [
+        [],
+        [
+          {
+            "node": "BuscarAnunciosVideo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SiNoVacio": {
+      "main": [
+        [
+          {
+            "node": "RecorrerElementos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BuscarAnunciosVideo": {
+      "main": [
+        [
+          {
+            "node": "SepararResultados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CrearHoja": {
+      "main": [
+        [
+          {
+            "node": "Esperar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AñadirAnuncios": {
+      "main": [
+        [
+          {
+            "node": "AñadirIdHoja",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ConfigurarDatos": {
+      "main": [
+        [
+          {
+            "node": "Esperar",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Esperar": {
+      "main": [
+        [
+          {
+            "node": "AñadirAnuncios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SepararResultados": {
+      "main": [
+        [
+          {
+            "node": "SiAlguno",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AñadirIdHoja": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SiAlguno": {
+      "main": [
+        [
+          {
+            "node": "CrearHoja",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "ConfigurarDatos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ActualizarHoja",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ActualizarHoja": {
+      "main": [
+        [
+          {
+            "node": "RecorrerElementos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ObtenerIDHoja": {
+      "main": [
+        [
+          {
+            "node": "BuclePorElementos1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ObtenerAnuncios": {
+      "main": [
+        [
+          {
+            "node": "ObtenerAudio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AnálisisVideoCompetencia": {
+      "main": [
+        [
+          {
+            "node": "GenerarGuionAnuncio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GenerarGuionAnuncio": {
+      "main": [
+        [
+          {
+            "node": "ActualizarBorradorAnuncios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ObtenerAudio": {
+      "main": [
+        [
+          {
+            "node": "TranscribirAudioUGC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TranscribirAudioUGC": {
+      "main": [
+        [
+          {
+            "node": "AnálisisVideoCompetencia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ActualizarBorradorAnuncios": {
+      "main": [
+        [
+          {
+            "node": "BuclePorElementos1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "BuclePorElementos1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "ObtenerAnuncios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ModeloChat OpenRouter": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "GenerarGuionAnuncio",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "ParserAutoCorrección",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AnálisisVideoCompetencia",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "RecorrerElementos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ParserAutoCorrección": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "GenerarGuionAnuncio",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ParserSalidaEstructurada": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "ParserAutoCorrección",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ObtenerAnunciosAprobados": {
+      "main": [
+        [
+          {
+            "node": "SiAprobado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SiAprobado": {
+      "main": [
+        [
+          {
+            "node": "GenerarVideoIntro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ObtenerVideo": {
+      "main": [
+        [
+          {
+            "node": "SiProcesamientoVideoCompleto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DescargarVideo": {
+      "main": [
+        [
+          {
+            "node": "UnidadGoogle",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SiProcesamientoVideoCompleto": {
+      "main": [
+        [
+          {
+            "node": "EstablecerNombreVideo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Esperar2minProcesamiento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ObtenerIdVideo": {
+      "main": [
+        [
+          {
+            "node": "Esperar2minProcesamiento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GenerarVideoIntro": {
+      "main": [
+        [
+          {
+            "node": "ObtenerIdVideo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EstablecerNombreVideo": {
+      "main": [
+        [
+          {
+            "node": "DescargarVideo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Esperar2minProcesamiento": {
+      "main": [
+        [
+          {
+            "node": "ObtenerVideo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UnidadGoogle": {
+      "main": [
+        [
+          {
+            "node": "ActualizarVideoUGC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {
+    "ObtenerAnuncios": [
+      {
+        "json": {
+          "row_number": 20,
+          "adArchiveId": 534163299714221,
+          "title": "No esperes a perder más",
+          "adBody": "🚨 Cada cabello que pierdes es una señal: no la ignores 🚨\nSi notas más cabello en la almohada o en la ducha, es momento de actuar. La mesoterapia capilar es la solución que tu imagen necesita para frenar la caída antes de que sea tarde.\n✔️ Recupera densidad y volumen en semanas\n✔️ Tratamiento avanzado sin cirugías\n✔️ Mantén tu imagen fuerte y segura\n\n📅 Reserva tu cita y evita una mayor pérdida.",
+          "original_image_url": "",
+          "video_sd_url": "https://video-atl3-2.xx.fbcdn.net/v/t42.1790-2/485210009_1503872680571792_3261666456368398102_n.mp4?_nc_cat=111&ccb=1-7&_nc_sid=c53f8f&_nc_ohc=1-zVUqvvHCoQ7kNvwHBAEa1&_nc_oc=Adl7KVOm4uXlA3HmlcEin7ZVpWvtwz2um2Yf2rUkffCGAIFD1pjYCdt7ZYxfaMb-FVc&_nc_zt=28&_nc_ht=video-atl3-2.xx&_nc_gid=YYqQbY06DvNHJEnhq__24g&oh=00_AfE9Iaw6FRgXM_CSa-H_j_hCffd6AzKmv9VtQpg4Sin84Q&oe=6811F6F2",
+          "caption": "",
+          "cta": "Learn More",
+          "link_url": "https://centrobilbao.hairsolution.es/home-3978",
+          "created": "21-03-2025",
+          "test": "Si"
+        }
+      }
+    ],
+    "ObtenerAudio": [
+      {
+        "json": {
+          "row_number": 20,
+          "adArchiveId": 534163299714221,
+          "title": "No esperes a perder más",
+          "adBody": "🚨 Cada cabello que pierdes es una señal: no la ignores 🚨\nSi notas más cabello en la almohada o en la ducha, es momento de actuar. La mesoterapia capilar es la solución que tu imagen necesita para frenar la caída antes de que sea tarde.\n✔️ Recupera densidad y volumen en semanas\n✔️ Tratamiento avanzado sin cirugías\n✔️ Mantén tu imagen fuerte y segura\n\n📅 Reserva tu cita y evita una mayor pérdida.",
+          "original_image_url": "",
+          "video_sd_url": "https://video-atl3-2.xx.fbcdn.net/v/t42.1790-2/485210009_1503872680571792_3261666456368398102_n.mp4?_nc_cat=111&ccb=1-7&_nc_sid=c53f8f&_nc_ohc=1-zVUqvvHCoQ7kNvwHBAEa1&_nc_oc=Adl7KVOm4uXlA3HmlcEin7ZVpWvtwz2um2Yf2rUkffCGAIFD1pjYCdt7ZYxfaMb-FVc&_nc_zt=28&_nc_ht=video-atl3-2.xx&_nc_gid=YYqQbY06DvNHJEnhq__24g&oh=00_AfE9Iaw6FRgXM_CSa-H_j_hCffd6AzKmv9VtQpg4Sin84Q&oe=6811F6F2",
+          "caption": "",
+          "cta": "Learn More",
+          "link_url": "https://centrobilbao.hairsolution.es/home-3978",
+          "created": "21-03-2025",
+          "test": "Si"
+        }
+      }
+    ],
+    "TranscribirAudioUGC": [
+      {
+        "json": {
+          "text": "El espejo no miente, se te está cayendo el pelo y lo sabes. En Gersolution empezamos con un diagnóstico detallado para entender el estado de falta de densidad y ponerle freno. Toma acción hoy rellenando este formulario."
+        }
+      }
+    ],
+    "AnálisisVideoCompetencia": [
+      {
+        "json": {
+          "text": "### 1. Gancho inicial\n- **Tipo de gancho utilizado:** Afirmación disruptiva.\n- **Emoción o impulso psicológico que activa:** Miedo a enfrentar problemas personales (en este caso, la caída del cabello).\n- **Evaluación:** Es memorable y provoca una reacción inmediata. Potencial viral moderado, dependiendo de la ejecución visual.\n\n### 2. Perfil de audiencia objetivo\n- **Demografía estimada:** \n  - Edad: 30-50 años.\n  - Género: Hombres y mujeres.\n  - Ubicación: Áreas urbanas.\n  - Ocupación: Profesionales o ejecutivos.\n  - Nivel adquisitivo: Medio-alto.\n  \n- **Psicografía:** \n  - Deseos profundos: Luzca bien, mantener la juventud.\n  - Frustraciones habituales: Pérdida de cabello, falta de confianza.\n  - Estilo de vida: Activo, busca soluciones efectivas.\n  - Valores dominantes: Autoimagen, salud.\n\n- **¿El mensaje conecta realmente con ese perfil?** Sí, conecta al apelar a la inseguridad relacionada con la apariencia y la búsqueda de soluciones para mejorar la autoimagen.\n\n### 3. Ángulo de comunicación\n- **Problema específico que ataca el anuncio:** Pérdida de densidad del cabello.\n- **Solución propuesta y promesa principal:** Diagnóstico detallado para entender y frenar la caída del cabello.\n- **Insight poderoso:** El cuidado personal es esencial en la lucha contra el envejecimiento y la pérdida de atractivo.\n\n### 4. Segmentación sugerida\n1. **Segmento 1:** \"Profesionales en transición\"\n   - Intereses clave: Cuidado personal, estética, fitness.\n   - Tipo de mensaje: Enfocado en resultados y transformación rápida.\n\n2. **Segmento 2:** \"Padres preocupados\"\n   - Intereses clave: Salud familiar, bienestar.\n   - Tipo de mensaje: Mensajes sobre la importancia de dar ejemplo a sus hijos.\n\n3. **Segmento 3:** \"Solteros activos\"\n   - Intereses clave: Citas, citas online.\n   - Tipo de mensaje: Resaltar cómo una buena apariencia aumenta la confianza.\n\n4. **Segmento 4:** \"Hombres en la mediana edad\"\n   - Intereses clave: Moda masculina, cuidado personal.\n   - Tipo de mensaje: Enfoque en la masculinidad y la importancia de lucir joven.\n\n5. **Segmento 5:** \"Mujeres en búsqueda de soluciones estéticas\"\n   - Intereses clave: Belleza, tratamientos capilares.\n   - Tipo de mensaje: Mensajes sobre la restauración de la juventud y belleza.\n\n### 5. Ángulos de venta detectados\n1. **Confianza en la marca:**\n   - Ejemplo: \"En Gersolution empezamos con un diagnóstico detallado...\"\n   \n2. **Transformación rápida:**\n   - Ejemplo: \"Para entender el estado de falta de densidad y ponerle freno.\"\n   \n3. **Ahorro:**\n   - Ejemplo: Implícito en la idea de que un diagnóstico evita gastos en tratamientos inútiles.\n   \n4. **Exclusividad:**\n   - Ejemplo: La sugerencia de un diagnóstico \"detallado\" implica una atención especial y personalizada.\n   \n5. **Prueba social:**\n   - Ejemplo: La aseveración inicial que puede resonar con la experiencia común del público en cuanto a la caída del cabello.\n\n### 6. Auditoría creativa\n- **Formatos y recursos usados:** Voz en off y un llamado a la acción directo al final.\n- **Fortalezas del anuncio:** Directo y claridad en el mensaje; aborda un tema sensible de forma directa.\n- **Debilidades:** Carece de testimonios visuales o evidencias que respalden la efectividad del servicio; podría parecer genérico sin un elemento diferenciador.\n- **Oportunidades:** Incorporar testimonios visuales o testimonios de clientes podría aumentar la credibilidad; incluir elementos visuales que ilustren la transformación o éxito de los tratamientos podría hacer el anuncio más atractivo."
+        }
+      }
+    ],
+    "ObtenerVideo": [
+      {
+        "json": {
+          "code": 100,
+          "data": {
+            "callback_id": null,
+            "caption_url": "",
+            "created_at": 1745625067,
+            "duration": 22.712,
+            "error": null,
+            "gif_url": null,
+            "id": "2e61fbc2d6ac477d9784b865cf87eb79",
+            "status": "completed",
+            "thumbnail_url": "https://files2.heygen.ai/aws_pacific/avatar_tmp/a7401837f1a343b9a1483808c34f053a/2e61fbc2d6ac477d9784b865cf87eb79.jpeg?Expires=1746229933&Signature=lHxC5mBqdtuYOLdULNVOOhUzMBjkbmdLA~x9eDtDCPTMO3KGi58D9YPuhTMibTbRBi8JrV0HwXXbJDshcnVv0Bx3QjH9qjLTBQR1JoBiDI7YnwL8OiMX~iT8BFbFpYpelFpwFYBz3NiG4aMzBuXsUYJ1laTMjLGRxw6ZVF81tTXiSKeVfKlOH99uNXbDcPMCmUil6WhqLLvQPh0tEn3sBXJmWXB56OFAwFjWrzq1Ct00wQFwTb27focijiEflV1BCvhElLk-cpNyQ3i5abvEzBQczWKSYWUNQtsMCvxJmBUxkN9xgCJNngO4z374Lvb38bGjJk0l0YhVhObib~a0Cg__&Key-Pair-Id=K38HBHX5LX3X2H",
+            "video_url": "https://files2.heygen.ai/aws_pacific/avatar_tmp/a7401837f1a343b9a1483808c34f053a/2e61fbc2d6ac477d9784b865cf87eb79.mp4?Expires=1746229933&Signature=A7uHMKrWiok5saFivAWQ3iV3plq2s1SVF9L4iWZtTI6mpM3zqbE71eas0v6c9laBp2o-35g2wbcAiH5gX~IxBFOevuLdfZeZLM6VTQP-1~j7ieghM6CakXiD~pUPFQeBC73N1ry4sJRHxT-SQPngQQbhSkMGMRFCKr2FQgsfFBeU3E-CZ0-VsK0XTNhdCwqErLNU5zx6k~Y4dCatYJ3LYVh6LlpbWuZjXdaAieSGXYLTarDJo5BI7iYz8x6GykwPv4ZwVerhT1VECJ4smTMRsfff0YBFnFrjed6vUg-aogEAU-WeCp7eHm-5LWxn7NjUd0OWXQs00dvQDwtpxIt8eA__&Key-Pair-Id=K38HBHX5LX3X2H",
+            "video_url_caption": null
+          },
+          "message": "Success"
+        }
+      }
+    ],
+    "Esperar2minProcesamiento": [
+      {
+        "json": {
+          "video_id": "2e61fbc2d6ac477d9784b865cf87eb79"
+        }
+      }
+    ],
+    "ObtenerIdVideo": [
+      {
+        "json": {
+          "video_id": "2e61fbc2d6ac477d9784b865cf87eb79"
+        }
+      }
+    ],
+    "GenerarVideoIntro": [
+      {
+        "json": {
+          "error": null,
+          "data": {
+            "video_id": "2e61fbc2d6ac477d9784b865cf87eb79"
+          }
+        }
+      }
+    ],
+    "ObtenerAnunciosAprobados": [
+      {
+        "json": {
+          "row_number": 2,
+          "Titulo": "Guion de voz en off para implantes capilares",
+          "Guion entero": "¿Te has dado cuenta que cada vez pasas más tiempo arreglándote el cabello frente al espejo? En ImplantIA Solutions entendemos lo que significa para ti. Por eso, nuestro equipo de cirujanos expertos utiliza la tecnología más avanzada para devolverte no solo tu cabello, sino tu confianza. Con resultados naturales garantizados y un acompañamiento personalizado, transformamos vidas todos los días. Descubre cómo podemos ayudarte. Agenda tu diagnóstico gratuito hoy mismo y da el primer paso hacia el cambio que deseas.",
+          "Estado": "Crear",
+          "Ad Referencia": "https://video-lax3-1.xx.fbcdn.net/v/t42.1790-2/489054354_522245754090558_3555201249829751362_n.mp4?_nc_cat=104&ccb=1-7&_nc_sid=c53f8f&_nc_ohc=ruCCNRxo_wEQ7kNvwHCCYWr&_nc_oc=AdmaFtWqv26asv6I9h7qzCms6n5gQeW_S7xsytKbI2bUzz-zMWae6mxOubO_i2JfSQ4&_nc_zt=28&_nc_ht=video-lax3-1.xx&_nc_gid=UdZB3tpaF7z2UetNP3nSmw&oh=00_AfF4YimQ3lE3RSybQ8DMACa3kSc1PkitX3PlTZluC6-USA&oe=68119B25",
+          "Audiencia": "Hombres 35-55 años preocupados por pérdida de cabello",
+          "Angulo": "Solución definitiva y natural con tecnología avanzada",
+          "Hook": "¿Te has dado cuenta que cada vez pasas más tiempo arreglándote el cabello frente al espejo?",
+          "Cuerpo": "En ImplantIA Solutions entendemos lo que significa para ti. Por eso, nuestro equipo de cirujanos expertos utiliza la tecnología más avanzada para devolverte no solo tu cabello, sino tu confianza. Con resultados naturales garantizados y un acompañamiento personalizado, transformamos vidas todos los días.",
+          "CTA": "Descubre cómo podemos ayudarte. Agenda tu diagnóstico gratuito hoy mismo y da el primer paso hacia el cambio que deseas.",
+          "Video Avatar": "https://drive.google.com/file/d/1HJqm_DsJHO_tZWNvLzbCPV7WUwBhUC2E/view?usp=drivesdk"
+        }
+      },
+      {
+        "json": {
+          "row_number": 3,
+          "Titulo": "Implant IA - Guión de voz en off",
+          "Guion entero": "¿Sabes qué es lo que más temen los hombres al pensar en un implante capilar? La incertidumbre. No saber si quedará natural, si dolerá, si valdrá la pena. En ImplantIA Solutions entendemos esa preocupación. Por eso combinamos tecnología de última generación con el expertise de cirujanos expertos que te acompañarán en cada paso. Nuestro sistema de implante asistido por IA garantiza resultados tan naturales que ni tú mismo notarás la diferencia. Y lo mejor: estaremos contigo antes, durante y después del procedimiento. Agenda tu consulta gratuita hoy y descubre cómo podemos ayudarte a recuperar no solo tu cabello, sino también tu confianza.",
+          "Estado": "Crear",
+          "Ad Referencia": "https://video-lax3-1.xx.fbcdn.net/v/t42.1790-2/491499916_1122757203223631_8260192132106539071_n.mp4?_nc_cat=102&ccb=1-7&_nc_sid=c53f8f&_nc_ohc=BrloZf17ZzMQ7kNvwG4v2AW&_nc_oc=AdlMu9t5E9uK9KuWyjAaR_9GtJ2DW2ljMVE9gqvZOnP7twEkLlD7uKjPrtw6SNFDDHs&_nc_zt=28&_nc_ht=video-lax3-1.xx&_nc_gid=UdZB3tpaF7z2UetNP3nSmw&oh=00_AfH1BK6NOslN9h4qByOmm89197eIrL335Y_NjN0-zJyGuw&oe=68119941",
+          "Audiencia": "Hombres 35-55 años con pérdida de cabello",
+          "Angulo": "Tecnología avanzada y acompañamiento experto para recuperar el cabello de forma natural",
+          "Hook": "¿Sabes qué es lo que más temen los hombres al pensar en un implante capilar?",
+          "Cuerpo": "La incertidumbre. No saber si quedará natural, si dolerá, si valdrá la pena. En ImplantIA Solutions entendemos esa preocupación. Por eso combinamos tecnología de última generación con el expertise de cirujanos expertos que te acompañarán en cada paso. Nuestro sistema de implante asistido por IA garantiza resultados tan naturales que ni tú mismo notarás la diferencia. Y lo mejor: estaremos contigo antes, durante y después del procedimiento.",
+          "CTA": "Agenda tu consulta gratuita hoy y descubre cómo podemos ayudarte a recuperar no solo tu cabello, sino también tu confianza.",
+          "Video Avatar": "https://drive.google.com/file/d/1Rojof5G_jCfkplx6DfhOtgHFhsyFvgUE/view?usp=drivesdk"
+        }
+      },
+      {
+        "json": {
+          "row_number": 4,
+          "Titulo": "Guion de voz en off para ImplantIA Solutions",
+          "Guion entero": "¿Sabes qué es peor que perder el cabello? Perder la oportunidad de recuperarlo de forma natural. En ImplantIA Solutions entendemos lo que significa para ti. Por eso combinamos tecnología de última generación con la experiencia de cirujanos expertos para ofrecerte resultados naturales garantizados. No solo recuperarás tu cabello, recuperarás tu confianza. Nuestro equipo te acompaña en cada paso del proceso, porque tu bienestar es nuestra prioridad. Agenda hoy tu diagnóstico gratuito y da el primer paso hacia el cambio que deseas. ImplantIA Solutions, tecnología y experiencia para tu transformación natural.",
+          "Estado": "Idea",
+          "Ad Referencia": "https://video-lax3-2.xx.fbcdn.net/v/t42.1790-2/490902672_641765588662625_4562757379190900324_n.mp4?_nc_cat=106&ccb=1-7&_nc_sid=c53f8f&_nc_ohc=MSoS7mNMWkMQ7kNvwFZgPX9&_nc_oc=AdmLh_XQsYmHOHxaIG8XZebQyj1KhOhsaVGhkWjA5SSdCr39u78o9GDHYeeDOdqax4w&_nc_zt=28&_nc_ht=video-lax3-2.xx&_nc_gid=UdZB3tpaF7z2UetNP3nSmw&oh=00_AfH6nM6VV78drRXKQ0bMeKlUbRFn1dsjvafvBI1veBb8aA&oe=6811ABAB",
+          "Audiencia": "Hombres 35-55 años con pérdida de cabello",
+          "Angulo": "Empatía y esperanza con respaldo tecnológico",
+          "Hook": "¿Sabes qué es peor que perder el cabello? Perder la oportunidad de recuperarlo de forma natural.",
+          "Cuerpo": "En ImplantIA Solutions entendemos lo que significa para ti. Por eso combinamos tecnología de última generación con la experiencia de cirujanos expertos para ofrecerte resultados naturales garantizados. No solo recuperarás tu cabello, recuperarás tu confianza. Nuestro equipo te acompaña en cada paso del proceso, porque tu bienestar es nuestra prioridad.",
+          "CTA": "Agenda hoy tu diagnóstico gratuito y da el primer paso hacia el cambio que deseas. ImplantIA Solutions, tecnología y experiencia para tu transformación natural.",
+          "Video Avatar": ""
+        }
+      },
+      {
+        "json": {
+          "row_number": 5,
+          "Titulo": "Guión ImplantIA Solutions - 40s",
+          "Guion entero": "¿Sabes qué es peor que perder el cabello? Perder la oportunidad de recuperarlo. En ImplantIA Solutions entendemos que no solo buscas recuperar tu cabello, sino también tu confianza. Por eso combinamos lo último en tecnología con el toque humano de nuestros especialistas. Miles de hombres ya han recuperado su imagen de forma natural y permanente. Descubre tu solución personalizada. Agenda tu diagnóstico gratuito en ImplantIA Solutions.",
+          "Estado": "Crear",
+          "Ad Referencia": "https://video-atl3-2.xx.fbcdn.net/v/t42.1790-2/485210009_1503872680571792_3261666456368398102_n.mp4?_nc_cat=111&ccb=1-7&_nc_sid=c53f8f&_nc_ohc=1-zVUqvvHCoQ7kNvwHBAEa1&_nc_oc=Adl7KVOm4uXlA3HmlcEin7ZVpWvtwz2um2Yf2rUkffCGAIFD1pjYCdt7ZYxfaMb-FVc&_nc_zt=28&_nc_ht=video-atl3-2.xx&_nc_gid=YYqQbY06DvNHJEnhq__24g&oh=00_AfE9Iaw6FRgXM_CSa-H_j_hCffd6AzKmv9VtQpg4Sin84Q&oe=6811F6F2",
+          "Audiencia": "Hombres 35-55 años con pérdida de cabello",
+          "Angulo": "Transformación natural con tecnología de vanguardia",
+          "Hook": "¿Sabes qué es peor que perder el cabello? Perder la oportunidad de recuperarlo.",
+          "Cuerpo": "En ImplantIA Solutions entendemos que no solo buscas recuperar tu cabello, sino también tu confianza. Por eso combinamos lo último en tecnología con el toque humano de nuestros especialistas. Miles de hombres ya han recuperado su imagen de forma natural y permanente.",
+          "CTA": "Descubre tu solución personalizada. Agenda tu diagnóstico gratuito en ImplantIA Solutions.",
+          "Video Avatar": ""
+        }
+      }
+    ],
+    "EstablecerNombreVideo": [
+      {
+        "json": {
+          "video_name": "Guión ImplantIA Solutions - 40s - 2e61fbc2d6ac477d9784b865cf87eb79"
+        }
+      }
+    ]
+  },
+  "versionId": "f9d6770c-8599-4b34-ae35-152b4e3b9901",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-05-01T18:37:35.200Z",
+      "updatedAt": "2025-05-01T18:37:35.200Z",
+      "id": "v8m67Kki1pouxZzb",
+      "name": "Meta Ads"
+    },
+    {
+      "createdAt": "2025-05-01T18:37:37.695Z",
+      "updatedAt": "2025-05-01T18:37:37.695Z",
+      "id": "zc5OgcNQ3nH8dkxl",
+      "name": "Heygen"
+    },
+    {
+      "createdAt": "2025-04-29T15:46:48.137Z",
+      "updatedAt": "2025-04-29T15:46:48.137Z",
+      "id": "yW4EMLWuZNXAw2Pa",
+      "name": "Contenido"
+    }
+  ]
+}
