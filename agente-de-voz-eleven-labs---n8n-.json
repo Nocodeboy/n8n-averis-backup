@@ -1,0 +1,267 @@
+{
+  "createdAt": "2025-04-29T17:23:42.478Z",
+  "updatedAt": "2025-04-29T17:23:42.478Z",
+  "id": "eq6XyWXSRvRzwGhv",
+  "name": "Agente de voz Eleven Labs - n8n",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "create-path",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "605627ab-79ea-40d0-8850-cd6eb91bacac",
+      "name": "Webhook",
+      "webhookId": "1876a691-3452-4a06-b5f4-966041b89533"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.question }}",
+        "options": {
+          "systemMessage": "You are a tools-based AI agent designed to retrieve relevant information or files based on user voice input. \n\nYour job is to:\n1. Receive transcribed voice input from ElevenLabs.\n2. Understand the user's intent—especially identifying any file, topic, or document they are asking for.\n3. Use the provided Pinecone vector search API to find the most relevant matching content from the database.\n4. Return either:\n   - The exact file or document if explicitly requested.\n   - A relevant data chunk or passage if the request is question-based or vague.\n5. Always return a concise summary of what you retrieved, and explain why it's relevant.\n6. If no match is found, ask a clarifying question.\n\nImportant:\n- Do not hallucinate or make assumptions about file names.\n- Prioritize relevance from vector similarity results.\n- Use the top match unless otherwise specified.\n- All interactions are driven by the transcription of the user’s voice prompt.\n- Keep responses direct and user-friendly.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        220,
+        0
+      ],
+      "id": "a69d3cc4-432e-4067-b733-2f42b89c4a33",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        180,
+        180
+      ],
+      "id": "afa33f48-4c22-4199-b71f-5731d96dcdaf",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "n8n-example",
+          "mode": "list",
+          "cachedResultName": "n8n-example"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1,
+      "position": [
+        260,
+        360
+      ],
+      "id": "24d795f9-3b09-49dc-bd99-08ee186f52ba",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "BiV7uKnw3HFMgSnP",
+          "name": "PineconeApi Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        400,
+        500
+      ],
+      "id": "aa8ed0b7-08b6-49d9-9088-5feb39c30623",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        600,
+        360
+      ],
+      "id": "ab2f5e1f-2e49-40a4-b3a3-155f2b08a1eb",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        560,
+        0
+      ],
+      "id": "11723a72-1d7a-48ff-9cd4-428e71d5187b",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "name": "prompting_information",
+        "description": "Invoices and financial data of my company.",
+        "topK": 5
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1,
+      "position": [
+        420,
+        220
+      ],
+      "id": "c03e2af2-7288-4091-b4b5-6a126ad13657",
+      "name": "Projects"
+    },
+    {
+      "parameters": {
+        "content": "https://www.youtube.com/watch?v=5qYNogjuUA0",
+        "width": 420
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -260,
+        -220
+      ],
+      "id": "9407db50-98ee-48ab-8851-55eef9888681",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Projects",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Projects",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Projects": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "e5b13221-3234-4f18-8cd4-3a2f1f5adee1",
+  "triggerCount": 0,
+  "tags": []
+}
