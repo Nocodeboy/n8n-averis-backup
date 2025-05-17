@@ -1,0 +1,221 @@
+{
+  "createdAt": "2025-05-08T15:30:06.438Z",
+  "updatedAt": "2025-05-08T15:30:06.438Z",
+  "id": "AhWCN6Bulu2zlSmu",
+  "name": "3. Tool Tickets -  Agente IA WhatsApp Denipharma",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7ab380a2-a8d3-421c-ab4e-748ea8fb7904",
+              "name": "response",
+              "value": "Unable to perform task. Please try again.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5da20213-09fd-4d4b-ade3-2e3ce48f215e",
+      "name": "Try Again",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "39c2f302-03be-4464-a17a-d7cc481d6d44",
+              "name": "=response",
+              "value": "={{$json.output}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b9c83d9c-d24d-4c27-ac81-82a95f530e5e",
+      "name": "Success",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "=daniellianes23@gmail.com",
+        "subject": "={{ $fromAI(\"subject\") }}",
+        "message": "={{ $fromAI(\"emailBody\") }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        -340,
+        340
+      ],
+      "id": "ca878481-f2d0-4ca4-8c9e-96a06403a015",
+      "name": "Send Email",
+      "webhookId": "86c8c4b1-13bb-4ebe-acb9-30e1d7082d55",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BwWjplhZQVpEPVPV",
+          "name": "Gmail daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -980,
+        100
+      ],
+      "id": "e9b08971-8154-4524-a2f8-4721efe6a50b",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -660,
+        340
+      ],
+      "id": "708db86c-b37c-41c5-afbb-a48f86e8f929",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "# Gestor de Tickets para Denipharma\n\nEres un asistente encargado de crear tickets de soporte para Denipharma, una tienda online de complementos alimenticios.\n\nTu tarea es enviar un email al equipo de soporte cada vez que un cliente necesite atención personalizada que no pueda ser resuelta automáticamente.\n\n## Herramienta de Email\n\n- Utiliza \"Send Email\" para enviar los tickets de soporte al equipo.\n\n## Formato del Email de Ticket\n\nTu email de ticket debe tener el siguiente formato:\n\nAsunto: Nuevo Ticket de Soporte - Cliente de WhatsApp: {número_teléfono}\n\n<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Nuevo Ticket de Soporte - Denipharma</title>\n  <style>\n    body {\n      font-family: Arial, sans-serif;\n      line-height: 1.6;\n      color: #333;\n    }\n    .header {\n      background-color: #4CAF50;\n      color: white;\n      padding: 10px;\n      text-align: center;\n    }\n    .container {\n      padding: 20px;\n    }\n    .info-label {\n      font-weight: bold;\n    }\n    .conversation {\n      background-color: #f9f9f9;\n      padding: 15px;\n      border-radius: 5px;\n      margin-top: 20px;\n    }\n  </style>\n</head>\n<body>\n  <div class=\"header\">\n    <h2>Nuevo Ticket de Soporte - Denipharma</h2>\n  </div>\n  <div class=\"container\">\n    <p>Se ha recibido una solicitud de atención personalizada:</p>\n    \n    <p><span class=\"info-label\">Número de Teléfono:</span> {número_teléfono}</p>\n    <p><span class=\"info-label\">Nombre del Cliente:</span> {nombre}</p>\n    <p><span class=\"info-label\">Número de Pedido:</span> {número_pedido}</p>\n    <p><span class=\"info-label\">Fecha y Hora:</span> {fecha_hora}</p>\n    <p><span class=\"info-label\">Tipo de Consulta:</span> {tipo_consulta}</p>\n    \n    <div class=\"conversation\">\n      <p><span class=\"info-label\">Consulta del Cliente:</span></p>\n      <p>{consulta_cliente}</p>\n      \n      <p><span class=\"info-label\">Historial de Conversación:</span></p>\n      <p>{historial_conversación}</p>\n    </div>\n    \n    <p>Por favor, contacta al cliente lo antes posible durante el horario de atención (Lunes a Viernes de 9:00h a 14:00h).</p>\n  </div>\n</body>\n</html>"
+        }
+      },
+      "id": "6e0a5357-61af-4337-a835-32b9e3809e4f",
+      "name": "ticketAgent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        -600,
+        100
+      ],
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "connections": {
+    "Send Email": {
+      "ai_tool": [
+        [
+          {
+            "node": "ticketAgent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "ticketAgent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "ticketAgent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ticketAgent": {
+      "main": [
+        [
+          {
+            "node": "Success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Try Again",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "query": "Name: Johnson, Email: Johnson@gmail.com, Details: I'm looking for a job, can you hire me?"
+        }
+      }
+    ]
+  },
+  "versionId": "aedc2bac-2c92-4536-80b7-0985329038e6",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-04-23T20:59:57.136Z",
+      "updatedAt": "2025-04-23T20:59:57.136Z",
+      "id": "Xq0NhXBZ2HnDESQS",
+      "name": "Agente"
+    },
+    {
+      "createdAt": "2025-04-29T11:53:17.305Z",
+      "updatedAt": "2025-04-29T11:53:17.305Z",
+      "id": "eThUEtA7WBZMFCSS",
+      "name": "Worker"
+    }
+  ]
+}
