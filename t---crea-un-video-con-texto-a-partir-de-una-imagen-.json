@@ -1,0 +1,679 @@
+{
+  "createdAt": "2025-05-01T07:27:08.524Z",
+  "updatedAt": "2025-05-01T07:47:56.937Z",
+  "id": "r5BPpJL8Y1po9m4a",
+  "name": "T - Crea un video con texto a partir de una imagen",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -140,
+        -80
+      ],
+      "id": "b7646756-9472-4a36-b2a4-ad9bbd97e67f",
+      "name": "Telegram Trigger",
+      "webhookId": "9c0fe3eb-3396-47be-8f9b-f4379c516410"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.photo[3].file_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -20,
+        -80
+      ],
+      "id": "a43360cb-25b4-45cd-8cbc-5358c0de19d6",
+      "name": "Telegram",
+      "webhookId": "5d4e1244-9d45-47eb-8e16-f47e2ae4b936"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1OQViKUJCN2N3e39ZFnJadQyFDiMcl1j3FcezRndtDvc",
+          "mode": "list",
+          "cachedResultName": "Image-to-Video Demo 123 - Post to Tiktok - Bulk Scheduler  - FabiMarkl.com",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1OQViKUJCN2N3e39ZFnJadQyFDiMcl1j3FcezRndtDvc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 740956331,
+          "mode": "list",
+          "cachedResultName": "Videos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1OQViKUJCN2N3e39ZFnJadQyFDiMcl1j3FcezRndtDvc/edit#gid=740956331"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Video URL": "={{ $('Final Video URL').item.json.movie.url }}",
+            "Video ID": "={{ $('VideoID').first().json.code }}",
+            "Caption Text": "={{ $json.choices[0].message.content }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Video ID",
+              "displayName": "Video ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Caption Text",
+              "displayName": "Caption Text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Video URL",
+              "displayName": "Video URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Publish Date",
+              "displayName": "Publish Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1280,
+        -80
+      ],
+      "id": "e6db0132-2a39-43b5-8f6b-25ca58864337",
+      "name": "Google Sheets1"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.telegram.org/file/botINSERT_YOUR_BOT_TOKEN/{{ $('Telegram').item.json.result.file_path }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        420,
+        -280
+      ],
+      "id": "4a5c2017-2768-42a9-844d-e3fdf23f7706",
+      "name": "Get Image"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.cloudinary.com/v1_1/INSERT_CLOUDINARY_ID/image/upload",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "upload_preset",
+              "value": "n8n_workflow"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        560,
+        -280
+      ],
+      "id": "e95d5f8c-c60f-409a-8659-8632b7e9333c",
+      "name": "Upload Image"
+    },
+    {
+      "parameters": {
+        "authentication": "headerAuth",
+        "requestMethod": "POST",
+        "url": "https://api.piapi.ai/api/v1/task",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\n  \"model\": \"kling\",\n  \"task_type\": \"video_generation\",\n  \"input\": {\n    \"prompt\": \"{{ $('Split').item.json.videoPrompt }}\",\n    \"image_url\": \"{{ $json.secure_url }}\",\n    \"negative_prompt\": \"\",\n    \"cfg_scale\": 0.5,\n    \"duration\": 5,\n\"aspect_ratio\": \"9:16\",\n  \"version\": \"1.6\", \n    \"camera_control\": {\n      \"type\": \"simple\",\n      \"config\": {\n        \"horizontal\": 0,\n        \"vertical\": 0,\n        \"pan\": 0,\n        \"tilt\": 0,\n        \"roll\": 0,\n        \"zoom\": 0\n      }\n    },\n    \"mode\": \"std\"\n  },\n  \"config\": {\n    \"service_mode\": \"\",\n    \"webhook_config\": {\n      \"endpoint\": \"\",\n      \"secret\": \"\"\n    }\n  }\n}\n"
+      },
+      "id": "a4d441cf-50b0-4bbe-b840-ada686e91b7f",
+      "name": "Generate Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        760,
+        -280
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "amount": 2.5,
+        "unit": "minutes"
+      },
+      "id": "438865f7-7ca1-46e9-9229-54f7f92efc13",
+      "name": "Wait For Video",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        920,
+        -280
+      ],
+      "typeVersion": 1,
+      "webhookId": "df653407-10dd-473b-a19b-1a24a6a2224e"
+    },
+    {
+      "parameters": {
+        "authentication": "headerAuth",
+        "url": "=https://api.piapi.ai/api/v1/task/{{ $json.data.task_id }}",
+        "options": {}
+      },
+      "id": "ce6e65bb-33fc-48cd-beb4-4f3f5456a0fe",
+      "name": "Get Video URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1060,
+        -280
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "jsCode": "function generateRandomCode(length = 20) {\n  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';\n  let result = '';\n  for (let i = 0; i < length; i++) {\n    result += chars[Math.floor(Math.random() * chars.length)];\n  }\n  return result;\n}\n\nreturn [\n  {\n    json: {\n      code: generateRandomCode()\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        -80
+      ],
+      "id": "4cb61481-0c38-44f0-b56c-b126544ccc9b",
+      "name": "VideoID"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $('Telegram Trigger').first().json.message.caption;\n\n// Remove optional \"generate video\" prefix\nconst cleaned = input.replace(/^generate video[:]?/i, '').trim();\n\n// Split by comma\nconst parts = cleaned.split(',').map(p => p.trim());\n\n// Assign whatever's there, even if broken or missing\nconst videoPrompt = parts[0] || \"\";\nconst captionIdea = parts[1] || \"\";\nconst musicStyle = parts[2] || \"\";\n\nreturn [\n  {\n    json: {\n      videoPrompt,\n      captionIdea,\n      musicStyle\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        100,
+        -80
+      ],
+      "id": "735cdde6-2a9c-4e13-a4d3-6939eda5634a",
+      "name": "Split"
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        580,
+        140
+      ],
+      "id": "283d4d07-da8b-49d8-b68b-457907563759",
+      "name": "Wait4",
+      "webhookId": "7fa94281-8f0a-4fec-9780-6830b30629e5"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').first().json.message.chat.id }}",
+        "text": "=Here's your scheduled video:  \n\n----------------  \n\nCaption Text: {{ $json['Caption Text'] }}  \n\n----------------  \n\nVideo Link: {{ $json['Video URL'] }}",
+        "replyMarkup": "forceReply",
+        "forceReply": {},
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1400,
+        -80
+      ],
+      "id": "22c1a79b-96b8-460b-9819-3e191e4c2050",
+      "name": "Telegram2",
+      "webhookId": "7d74262f-3689-4f9a-9985-de1aa1afdbe5"
+    },
+    {
+      "parameters": {
+        "operation": "sendVideo",
+        "chatId": "={{ $json.result.chat.id }}",
+        "file": "={{ $('Google Sheets1').item.json['Video URL'] }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1520,
+        -80
+      ],
+      "id": "24b9c6e3-44aa-4332-be0c-ea9a03f94018",
+      "name": "Telegram1",
+      "webhookId": "5d6e6ac8-b446-4bbd-8773-fbd8c6a78b6d"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Write a short social media caption based on this: \n\n{{ $('Split').item.json.captionIdea }}\n\nMake it actionable, but not sound generic or motivational. Maybe some highly specific tips, or a problem along with a solution. and add 2 relevant hashtags. And only one sentence per line and empty line between each sentence. Then encourage to comment with a keyword if they want to get the real solution.\n"
+            }
+          ]
+        },
+        "simplify": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        920,
+        140
+      ],
+      "id": "c2a50523-c5ba-4e81-9d21-5464fd5295dd",
+      "name": "Caption Text"
+    },
+    {
+      "parameters": {
+        "authentication": "headerAuth",
+        "requestMethod": "POST",
+        "url": "https://api.piapi.ai/api/v1/task",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "={\n  \"model\": \"Qubico/diffrhythm\",\n  \"task_type\": \"txt2audio-base\",\n  \"input\": {\n    \"style_prompt\": \"{{ $('Split').item.json.musicStyle }}\"\n  },\n  \"config\": {}\n}"
+      },
+      "id": "ded499f2-6ae4-4324-90c7-82425886e8e2",
+      "name": "Generate Music",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        420,
+        -80
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "unit": "minutes"
+      },
+      "id": "f19fadcb-860f-47c9-9b14-a4f399b2a48d",
+      "name": "Wait For Music",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        540,
+        -80
+      ],
+      "typeVersion": 1,
+      "webhookId": "2df639b9-a044-4b27-a638-202da6181cfe"
+    },
+    {
+      "parameters": {
+        "authentication": "headerAuth",
+        "url": "=https://api.piapi.ai/api/v1/task/{{ $json.data.task_id }}",
+        "options": {}
+      },
+      "id": "9443d110-0f1d-452e-bc66-0d97ca0233d4",
+      "name": "Get Music URL",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        660,
+        -80
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an expert copywriter for short-form social videos.\n\nYour task is to write **two short, compelling text lines** for a vertical video. These will be used as text overlays (top and bottom) in the video.\n\n1) Follow this structure:\ntext1: [Hook — grabs attention]  \ntext2: [Payoff — emotional or curiosity-driven follow-up]\n\n2) Model this example as exact as possible including no period at the end of text1 and \"...\" end of text 2:\ntext1: Why I broke up with ChatGPT\ntext2: this other AI “gets me” so much better...\n\n✂️ Rules:\n- Max 50 characters per line\n- Do NOT return anything except:\n  text1: ...\n  text2: ...\n- No quotes, no brackets, no emojis\n- Avoid hashtags, titles, or introductions\n\n---\n\nVideo topic:  \n{{ $('Split').item.json.captionIdea }}\n"
+            }
+          ]
+        },
+        "simplify": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        780,
+        -80
+      ],
+      "id": "786d9b51-026e-4de8-a1ff-af8d894b88a4",
+      "name": "Text on Video"
+    },
+    {
+      "parameters": {
+        "jsCode": "const aiOutput = $input.first().json.choices[0].message.content; // or wherever your AI response is\n\nconst lines = aiOutput.split('\\n').map(l => l.trim());\nlet text1 = \"\";\nlet text2 = \"\";\n\nfor (const line of lines) {\n  if (line.toLowerCase().startsWith(\"text1:\")) {\n    text1 = line.replace(/^text1:\\s*/i, '').trim();\n  } else if (line.toLowerCase().startsWith(\"text2:\")) {\n    text2 = line.replace(/^text2:\\s*/i, '').trim();\n  }\n}\n\nreturn [\n  {\n    json: {\n      text1,\n      text2\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1060,
+        -80
+      ],
+      "id": "4b189540-f9f0-4499-b9a7-8a780f855c8e",
+      "name": "Split Text"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.json2video.com/v2/movies",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"id\": \"qbaasr7s\",\n\"resolution\": \"instagram-story\",\n\"quality\": \"high\",\n\"scenes\": [\n{\n\"id\": \"qyjh9lwj\",\n\"comment\": \"Scene 1\",\n\"elements\": []\n}\n],\n\"elements\": [\n{\n\"id\": \"q6dznzcv\",\n\"type\": \"video\",\n\"src\": \"{{ $('Get Video URL').item.json.data.output.video_url }}\",\n\"resize\": \"cover\"\n},\n{\n\"id\": \"top-text\",\n\"type\": \"text\",\n\"text\": \"{{ $json.text1 }}\",\n\"settings\": {\n\"font-family\": \"Libre Baskerville\",\n\"font-size\": \"80px\",\n\"color\": \"#ffffff\",\n\"horizontal-position\": \"center\",\n\"vertical-position\": \"top\",\n\"margin-top\": \"100px\",\n\"word-break\": \"break-word\",\n\"overflow-wrap\": \"break-word\",\n\"font-weight\": \"normal\",\n\"text-shadow\": \"3px 3px 0 #000, -3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 0px 3px 0 #000, 3px 0px 0 #000, -3px 0px 0 #000, 0px -3px 0 #000\"\n\n}\n},\n{\n\"id\": \"bottom-text\",\n\"type\": \"text\",\n\"text\": \"{{ $json.text2 }}\",\n\"settings\": {\n\"font-family\": \"Libre Baskerville\",\n\"font-size\": \"80px\",\n\"color\": \"#ffffff\",\n\"horizontal-position\": \"center\",\n\"vertical-position\": \"bottom\",\n\"margin-bottom\": \"250px\",\n\"word-break\": \"break-word\",\n\"overflow-wrap\": \"break-word\",\n\"font-weight\": \"normal\",\n\"text-shadow\": \"3px 3px 0 #000, -3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 0px 3px 0 #000, 3px 0px 0 #000, -3px 0px 0 #000, 0px -3px 0 #000\"\n\n}\n},\n{\n\"id\": \"music-track\",\n\"type\": \"audio\",\n\"src\": \"{{ $('Get Music URL').item.json.data.output.audio_url }}\",\n\"volume\": 0.5,\n\"duration\": -2\n}\n]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        420,
+        140
+      ],
+      "id": "29d5c711-4844-4edc-9a67-9a7f99ecb342",
+      "name": "Add Music + Text to Video"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.json2video.com/v2/movies?id={{ $json.project }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        740,
+        140
+      ],
+      "id": "5f8bb470-2bac-4787-8815-ffe4ff7401e1",
+      "name": "Final Video URL"
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [
+        [
+          {
+            "node": "Split",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Telegram2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Image": {
+      "main": [
+        [
+          {
+            "node": "Upload Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Image": {
+      "main": [
+        [
+          {
+            "node": "Generate Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Video": {
+      "main": [
+        [
+          {
+            "node": "Wait For Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait For Video": {
+      "main": [
+        [
+          {
+            "node": "Get Video URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Video URL": {
+      "main": [
+        [
+          {
+            "node": "Generate Music",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VideoID": {
+      "main": [
+        [
+          {
+            "node": "Get Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split": {
+      "main": [
+        [
+          {
+            "node": "VideoID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait4": {
+      "main": [
+        [
+          {
+            "node": "Final Video URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram2": {
+      "main": [
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Caption Text": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Music": {
+      "main": [
+        [
+          {
+            "node": "Wait For Music",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait For Music": {
+      "main": [
+        [
+          {
+            "node": "Get Music URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Music URL": {
+      "main": [
+        [
+          {
+            "node": "Text on Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text on Video": {
+      "main": [
+        [
+          {
+            "node": "Split Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Text": {
+      "main": [
+        [
+          {
+            "node": "Add Music + Text to Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Music + Text to Video": {
+      "main": [
+        [
+          {
+            "node": "Wait4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final Video URL": {
+      "main": [
+        [
+          {
+            "node": "Caption Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "ee07424e-17fb-4285-8966-53f14b67f4ad",
+  "triggerCount": 0,
+  "tags": []
+}
