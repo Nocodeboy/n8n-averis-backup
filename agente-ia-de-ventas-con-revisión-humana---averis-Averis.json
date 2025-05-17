@@ -1,0 +1,599 @@
+{
+  "createdAt": "2025-04-29T10:37:06.265Z",
+  "updatedAt": "2025-04-29T13:42:04.890Z",
+  "id": "OHdaiF363oLcPajt",
+  "name": "Agente IA de ventas con Revisión Humana - Averis",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"asunto\": {\n      \"type\": \"string\",\n      \"description\": \"Asunto para el email\"\n    },\n    \"cuerpo_email\": {\n      \"type\": \"string\",\n      \"description\": \"Cuerpo del email para enviar al cliente\"\n    }\n  },\n  \"required\": [\"asunto\", \"cuerpo_email\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        120,
+        360
+      ],
+      "id": "349830e1-66e0-43e9-9983-66ce37d33642",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Nombre: {{ $json.fields.Nombre }}\nEmail: {{ $json.fields.Email }}\nTelefono de whatsapp: {{ $json.fields.Telefono }}\nServicio: {{ $json.fields.Servicio }}\nPresupuesto: {{ $json.fields.Presupuesto }}\nEmpresa: {{ $json.fields.Empresa }}\nTiempo de aplicación: {{ $json.fields['Tiempo servicio'] }}\nDescripción del proyecyo: {{ $json.fields['Descripción'] }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Eres un experto vendedor de una agencia que ofrece soluciones de autmatizaciones con IA. Tu trabajo es responder a los clientes potenciales entrantes abordando sus necesidades de manera profesional. Recibirás información como la descripción del proyecto y el cronograma del lead, y tu objetivo es convencerlos de que somos la mejor Agencia de IA del mercado.\n\nHerramientas\nBase_datos - Usa esta herramienta para buscar entre los proyectos anteriores que hemos realizado.\n\nReglas\n- Recibirás información sobre un lead y necesitas redactar un correo electrónico profesional. Mantenlo conciso, a nadie le gusta leer un correo demasiado largo.\n- Tu objetivo principal es convencer al lead de agendar una segunda llamada. Tu trabajo es hacerles creer que podemos llevar a cabo el proyecto que han descrito y superar sus expectativas.\n- Recupera información sobre proyectos anteriores para compartir con el lead y demostrar que nuestro equipo es capaz de manejar su proyecto. Encuentra un proyecto similar que hayamos realizado para compartir con el lead. Comparte el resultado de cómo ayudamos al cliente.\n-El tono debe de ser cercano y no demasiado formal, tiene que parecer extremadamente humano\n-El asunto debe de ser corto, muy llamativo y que contenga el nombre del cliente potencial\n\nNotas Finales\nFirma los correos electrónicos como Daniel Lianes | Averis Solutions\nAquí está la fecha/hora actual: {{ $now }}\nHoy es: {{ $now.format('cccc') }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -700,
+        -20
+      ],
+      "id": "c4ab83dd-be13-4e7a-b85f-9ab2d7682bb3",
+      "name": "Agente de Ventas"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "daniel@averis.es",
+        "subject": "=Se requiere APROBACIÓN para nuevo lead: {{ $('On form submission').item.json.Empresa }} - {{ $('On form submission').item.json['¿En que servicio estás interesado?'] }}",
+        "message": "={{ $('On form submission').item.json['Nombre completo'] }} de {{ $('On form submission').item.json.Empresa }} está buscando {{ $('On form submission').item.json['¿En que servicio estás interesado?'] }}. Su presupuesto es {{ $('On form submission').item.json['¿Cual es tu presupuesto?'] }} con un plazo de {{ $('On form submission').item.json['¿Para cuando esperas implementar el servicio?'] }}.\n\nPor favor, aprueba o rechaza el envío de este mensaje generado por Veris, nuestro Agente de Ventas con IA.\n\nAsunto: {{ $json.output.asunto }}\n\nEmail: {{ $json.output.cuerpo_email }}",
+        "responseType": "freeText",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -260,
+        -20
+      ],
+      "id": "3db881ac-f46d-43c3-bce2-3adb3281b2d8",
+      "name": "Feedback",
+      "webhookId": "10605e1c-7bc0-4a9f-b23a-9797cc88449e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BwWjplhZQVpEPVPV",
+          "name": "Gmail daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.data.text }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "=Aprobado",
+              "description": "El correo electrónico ha sido revisado y aprobado tal como está. La persona, de forma explícita o implícita, expresa su aprobación, indicando que no se requieren cambios.  \nFrases de ejemplo incluyen:\n  \"Se ve bien.\"\n  \"Adelante, envíalo.\"\n  \"Está bien para mí.\"\n  \"Aprobado.\"\n  \"No necesita cambios.\"\n  \"OK\""
+            },
+            {
+              "category": "Re-Generar",
+              "description": "El correo electrónico ha sido revisado, pero la persona solicita modificaciones antes de enviarlo. Esto puede incluir ajustes, eliminación de partes, reformulaciones o revisiones importantes.  \nFrases de ejemplo incluyen:\n  \"¿Podemos ajustar esta parte?\"\n  \"Necesita algunos cambios.\"\n  \"Me gustaría reformular esto.\"\n  \"No está del todo bien, revisémoslo.\"\n  \"¿Puedes ajustar esto antes de enviarlo?\"\n  \"No menciones que no podemos hacer eso.\""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -20
+      ],
+      "id": "6003cad0-6ec4-4616-a36e-a8399f261c7c",
+      "name": "Verifica el feedback"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.Email }}",
+        "subject": "={{ $('Agente de Ventas').item.json.output.asunto }}",
+        "emailType": "text",
+        "message": "={{ $('Agente de Ventas').item.json.output.cuerpo_email }}",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "Averis - Equipo Comercial"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        380,
+        -140
+      ],
+      "id": "239bac3f-b646-4edc-a913-d9fb298b2c0f",
+      "name": "Envio Email",
+      "webhookId": "9ae2a2f2-de7c-46a1-93f7-8b2612d40751",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BwWjplhZQVpEPVPV",
+          "name": "Gmail daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Email: {{ $('Agente de Ventas').item.json.output.cuerpo_email }}\n\nFeedback: {{ $json.data.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Eres un redactor experto en correos electrónicos. Tu trabajo es tomar un correo entrante y revisarlo con base en la retroalimentación proporcionada por la persona.\n\nReglas\n-Firma los correos electrónicos como Angel Aparicio, IA Masters Automations\n-El tono debe de ser cercano y no demasiado formal, tiene que parecer extremadamente humano\n-El asunto debe de ser corto, muy llamativo y que contenga el nombre del cliente potencial\nAquí está la fecha y hora actual: {{ $now }}\nHoy es: {{ $now.format('cccc') }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        380,
+        40
+      ],
+      "id": "3b6ca79b-15ea-429d-8eaa-9dd19aa304f7",
+      "name": "Revisión Agente"
+    },
+    {
+      "parameters": {
+        "model": "=gpt-4o-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.1,
+      "position": [
+        -200,
+        360
+      ],
+      "id": "8b74ae8d-6584-4b4d-bc90-4d286be5cd4b",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "Formulario de contacto",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Nombre completo",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Telefono de WhatsApp",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Empresa",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "¿En que servicio estás interesado?",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Automatización de procesos"
+                  },
+                  {
+                    "option": "Consultoria"
+                  },
+                  {
+                    "option": "Chatbot de atención al cliente"
+                  },
+                  {
+                    "option": "Consultoria de negocio"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "¿Cual es tu presupuesto?",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "1.000€ a 2.000€"
+                  },
+                  {
+                    "option": "2.000€ a 5.000€"
+                  },
+                  {
+                    "option": "5.000€ a 10.000€"
+                  },
+                  {
+                    "option": "+10.000€"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "¿Para cuando esperas implementar el servicio?",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Lo antes posible"
+                  },
+                  {
+                    "option": "En 2 semanas"
+                  },
+                  {
+                    "option": "En 1 mes"
+                  },
+                  {
+                    "option": "+ de 1 mes"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Descríbenos brevemente el proyecto",
+              "fieldType": "textarea",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false,
+          "buttonLabel": "Enviar",
+          "respondWithOptions": {
+            "values": {
+              "formSubmittedText": "Hemos recibido tu solicitud. En breve contactaremos contigo"
+            }
+          },
+          "ignoreBots": true
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -1140,
+        -20
+      ],
+      "id": "69b3c202-4063-4244-9f95-83076bb1f9fc",
+      "name": "On form submission",
+      "webhookId": "6e868906-f857-41e5-b39d-a44238ea3b26"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "apphomYbWtL3YiZAP",
+          "mode": "list",
+          "cachedResultName": "CRM Averis",
+          "cachedResultUrl": "https://airtable.com/apphomYbWtL3YiZAP"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl0KsrgcjFgPBhJI",
+          "mode": "list",
+          "cachedResultName": "Clientes Potenciales",
+          "cachedResultUrl": "https://airtable.com/apphomYbWtL3YiZAP/tbl0KsrgcjFgPBhJI"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nombre": "={{ $json['Nombre completo'] }}",
+            "Email": "={{ $json.Email }}",
+            "Empresa": "={{ $json.Empresa }}",
+            "Servicio": "={{ $json['¿En que servicio estás interesado?'] }}",
+            "Presupuesto": "={{ $json['¿Cual es tu presupuesto?'] }}",
+            "Descripción": "={{ $json['Descríbenos brevemente el proyecto'] }}",
+            "Tiempo Servicio": "={{ $json['¿Para cuando esperas implementar el servicio?'] }}",
+            "Telefono": "={{ $json['Telefono de WhatsApp'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Nombre",
+              "displayName": "Nombre",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Telefono",
+              "displayName": "Telefono",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Empresa",
+              "displayName": "Empresa",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Servicio",
+              "displayName": "Servicio",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Presupuesto",
+              "displayName": "Presupuesto",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Descripción",
+              "displayName": "Descripción",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Tiempo Servicio",
+              "displayName": "Tiempo Servicio",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -920,
+        -20
+      ],
+      "id": "0446ce7c-998f-474c-bfb0-ced3d2e205e1",
+      "name": "Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HF9Z3ewHMQS69DqJ",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "apphomYbWtL3YiZAP",
+          "mode": "list",
+          "cachedResultName": "CRM Averis",
+          "cachedResultUrl": "https://airtable.com/apphomYbWtL3YiZAP"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl0KsrgcjFgPBhJI",
+          "mode": "list",
+          "cachedResultName": "Clientes Potenciales",
+          "cachedResultUrl": "https://airtable.com/apphomYbWtL3YiZAP/tbl0KsrgcjFgPBhJI"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -600,
+        300
+      ],
+      "id": "c0e4d609-2388-499a-97f5-360c896d69b8",
+      "name": "Base_datos",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HF9Z3ewHMQS69DqJ",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Agente de Ventas",
+            "type": "ai_outputParser",
+            "index": 0
+          },
+          {
+            "node": "Revisión Agente",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente de Ventas": {
+      "main": [
+        [
+          {
+            "node": "Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Feedback": {
+      "main": [
+        [
+          {
+            "node": "Verifica el feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica el feedback": {
+      "main": [
+        [
+          {
+            "node": "Envio Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Revisión Agente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revisión Agente": {
+      "main": [
+        [
+          {
+            "node": "Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente de Ventas",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Verifica el feedback",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Revisión Agente",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable": {
+      "main": [
+        [
+          {
+            "node": "Agente de Ventas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Base_datos": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente de Ventas",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "1a7003f2-7176-4adc-9068-a2756882ae2e",
+  "triggerCount": 1,
+  "tags": [
+    {
+      "createdAt": "2025-04-23T20:54:02.682Z",
+      "updatedAt": "2025-04-23T20:54:02.682Z",
+      "id": "sPdc51YFSDyYeZsT",
+      "name": "Averis"
+    },
+    {
+      "createdAt": "2025-04-23T20:56:38.211Z",
+      "updatedAt": "2025-04-23T20:56:38.211Z",
+      "id": "cw7Ec13kzTSRWDUF",
+      "name": "Customer / Sales"
+    },
+    {
+      "createdAt": "2025-04-23T20:59:57.136Z",
+      "updatedAt": "2025-04-23T20:59:57.136Z",
+      "id": "Xq0NhXBZ2HnDESQS",
+      "name": "Agente"
+    }
+  ]
+}
