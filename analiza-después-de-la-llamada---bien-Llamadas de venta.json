@@ -1,0 +1,1215 @@
+{
+  "createdAt": "2025-05-02T18:01:46.131Z",
+  "updatedAt": "2025-05-12T11:54:53.360Z",
+  "id": "HTg5iPoUUJwpNCzt",
+  "name": "Analiza después de la llamada - Bien",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "d7bece89-88f1-4200-8495-c3980057a7f7",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -4620,
+        900
+      ],
+      "id": "8c3622e1-6a96-43bc-93ed-99b9608c0a58",
+      "name": "Fireflies - New Transcription ",
+      "webhookId": "d7bece89-88f1-4200-8495-c3980057a7f7"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.fireflies.ai/graphql",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"query Transcript($transcriptId: String!) { transcript(id: $transcriptId) { id title transcript_url audio_url sentences { raw_text speaker_name } summary { keywords action_items } }}\",\n  \"variables\": {\n    \"transcriptId\": \"{{ $json.body.meetingId }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -4400,
+        900
+      ],
+      "id": "12c26443-21ce-49e8-9266-4d8438557d51",
+      "name": "Transcription"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data.transcript.sentences",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -4200,
+        900
+      ],
+      "id": "0fc68476-5d47-49f0-a695-f90ca8b98d70",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nlet transcript = \"\";\nlet previousSpeaker = \"\";\n\nfor (const item of items) {\n  const { speaker_name, raw_text } = item.json;\n  \n  if (speaker_name === previousSpeaker) {\n    transcript += \" \" + raw_text;\n  } else {\n    if (transcript !== \"\") {\n      transcript += \" \";\n    }\n    transcript += `{${speaker_name}} : ${raw_text}`;\n  }\n  \n  previousSpeaker = speaker_name;\n}\n\nreturn [{ transcript }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -4020,
+        900
+      ],
+      "id": "c4b946f7-3bd4-4227-bc6e-b560e4bc0618",
+      "name": "Reformat"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.fireflies.ai/graphql",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"query MeetingSummary($transcriptId: String!) { transcript(id: $transcriptId) { summary { action_items keywords outline shorthand_bullet gist short_summary topics_discussed transcript_chapters } } }\",\n  \"variables\": {\n    \"transcriptId\": \"{{ $('Fireflies - New Transcription ').last().json.body.meetingId }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3840,
+        900
+      ],
+      "id": "58df1296-5d9b-4cac-a7f4-cd96febc48b9",
+      "name": "Other Details"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Below is the action items for a recent online meeting. \n\nThe action items are each aimed at one person. \n\nReformat the action items the following JSON format: \n\n{ \n\"tasks\": \n\"[Person1 Name]\": {\n[\n{ \n\"taskTitle\": \"[TITLE]\",\n\"taskDetails\": \"[DETAILS]\"\n},\n{ \n\"taskTitle\": \"[TITLE]\",\n\"taskDetails\": \"[DETAILS]\"\n},\n...\n]\n},\n\"[Person2 Name]\": {\n[\n{ \n\"taskTitle\": \"[TITLE]\",\n\"taskDetails\": \"[DETAILS]\"\n},\n{ \n\"taskTitle\": \"[TITLE]\",\n\"taskDetails\": \"[DETAILS]\"\n},\n...\n]\n}\n\nDon't output anything else. Don't wrap the output in ```json```. \n\nHere's the meeting action items you must reformat:\n\n{{ $('Other Details').item.json.data.transcript.summary.action_items }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -3180,
+        900
+      ],
+      "id": "f188b1d4-7f86-4150-9540-7d8b0f42b983",
+      "name": "Reformat Tasks"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ $json.message.content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2820,
+        900
+      ],
+      "id": "b136133c-d6d6-4aec-b47d-a4376bf513b1",
+      "name": "JSON"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.fireflies.ai/graphql",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"query\": \"query MeetingAttendees($transcriptId: String!) { transcript(id: $transcriptId) { meeting_attendees { email displayName name } } }\",\n  \"variables\": {\n    \"transcriptId\": \"{{ $('Fireflies - New Transcription ').last().json.body.meetingId }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3640,
+        900
+      ],
+      "id": "563b2c47-f25a-4668-9993-fd79680b3ec5",
+      "name": "Meeting Attendees"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.hubapi.com/crm/v3/objects/contacts/{{ $json.data.transcript.meeting_attendees[1].email }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "properties",
+              "value": "firstname,lastname,email,phone,jobtitle"
+            },
+            {
+              "name": "archived",
+              "value": "false"
+            },
+            {
+              "name": "idProperty",
+              "value": "email"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3440,
+        900
+      ],
+      "id": "1b8d8d7d-2eec-4d7a-a0b1-df224547448a",
+      "name": "Find ContactID",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.hubapi.com/crm/v3/objects/notes",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"properties\": {\n    \"hs_note_body\": \"{{ JSON.stringify($('HTML').last().json.html).slice(1,-1) }}\",\n    \"hs_timestamp\": \"{{ $now.toISO() }}\"\n  },\n  \"associations\": [\n    {\n      \"to\": {\n        \"id\": \"{{ $('Find ContactID').last().json.id }}\"\n      },\n      \"types\": [\n        {\n          \"associationCategory\": \"HUBSPOT_DEFINED\",\n          \"associationTypeId\": 202\n        }\n      ]\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1160,
+        900
+      ],
+      "id": "841a969b-3d41-4074-aa36-d217c244a756",
+      "name": "Add Call as Notes"
+    },
+    {
+      "parameters": {
+        "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Meeting Report</title>\n  <style>\n    body {\n      font-family: Arial, sans-serif;\n      margin: 20px;\n    }\n    h1 {\n      font-size: 24px;\n      margin-bottom: 10px;\n    }\n    h2 {\n      font-size: 20px;\n      margin-top: 20px;\n      margin-bottom: 10px;\n    }\n    p {\n      font-size: 16px;\n      line-height: 1.5;\n    }\n  </style>\n</head>\n<body>\n  <h1> Meeting: {{ $('Transcription').last().json.data.transcript.title }}</h1>\n  \n  <h2>Summary</h2>\n  <p>{{ $('Create Summary').last().json.message.content }}</p>\n\n  <h2>Action Items</h2>\n  <p>{{ $('Reformat Action Items').item.json.message.content }}</p>\n\n  <p>Access the recording URL <a href=\"{{ $('Transcription').last().json.data.transcript.transcript_url }}\">HERE</a></p>\n</body>\n</html>\n"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        -1380,
+        900
+      ],
+      "id": "e254740d-a7eb-40fc-8126-53e2070aed55",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "tasks[\"Kamexa AI\"]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -2580,
+        900
+      ],
+      "id": "d513d720-b066-4c92-9e99-f611a5445ced",
+      "name": "Split Kia - Tasks",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Convert the following markdown into HTML: \n\n{{ $('Other Details').last().json.data.transcript.summary.action_items }}\n\nMake it into dot point format.\n\n\nDon't wrap the output in ```html```. Start with <p>. \n\nOutput only the reformatted HTML and nothing else."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -1700,
+        900
+      ],
+      "id": "ecdbe273-fb88-4744-b354-b6ede968b96d",
+      "name": "Reformat Action Items"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "workspace": "1207797859868521",
+        "name": "={{ $('Find ContactID').item.json.properties.firstname }} {{ $('Find ContactID').item.json.properties.lastname }}: {{ $('Split Kia - Tasks').item.json.taskTitle }}",
+        "otherProperties": {
+          "assignee": "1207797717695449",
+          "assignee_status": "today",
+          "notes": "={{ $json.taskDetails }}",
+          "projects": [
+            "1209576424642317"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.asana",
+      "typeVersion": 1,
+      "position": [
+        -2360,
+        900
+      ],
+      "id": "f26505ca-f023-482a-8a82-7cc2c39c6cde",
+      "name": "Create Tasks"
+    },
+    {
+      "parameters": {
+        "content": "# Transcription + Tasks \n",
+        "height": 400,
+        "width": 4460,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -4720,
+        740
+      ],
+      "typeVersion": 1,
+      "id": "0f6a834f-3181-440a-8cb5-5768448212b0",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "o1-mini",
+          "mode": "list",
+          "cachedResultName": "O1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a consultation effectiveness analyst at Kamexa, an AI and automation agency that provides automation consulting and custom automation development services. \n\nYour role is to review transcriptions of client consultations and evaluate how effectively the consultant conducted the session. \n\nThe goal is to provide actionable feedback to help the sales and consultation team improve their performance.\n\nFor each consultation transcription, analyse the following aspects of the consultant's performance:\n\n1. **Question Quality**: Did the consultant ask open-ended, insightful questions to understand the client's needs, challenges, and goals?\n2. **Clarity of Explanations**: Did the consultant explain automation concepts and solutions clearly, avoiding jargon or ensuring it was understood by the client?\n3. **Identification of Pain Points and Goals**: Did the consultant accurately identify and summarise the client's main challenges and objectives?\n4. **Suggestions for Automation Solutions**: Did the consultant propose specific, relevant automation ideas tailored to the client's needs?\n5. **Handling Objections**: How well did the consultant address any concerns or hesitations expressed by the client?\n6. **Call-to-Action**: Did the consultant provide a clear next step or action for the client to take?\n\nFor each aspect, provide:\n- **Evaluation**: Positive, Negative, or Neutral\n- **Details**: Specific examples from the transcription that support your evaluation. If there are multiple points, use an unordered list (<ul>) with <li> for each point.\n- **Recommendation**: Suggestions for improvement or ways to maintain this aspect. If there are multiple suggestions, use an unordered list (<ul>) with <li> for each suggestion.\n\nAdditionally, provide an **Overall Assessment** of the consultation's effectiveness, summarising the key strengths and areas for improvement.\n\nYour output must be in **HTML format**, suitable for embedding directly into an email body. Use the following structure:\n\n<h2>Consultation Effectiveness Analysis</h2>\n\n<h3>1. Question Quality</h3>\n<p><strong>Evaluation:</strong> [Evaluation]</p>\n<p><strong>Details:</strong> [Details]</p>\n<p><strong>Recommendation:</strong> [Recommendation]</p>\n\n<h3>2. Clarity of Explanations</h3>\n<p><strong>Evaluation:</strong> [Evaluation]</p>\n<p><strong>Details:</strong> [Details]</p>\n<p><strong>Recommendation:</strong> [Recommendation]</p>\n\n<h3>3. Identification of Pain Points and Goals</h3>\n<p><strong>Evaluation:</strong> [Evaluation]</p>\n<p><strong>Details:</strong> [Details]</p>\n<p><strong>Recommendation:</strong> [Recommendation]</p>\n\n<h3>4. Suggestions for Automation Solutions</h3>\n<p><strong>Evaluation:</strong> [Evaluation]</p>\n<p><strong>Details:</strong> [Details]</p>\n<p><strong>Recommendation:</strong> [Recommendation]</p>\n\n<h3>5. Handling Objections</h3>\n<p><strong>Evaluation:</strong> [Evaluation]</p>\n<p><strong>Details:</strong> [Details]</p>\n<p><strong>Recommendation:</strong> [Recommendation]</p>\n\n<h3>6. Call-to-Action</h3>\n<p><strong>Evaluation:</strong> [Evaluation]</p>\n<p><strong>Details:</strong> [Details]</p>\n<p><strong>Recommendation:</strong> [Recommendation]</p>\n\n<h3>Overall Assessment</h3>\n<p><strong>Strengths:</strong> [Strengths]</p>\n<p><strong>Areas for Improvement:</strong> [Areas for Improvement]</p>\n<p><strong>Summary:</strong> [Summary]</p> \n\nDon't output anything else. Don't wrap the output in ```html```. \n\nAnalyse the following call transcription: \n\n{{ $('Reformat').last().json.transcript }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        100,
+        1520
+      ],
+      "id": "de2deda6-6bf3-44d4-9376-a352181916d4",
+      "name": "Analysis "
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "o1-mini",
+          "mode": "list",
+          "cachedResultName": "O1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are part of the business development team at Kamexa, which is a AI and automation agency. \n\nAs a BDR your jobs it to ensure we build a relationship with clients over time. \n\nTo do this, you analyse the transcription of each consultation, to identify opportunities for followups. \n\nThese followup opportunities should either be: \n- Related to the clients interests. OR\n- Related to the clients plans and goals. \n\nYour goal is to follow them up on something that shows you care. The followup must not be related to Kamexa's services, rather it should be something personal for the client that by following up on we prove that we care and remembered them. \n\nFor each consultation you must identify the top 2 followup opportunities. \n\nYour output must be in the following format: \n\n[\n  {\n    \"followupOpportunityName\": \"[Followup Opportunity Name]\",\n    \"instructions\": \"[INSTRUCTIONS]\",\n    \"reason\": \"[REASON]\",\n    \"dueDate\": \"[ISO FORMAT]\"\n  },\n  {\n    \"followupOpportunityName\": \"[Followup Opportunity Name]\",\n    \"instructions\": \"[INSTRUCTIONS]\",\n    \"reason\": \"[REASON]\",\n    \"dueDate\": \"[ISO FORMAT]\"\n  }\n] \n\nWhere: \n\n- instructions defines how we should followup and what we should say. \n- reason outlines the context behind this interest. \n- dueDate identifies exactly when we should follow them up. The current date and time in ISO format is - {{ $now.toISO() }}\n\nDon't output anything else. Don't wrap the output in ```json```.\n\nA consultation just finished with the following transcription. Identify the top follow up opportunities: \n\n{{ $('Reformat').last().json.transcript }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        100,
+        200
+      ],
+      "id": "66a42ece-f33d-471b-833a-7496ad4cf7c3",
+      "name": "Followup - Interests"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "o1-mini",
+          "mode": "list",
+          "cachedResultName": "O1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are part of the business development team at Kamexa, which is a AI and automation agency.\n\nKamexa provides the following services: \n- Automation Consulting: consulting businesses in regards to automation. \n- Custom Automation Development: Kamexa develops custom automations for businesses. These could be automating the clients services, internal processes or even marketing efforts.  \n\nAs a BDR you ensure Kamexa does not miss any sales opportunities. \n\nTo do this, you analyse the transcription of each consultation, to identify the services in which the client expressed interest.\n\nYour output must be in the following format: \n\n# 1. [Opportunity Name]\nDetails: [DETAILS]\nReason: [REASON]\n\n# 2. [Opportunity Name]\nDetails: [DETAILS]\nReason: [REASON] \n\n...\n\nWhere: \n\n- Details is the details of the service the client was interested in. \n- Reason is the reason why you have identified this as a sales opportunity. \n\nDon't output anything else. \n\nOnly choose the most obvious opportunities from the transcription.\n\nA consultation just finished with the following transcription. Identify the top opportunities: \n\n{{ $('Reformat').last().json.transcript }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        80,
+        880
+      ],
+      "id": "1b610e9b-3f2f-4895-8f52-930c2c95adb0",
+      "name": "Sales Opportunities"
+    },
+    {
+      "parameters": {
+        "sendTo": "kia@kamexa.ai",
+        "subject": "=Consultation Analysis: {{ $('Transcription').last().json.data.transcript.title }}",
+        "message": "={{ $json.message.content }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        540,
+        1520
+      ],
+      "id": "40be3999-2a21-4e05-b06f-4d58c668810e",
+      "name": "Send Email",
+      "webhookId": "6e30624a-972d-40d7-9013-ca93914badb5"
+    },
+    {
+      "parameters": {
+        "authentication": "appToken",
+        "email": "={{ $('Find ContactID').last().json.properties.email }}",
+        "additionalFields": {
+          "customPropertiesUi": {
+            "customPropertiesValues": [
+              {
+                "property": "interested_services",
+                "value": "={{ $json.data }}"
+              }
+            ]
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2.1,
+      "position": [
+        960,
+        780
+      ],
+      "id": "149bdb07-c674-4f21-a116-06c3791f6e6a",
+      "name": "Add to Hubspot"
+    },
+    {
+      "parameters": {
+        "mode": "markdownToHtml",
+        "markdown": "={{ $json.content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        740,
+        780
+      ],
+      "id": "a3936685-03d9-421f-bea1-eec040e2e2d1",
+      "name": "Markdown to HTML"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "workspace": "1207797859868521",
+        "name": "=Sales Opportunity Followup: {{ $('Find ContactID').last().json.properties.firstname }} {{ $('Find ContactID').last().json.properties.lastname }}",
+        "otherProperties": {
+          "assignee": "1207797717695449",
+          "assignee_status": "today",
+          "due_on": "={{ new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() }}",
+          "notes": "={{ $json.message.content }}",
+          "projects": [
+            "1209576424642317"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.asana",
+      "typeVersion": 1,
+      "position": [
+        520,
+        1000
+      ],
+      "id": "2eaf790b-7ca2-4d60-bab4-6325d3ab9152",
+      "name": "Create Tasks1"
+    },
+    {
+      "parameters": {
+        "authentication": "appToken",
+        "email": "={{ $('Find ContactID').last().json.properties.email }}",
+        "additionalFields": {
+          "customPropertiesUi": {
+            "customPropertiesValues": [
+              {
+                "property": "interests",
+                "value": "={{ $json.followupOpportunityName }}: \n\nInstructions: {{ $json.instructions }}\n\nReason: {{ $json.reason }}"
+              }
+            ]
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2.1,
+      "position": [
+        940,
+        80
+      ],
+      "id": "c88d8939-d990-4640-b5c5-8b9c4ce35084",
+      "name": "Add to Hubspot1"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={ \n\"data\": \n{{ $json.message.content }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        440,
+        200
+      ],
+      "id": "a6ba63a6-8595-4e46-a610-3f7669da8f6c",
+      "name": "JSON1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        640,
+        200
+      ],
+      "id": "1509511a-c26a-4d71-adb8-10c9e1084671",
+      "name": "Split Out2"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "workspace": "1207797859868521",
+        "name": "={{ $('Find ContactID').last().json.properties.firstname }} {{ $('Find ContactID').last().json.properties.lastname }}: Followup {{ $json.followupOpportunityName }}",
+        "otherProperties": {
+          "assignee": "1207797717695449",
+          "assignee_status": "upcoming",
+          "due_on": "={{ $json.dueDate }}",
+          "notes": "=Instructions: {{ $json.instructions }}\n\nContext: {{ $json.reason }}",
+          "projects": [
+            "1209576424642317"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.asana",
+      "typeVersion": 1,
+      "position": [
+        960,
+        320
+      ],
+      "id": "d8683af7-5785-4b3a-813d-9911927a8b2f",
+      "name": "Create Tasks2"
+    },
+    {
+      "parameters": {
+        "content": "# Interests\n \n",
+        "height": 500,
+        "width": 1200,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "6625e74e-5ec1-4adb-a471-34035395fd24",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# Sales Opportunities\n \n",
+        "height": 500,
+        "width": 1220,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        660
+      ],
+      "typeVersion": 1,
+      "id": "4d509125-1c72-4b3c-b3f7-9a9d955098f9",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "# Call Analysis \n \n",
+        "height": 500,
+        "width": 1220,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        1300
+      ],
+      "typeVersion": 1,
+      "id": "2c4a0c8d-efda-416e-a844-d86ddf720150",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "o1-mini",
+          "mode": "list",
+          "cachedResultName": "O1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Create a summary of the following call transcription.\n\nYour output must be using dot points and be in HTML format. Make sure to extract all the important points.\n\nDon't wrap the output in ```html. Don't output anything other than the summarisation of the call. \n\n{{ $('Reformat').last().json.transcript }}\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -2020,
+        900
+      ],
+      "id": "38a2356c-a76a-45aa-a4c1-b63196f25966",
+      "name": "Create Summary"
+    },
+    {
+      "parameters": {
+        "content": "# Tasks - NOW\n\n",
+        "height": 700,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2440,
+        580
+      ],
+      "typeVersion": 1,
+      "id": "73c0017e-c8e0-4f3b-8015-6072578d90af",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "# HubSpot",
+        "height": 700,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1240,
+        580
+      ],
+      "typeVersion": 1,
+      "id": "9dd561bb-197a-4d22-94e5-11490a7b9a30",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "# HubSpot",
+        "height": 300,
+        "width": 280,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        900,
+        660
+      ],
+      "typeVersion": 1,
+      "id": "284e5ef7-1619-4b58-a597-f0306a5db08f",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "# Email Report\n",
+        "height": 300,
+        "width": 280,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        440,
+        1420
+      ],
+      "typeVersion": 1,
+      "id": "24014976-6c6c-436e-9253-dda5608b6199",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "# Task",
+        "height": 260,
+        "width": 280,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        860,
+        240
+      ],
+      "typeVersion": 1,
+      "id": "ff981981-c8bd-47db-8f6d-d56e35773948",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "# Task",
+        "height": 220,
+        "width": 280,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        420,
+        940
+      ],
+      "typeVersion": 1,
+      "id": "ccbcf663-ab76-4007-8821-f698ac04500a",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "# HubSpot",
+        "height": 240,
+        "width": 280,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        860,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "8f46f31b-3aa1-456d-a637-69abdd4db4b6",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6751e7ba-38e1-48e7-8c04-66077c380106",
+              "name": "content",
+              "value": "={{ $json.message.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        520,
+        780
+      ],
+      "id": "958660a0-1440-4c9e-b60b-5ba3b79da7e1",
+      "name": "Extract Field"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "67ad2ab8-aaef-4588-b8bb-7235486026d0",
+              "leftValue": "={{ $json.analyse }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -440,
+        900
+      ],
+      "id": "1aa6249a-fcde-4241-ab9a-775311a91b4c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Below is the summary of a call. \n\nBased on the call summary you must decide whether the call is a first time consultation or not. \n\nIf the call is a first time consultation, your output must be: \n\n{\n\"analyse\": true\n}\n\n\n\nOtherwise it should be: \n\n{\n\"analyse\": false\n}\n\nDon't output anything else. Don't wrap the output in ```html. \n\nCall summary: \n\n {{ $('Create Summary').last().json.message.content }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -960,
+        900
+      ],
+      "id": "1db41a51-d9b3-4555-be1b-5e68133a95ab",
+      "name": "Analyse Further?"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ $json.message.content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -620,
+        900
+      ],
+      "id": "f767cc28-22a9-4a9b-835d-e3dad6f0cdc6",
+      "name": "JSON2"
+    },
+    {
+      "parameters": {
+        "authentication": "appToken",
+        "email": "={{ $json.data.transcript.meeting_attendees[1].email }}",
+        "additionalFields": {
+          "firstName": "={{ $json.data.transcript.meeting_attendees[1].displayName }}"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2.1,
+      "position": [
+        -3260,
+        1120
+      ],
+      "id": "e30f3073-4ddf-412b-997a-0b77b57f76de",
+      "name": "Add Contact ",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -2180,
+        900
+      ],
+      "id": "16135d5b-ec4e-48f0-9328-50ea28c590c3",
+      "name": "Aggregate"
+    }
+  ],
+  "connections": {
+    "Fireflies - New Transcription ": {
+      "main": [
+        [
+          {
+            "node": "Transcription",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcription": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Reformat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reformat": {
+      "main": [
+        [
+          {
+            "node": "Other Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Other Details": {
+      "main": [
+        [
+          {
+            "node": "Meeting Attendees",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reformat Tasks": {
+      "main": [
+        [
+          {
+            "node": "JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JSON": {
+      "main": [
+        [
+          {
+            "node": "Split Kia - Tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meeting Attendees": {
+      "main": [
+        [
+          {
+            "node": "Find ContactID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find ContactID": {
+      "main": [
+        [
+          {
+            "node": "Reformat Tasks",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add Contact ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Call as Notes": {
+      "main": [
+        [
+          {
+            "node": "Analyse Further?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Add Call as Notes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Kia - Tasks": {
+      "main": [
+        [
+          {
+            "node": "Create Tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reformat Action Items": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Tasks": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analysis ": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sales Opportunities": {
+      "main": [
+        [
+          {
+            "node": "Extract Field",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create Tasks1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Markdown to HTML": {
+      "main": [
+        [
+          {
+            "node": "Add to Hubspot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Followup - Interests": {
+      "main": [
+        [
+          {
+            "node": "JSON1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JSON1": {
+      "main": [
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "Create Tasks2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Add to Hubspot1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Summary": {
+      "main": [
+        [
+          {
+            "node": "Reformat Action Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Field": {
+      "main": [
+        [
+          {
+            "node": "Markdown to HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyse Further?": {
+      "main": [
+        [
+          {
+            "node": "JSON2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Followup - Interests",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Sales Opportunities",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Analysis ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JSON2": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Contact ": {
+      "main": [
+        [
+          {
+            "node": "Find ContactID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Create Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "965be10e-a8c8-4607-8558-f27a4c1d6276",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-05-02T18:02:03.805Z",
+      "updatedAt": "2025-05-02T18:02:03.805Z",
+      "id": "skEFBXqqXDofwVMk",
+      "name": "Llamadas de venta"
+    }
+  ]
+}
