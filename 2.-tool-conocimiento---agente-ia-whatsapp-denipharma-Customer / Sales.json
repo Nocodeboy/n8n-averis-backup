@@ -1,0 +1,314 @@
+{
+  "createdAt": "2025-05-08T15:27:06.156Z",
+  "updatedAt": "2025-05-08T15:27:28.716Z",
+  "id": "6ZHV8sNtUvxHAca2",
+  "name": "2. Tool Conocimiento -  Agente IA WhatsApp Denipharma",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "modelName": "models/text-embedding-004"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        880,
+        260
+      ],
+      "id": "cecc292b-d8a7-44d6-bc41-31771a600214",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "iNiz53Yy3AWmTq9X",
+          "name": "Gemini API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "tienda",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        0
+      ],
+      "id": "df2bb79b-4833-497f-94d4-fb2eddd0ae30",
+      "name": "Qdrant Vector Store",
+      "credentials": {
+        "qdrantApi": {
+          "id": "HxyaUlOoj8RNQc1V",
+          "name": "QdrantApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "4f330809-1c3f-4a73-b276-4d155be13ac0",
+      "name": "Inicio"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        1220,
+        360
+      ],
+      "id": "18111870-acdf-4cd6-85e4-3d9aabfba218",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "loader": "csvLoader",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "tipo",
+                "value": "tienda"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        200
+      ],
+      "id": "e76f0127-861e-41b9-93b8-a6f363c92963",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const data = item.json;\n\n  // Función para eliminar etiquetas HTML\n  const stripHTML = (html) =>\n    typeof html === 'string'\n      ? html.replace(/<[^>]*>/g, '').trim()\n      : '';\n\n  // Valores base\n  const base = {\n    id: data.id || null,\n    name: data.name || '',\n    slug: data.slug || '',\n    permalink: data.permalink || '',\n    description: stripHTML(data.description),\n    short_description: stripHTML(data.short_description),\n    sku: data.sku || '',\n    price: data.price || '',\n    categories: Array.isArray(data.categories)\n      ? data.categories.map(cat => cat.name).filter(Boolean).join(', ')\n      : '',\n    images: Array.isArray(data.images)\n      ? data.images.map(img => img.src).filter(Boolean).join(', ')\n      : ''\n  };\n\n  // Atributos a columnas planas (Color: Amarillo, Talla: M, etc.)\n  if (Array.isArray(data.attributes)) {\n    for (const attr of data.attributes) {\n      if (\n        attr &&\n        typeof attr.name === 'string' &&\n        Array.isArray(attr.options)\n      ) {\n        base[attr.name] = attr.options.join(', ');\n      }\n    }\n  }\n\n  return { json: base };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        0
+      ],
+      "id": "2af7bd1f-ed69-421c-9ba7-edfed34baf10",
+      "name": "Transformar Datos"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener los productos desde el nodo \"Filtrar la información de productos\"\nconst productos = $('Transformar Datos').all().flatMap(item => item.json); \n\n// Si la API devolvió menos productos de los esperados, detener el loop\nif (!productos || productos.length < $('Inicio').first().json.limit) {\n    return [{ json: { hasMore: false } }];\n}\n\n// Aumentar el offset para la siguiente iteración\nreturn [{ json: { offset: $('Inicio').first().json.offset + $('Inicio').first().json.limit, limit: $('Inicio').first().json.limit, hasMore: true } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1720,
+        0
+      ],
+      "id": "e573b9ab-1576-4ff2-b165-2c8874158b6e",
+      "name": "Salida a Flujo Principal"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1460,
+        0
+      ],
+      "id": "b52b053a-e91e-4c31-bb3f-d8664188a592",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        740,
+        0
+      ],
+      "id": "6e10c5ac-3224-4fb1-a4b7-205ebdf73820",
+      "name": "Convertir a CSV"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wooCommerce",
+      "typeVersion": 1,
+      "position": [
+        240,
+        0
+      ],
+      "id": "22000a31-a6e5-4b95-bcfa-87982ce6031d",
+      "name": "WooCommerce",
+      "credentials": {
+        "wooCommerceApi": {
+          "id": "dPi6kk5dfJOIAmw8",
+          "name": "WooCommerce account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inicio": {
+      "main": [
+        [
+          {
+            "node": "WooCommerce",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transformar Datos": {
+      "main": [
+        [
+          {
+            "node": "Convertir a CSV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Vector Store": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Salida a Flujo Principal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convertir a CSV": {
+      "main": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WooCommerce": {
+      "main": [
+        [
+          {
+            "node": "Transformar Datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "18f95e35-d4e8-4bcc-824d-db266c3b7773",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-04-23T20:56:38.211Z",
+      "updatedAt": "2025-04-23T20:56:38.211Z",
+      "id": "cw7Ec13kzTSRWDUF",
+      "name": "Customer / Sales"
+    },
+    {
+      "createdAt": "2025-04-27T18:42:31.149Z",
+      "updatedAt": "2025-04-27T18:42:31.149Z",
+      "id": "yCzirQ8grCnJYX3H",
+      "name": "Whatsapp"
+    },
+    {
+      "createdAt": "2025-04-30T06:44:42.642Z",
+      "updatedAt": "2025-04-30T06:44:42.642Z",
+      "id": "WwDOci9twMaUHqZy",
+      "name": "Subflujo"
+    },
+    {
+      "createdAt": "2025-04-30T06:46:15.271Z",
+      "updatedAt": "2025-04-30T06:46:15.271Z",
+      "id": "458NrfE8JrfG6exr",
+      "name": "Denipharma"
+    }
+  ]
+}
