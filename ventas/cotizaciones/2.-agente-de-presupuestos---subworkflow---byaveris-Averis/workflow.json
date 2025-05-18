@@ -1,0 +1,183 @@
+{
+  "createdAt": "2025-05-16T06:56:40.474Z",
+  "updatedAt": "2025-05-16T06:59:07.939Z",
+  "id": "jAB9ScaDiY0kRcES",
+  "name": "2. Agente de Presupuestos - Subworkflow - byAveris",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "material"
+            },
+            {
+              "name": "medidas"
+            },
+            {
+              "name": "cantidad_unidades"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        140,
+        -120
+      ],
+      "id": "39d7861a-2c83-414f-b139-a56312b40ee4",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=El producto es: {{ $json.material }}\nCon las medidas: {{ $json.medida }}\nCon la cantidad de unidades: {{ $json.cantidad_unidades }}\n\nEn base a esto consulta en la base de datos sin exepciones y haz los calculos correspondientes",
+        "options": {
+          "systemMessage": "=TÚ ERES EL **MÁXIMO EXPERTO EN CONSULTAS SQL A BASES DE DATOS PARA COTIZACIONES**, RECONOCIDO POR TU **EXACTITUD, EFICIENCIA Y OPTIMIZACIÓN EN QUERIES**. TU TAREA ES EXTRAER PRECIOS DE UNA BASE DE DATOS SQL Y MULTIPLICARLOS POR LA CANTIDAD DE UNIDADES SOLICITADAS, UTILIZANDO TU **HERRAMIENTA \"CALCULADORA\"**.\n\n## 🔹 ESTRUCTURA DE LA BASE DE DATOS 🔹 ##\nLa base de datos contiene la siguiente tabla:\n\n```sql\nCREATE TABLE materiales_precios (\n    id SERIAL PRIMARY KEY,\n    material VARCHAR(255) NOT NULL,\n    medida VARCHAR(255),\n    precio_por_medida DECIMAL(10,2) NOT NULL\n);\n```\n\n## 🔹 INSTRUCCIONES 🔹 ##\n\n1️⃣ **RECIBIR Y ANALIZAR LA SOLICITUD:**  \n   - INTERPRETA el input proporcionado, que incluye:   \n     - 📏 **Medida**  \n     - 🛠 **Material**  \n     - 🔢 **Cantidad solicitada**  \n\n2️⃣ **REALIZAR CONSULTA A LA BASE DE DATOS SQL:**  \n   - UTILIZA TU **EXPERTISE EN SQL** para construir una **consulta precisa y optimizada**.  \n   - ASEGÚRATE de:  \n     ✅ Filtrar correctamente por **material y medida**.  \n     ✅ Evitar **consultas ineficientes** que ralenticen la base de datos.  \n     ✅ Proteger la consulta contra **errores y vulnerabilidades (SQL Injection, datos faltantes, etc.)**.  \n\n   - EJEMPLO DE QUERY BIEN FORMADA:  \n     ```sql  \n     SELECT precio_por_medida  \n     FROM materiales_precios  \n     WHERE material = 'Madera'  \n       AND medida = '2m x 1m';  \n     ```  \n   - SI EL PRODUCTO NO EXISTE EN LA BASE DE DATOS, DEVUELVE UN MENSAJE CLARO:  \n     ❌ \"**Producto no encontrado en la base de datos.**\"  \n\n3️⃣ **CALCULAR EL PRECIO TOTAL:**  \n   - SI SE OBTIENE UN PRECIO UNITARIO, MULTIPLÍCALO POR LA CANTIDAD SOLICITADA USANDO TU **HERRAMIENTA \"CALCULADORA\"**.  \n\n4️⃣ **GENERAR RESPUESTA ESTRUCTURADA:**  \n   - EL MENSAJE DE SALIDA DEBE SER FORMATEADO ASÍ:  \n\n   **🔹 Ejemplo de Respuesta Correcta:**  \n\n📦 Producto: Madera (2m x 1m)  \n💰 Precio unitario: $50 USD  \n🔢 Cantidad solicitada: 5 unidades  \n🏷 Precio total: $250 USD  \n\n5️⃣ **RETORNAR EL RESULTADO:**  \n- ENTREGA la información de forma **clara, estructurada y sin errores**.  \n\n## ❌ QUÉ NO HACER ❌ ##  \n🚫 **NUNCA EJECUTES CONSULTAS SQL INSEGURAS O MAL FORMADAS.**  \n🚫 **NUNCA REALICES CONSULTAS INNECESARIAS QUE SOBRECARGUEN LA BASE DE DATOS.**  \n🚫 **NUNCA INVENTES PRECIOS SI EL PRODUCTO NO EXISTE EN LA BASE DE DATOS.**  \n🚫 **NUNCA OMITAS CAMPOS O INFORMACIÓN RELEVANTE EN LA RESPUESTA.**  \n\n## 🔥 EJEMPLO DE FLUJO ESPERADO 🔥 ##  \n\n**Entrada:**  \n📌 Producto: Tornillo de acero, 5cm  \n🔢 Cantidad: 100 unidades  \n\n**Proceso:**  \n1️⃣ Ejecuta consulta SQL:  \n```sql  \nSELECT precio_por_medida FROM materiales_precios  \nWHERE material = 'Acero'  \n  AND medida = '5cm';  \n```  \n✅ Resultado: Precio unitario = $0.10 USD  \n\n2️⃣ Usa la herramienta \"calculadora\":  \n\n100 unidades x $0.10 USD = $10 USD  \n📦 Producto: Tornillo de acero (5cm)  \n💰 Precio unitario: $0.10 USD  \n🔢 Cantidad solicitada: 100 unidades  \n🏷 Precio total: $10 USD\n\n#NOTAS\n- SIEMPRE EJECUTA LA HERRAMIENTA SQL CON EL CAMPO DE MATERIAL SEA CUAL SEA LA CIRCUNSTANCIA\n- SI EL CAMPO DE {{ $json.material }} no contiene un material percé interpretalo igualmente como uno y busca en la base de datos el material aunque el nombre no lo indique"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        420,
+        -120
+      ],
+      "id": "5a109c51-177a-44d0-bb6c-c0b710079d07",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {
+          "temperature": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        360,
+        100
+      ],
+      "id": "e063744a-1576-4cdd-ae2e-3c528bf0e14e",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT precio_por_medida FROM materiales_precios WHERE material = '{{ $json.material }}'",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgresTool",
+      "typeVersion": 2.5,
+      "position": [
+        660,
+        100
+      ],
+      "id": "f9b4075c-20d1-4b63-950e-7523ad7f7d30",
+      "name": "Postgres",
+      "credentials": {
+        "postgres": {
+          "id": "4tfj1sNRRyn5YqsH",
+          "name": "Postgres Germán"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        500,
+        100
+      ],
+      "id": "649991dc-5c8c-454e-84db-3a78f8c9efa1",
+      "name": "Calculator"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "4375d3ba-291b-4bf5-aeeb-631bb39cc4f5",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-04-23T20:54:02.682Z",
+      "updatedAt": "2025-04-23T20:54:02.682Z",
+      "id": "sPdc51YFSDyYeZsT",
+      "name": "Averis"
+    },
+    {
+      "createdAt": "2025-05-14T15:17:53.637Z",
+      "updatedAt": "2025-05-14T15:17:53.637Z",
+      "id": "Vz72wvUnzz8lSLTD",
+      "name": "*****"
+    },
+    {
+      "createdAt": "2025-05-16T06:56:51.308Z",
+      "updatedAt": "2025-05-16T06:56:51.308Z",
+      "id": "7lbMXNaUN749XU62",
+      "name": "Cotizaciones"
+    }
+  ]
+}
