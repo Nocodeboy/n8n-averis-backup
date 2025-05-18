@@ -1,0 +1,221 @@
+{
+  "createdAt": "2025-04-29T17:31:52.342Z",
+  "updatedAt": "2025-04-29T17:31:55.271Z",
+  "id": "6wvCfbNUHvoKuM2R",
+  "name": "T - Revisa las tendencias en canal de Youtube",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6a75c22d-581f-4eec-869d-a6d6e817fb99",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UCKLLGYXqMiz114Lhs3uFcqg",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "5b8ae369-a72e-41e9-a8a2-d6843672eb39",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        440,
+        0
+      ],
+      "id": "faea4722-3f97-4bdd-9cca-a37ef7bec32c",
+      "name": "XML"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a friendly social media writing assistant. Given the YouTube video details below, please write a short and engaging YouTube post that can be added to my YouTube Channel Posts section. Do not use hashtags. \n\nVideo Title:  {{ $json.feed.entry[0].title }}\nVideo Description: {{ $json.feed.entry[0]['media:group']['media:description'] }}\n\nDo not use markdown. Format your answer in JSON like this:\n{ \"post\": \"<content here>\" }"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        660,
+        0
+      ],
+      "id": "cace5dd5-254f-4372-8dd3-ccc99f8d2036",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1kIG6QuHO1ppxxLu0ZAA3Lek6ueNo5g4h_6Rkhe1RicI",
+          "mode": "list",
+          "cachedResultName": "Social Media Content Ideas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kIG6QuHO1ppxxLu0ZAA3Lek6ueNo5g4h_6Rkhe1RicI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kIG6QuHO1ppxxLu0ZAA3Lek6ueNo5g4h_6Rkhe1RicI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Content": "={{ $json.message.content.post }}",
+            "Platform": "YouTube",
+            "Created Date": "={{ DateTime.now() }}",
+            "Status": "Ready for Review"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Content",
+              "displayName": "Content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Platform",
+              "displayName": "Platform",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Created Date",
+              "displayName": "Created Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1020,
+        0
+      ],
+      "id": "802f8391-628d-49ca-9bf4-8844a3f8bea1",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ae7wYVNQMP6fIWzo",
+          "name": "Google Sheets daniel@averis.es"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "XML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XML": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "3d03faac-7add-4ab9-887e-e26e0c1f6421",
+  "triggerCount": 0,
+  "tags": []
+}
