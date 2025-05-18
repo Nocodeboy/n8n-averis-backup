@@ -1,0 +1,1096 @@
+{
+  "createdAt": "2025-04-23T20:59:35.989Z",
+  "updatedAt": "2025-05-14T16:15:33.262Z",
+  "id": "1teVneCm9s5GWtUP",
+  "name": "Agente IA Asistente Personal",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        200
+      ],
+      "id": "ee713eef-0afb-40ac-bc03-14928a0faad3",
+      "name": "WhatsApp Trigger",
+      "webhookId": "d7340e57-0c76-493c-9ce7-6d167262d85b"
+    },
+    {
+      "parameters": {
+        "resource": "media",
+        "operation": "mediaUrlGet",
+        "mediaGetId": "={{ $('WhatsApp Trigger').item.json.messages[0].audio.id }}"
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "fb63fa3f-d86c-40b6-a69e-f0bf0f31325d",
+      "name": "WhatsApp Business Cloud",
+      "webhookId": "62c4d153-a263-46b2-948d-5a0cedc56452"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "whatsAppApi",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        200,
+        0
+      ],
+      "id": "0844b253-b04f-4591-9a5b-268ec9aad8db",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        360,
+        0
+      ],
+      "id": "39a942a9-2f08-4d19-b3ff-4f268c10e61a",
+      "name": "OpenAI"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.messages[0].type }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d6f618dd-6dc2-4164-ad03-414deae5159b",
+                    "leftValue": "={{ $json.messages[0].type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Texto"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "81c8bb47-2597-4451-a67d-155a492e1863",
+                    "leftValue": "={{ $json.messages[0].type }}",
+                    "rightValue": "document",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Documento"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -540,
+        200
+      ],
+      "id": "8a487700-91fc-4a9b-b4d3-d708cd77d928",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.messages[0].text.body }} {{ $json.text }}",
+        "options": {
+          "systemMessage": "=Eres un agente personal avanzado diseñado para interactuar a través de WhatsApp.  \nTu objetivo es identificar con precisión la intención del usuario y ejecutar acciones específicas basadas en sus solicitudes. Eres capaz de realizar las siguientes funciones:\n\n## **Funciones principales**\n\n### 1. Gestión de correos electrónicos\n- Identificar correos relevantes y generar un resumen.\n- Redactar y enviar correos electrónicos según las indicaciones.\n\n### 2. Gestión de tareas y calendario\n- Crear tareas en ClickUp.\n- Consultar y programar eventos en el calendario.\n- Confirmar citas y proponer alternativas si la hora está ocupada.\n- Recordar tareas y pendientes diarios.\n\n### 3. Consultas y búsqueda de información\n- Buscar información relevante en internet y resumirla.\n- Obtener noticias personalizadas según los intereses del usuario.\n\n### 4. Organización de datos\n- Guardar notas rápidas en herramientas como Notion.\n\n### 5. Optimización del tiempo\n- Agendar reuniones o llamadas con un comando rápido.\n\n### 6. Responder preguntas a partir de una base de conocimiento\n- Consultar una tienda vectorizada para buscar información relevante a las consultas del usuario.  \n- Proporcionar respuestas claras y directas utilizando los datos encontrados en la base de conocimiento.  \n- Si no se encuentra una respuesta exacta, ofrecer opciones relacionadas o solicitar más detalles.\n\n---\n\n## **Instrucciones de funcionamiento**\n\n### 1. Identificación de intención\n- Analiza cada mensaje y determina la intención del usuario basándote en palabras clave, contexto y estructura del mensaje.\n- Si el mensaje no es claro, solicita una aclaración educadamente.\n\n### 2. Flujo de respuestas y acciones\n- Responde de manera directa y clara al usuario sobre la acción que se llevará a cabo.\n- Si es necesario, solicita información adicional para completar la tarea (por ejemplo, destinatarios del correo, detalles de la reunión, etc.).\n- Al responder preguntas, prioriza información relevante encontrada en la base de conocimiento antes de recurrir a búsquedas externas.\n\nTen en cuenta que hoy es {{ $now }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        960,
+        200
+      ],
+      "id": "312390f2-ae47-471e-874d-10d8621898ce",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.1,
+      "position": [
+        620,
+        460
+      ],
+      "id": "3c393dd0-a9e3-4c39-bf6b-b4bfc2d2ba80",
+      "name": "OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "options": {
+          "hl": "es"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        680,
+        900
+      ],
+      "id": "2f922245-b12e-4e41-bd2a-c9659099d45c",
+      "name": "SerpAPI"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "angel.aparicio92@gmail.com",
+          "mode": "list",
+          "cachedResultName": "angel.aparicio92@gmail.com"
+        },
+        "start": "={{ $fromAI(\"start\", \"cuando empieza el evento\") }}",
+        "end": "={{ $fromAI(\"End\", \"cuando acaba el evento\") }}",
+        "additionalFields": {
+          "attendees": [
+            "={{ $fromAI(\"Participantes\", \"Quien va a atender a la reunion\") }}"
+          ],
+          "conferenceDataUi": {
+            "conferenceDataValues": {
+              "conferenceSolution": "hangoutsMeet"
+            }
+          },
+          "description": "={{ $fromAI(\"Descripcion\", \"Descripcion sobre que va a tratar la reunion\") }}",
+          "location": "={{ $fromAI(\"Ubicacion\", \"donde se va a celebrar el encuentro, puede ser online\") }}",
+          "summary": "={{ $fromAI(\"Resumen\", \"De que va a tratar la reunión\") }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.2,
+      "position": [
+        900,
+        1000
+      ],
+      "id": "9002aabb-19f7-4ec1-8474-7487551faa53",
+      "name": "Crear eventos"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "angel.aparicio92@gmail.com",
+          "mode": "list",
+          "cachedResultName": "angel.aparicio92@gmail.com"
+        },
+        "limit": "={{ $fromAI(\"numero_de_respuestas\", \"numero de eventos a recuperar\") }}",
+        "options": {
+          "timeMin": "={{ $fromAI(\"after\", \"a partir de que fecha\") }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.2,
+      "position": [
+        1080,
+        1060
+      ],
+      "id": "a95df1cf-6496-4cfa-9ed6-e298dca046d8",
+      "name": "Buscar eventos"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": "={{ $fromAI(\"numero_emails\", \"el numero de emails que quiero que devuelva\") }}",
+        "filters": {
+          "includeSpamTrash": false,
+          "labelIds": [
+            "INBOX"
+          ],
+          "q": "={{ $fromAI(\"Termino_busqueda\", \"buscar correos con ciertas palabras clave\") }}",
+          "readStatus": "unread",
+          "receivedAfter": "={{ $fromAI(\"after\", \"recibidos a partir de cierto dia\") }}",
+          "sender": "={{ $fromAI(\"Remitente\", \"quien ha enviado el email, el remitente\") }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1260,
+        980
+      ],
+      "id": "77acfbc2-e2f6-4147-beb6-0decdb56f124",
+      "name": "Buscar emails",
+      "webhookId": "7901b579-0f8d-4700-a2ec-014e6299a9ac"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $fromAI(\"Destinatario\", \"email del destinatario a quien quiero enviar el email\") }}",
+        "subject": "={{ $fromAI(\"Asunto\", \"asunto del correo\") }}",
+        "emailType": "text",
+        "message": "={{ $fromAI(\"cuerpo\", \"cuerpo del email, mensaje del cuerpo\") }}",
+        "options": {
+          "senderName": "Angel Aparicio"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1400,
+        960
+      ],
+      "id": "c49b1b45-8d20-46b9-b303-8a092fe20aa3",
+      "name": "Enviar email",
+      "webhookId": "eb916d54-6439-41ff-a4b7-948ed1dd9e2f"
+    },
+    {
+      "parameters": {
+        "pageId": {
+          "__rl": true,
+          "value": "1822cd2e5d15800284edfddc22b0318a",
+          "mode": "id"
+        },
+        "title": "={{ $fromAI(\"titulo\", \"titulo de la nota personal. Crea uno breve\") }}",
+        "blockUi": {
+          "blockValues": [
+            {
+              "textContent": "={{ $fromAI(\"texto\", \"resumen detallado del texto que quiero guardar como nota\") }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notionTool",
+      "typeVersion": 2.2,
+      "position": [
+        1560,
+        940
+      ],
+      "id": "473e80f9-3a01-44f0-8dc0-677902999da7",
+      "name": "Crear nota personal"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "532278873304599",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        1460,
+        200
+      ],
+      "id": "13100dff-82a5-4994-9d34-449cde2c0d6c",
+      "name": "WhatsApp Business Cloud1",
+      "webhookId": "9b463060-ce0e-4769-b5ca-4869c415ce24"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -560,
+        1140
+      ],
+      "id": "230d519e-af68-4b61-aa16-bd002f4c170e",
+      "name": "Google Drive"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "ejemplon8n",
+          "mode": "list",
+          "cachedResultName": "ejemplon8n"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1,
+      "position": [
+        -300,
+        1140
+      ],
+      "id": "cb3da2e7-646a-4e87-ba12-3baf99e2d0b8",
+      "name": "Pinecone Vector Store"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -380,
+        1300
+      ],
+      "id": "e3f62270-193c-400c-ad8a-1f109ed2e91f",
+      "name": "Embeddings OpenAI"
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        1320
+      ],
+      "id": "4b7922de-4d45-453f-b2e1-2a77c00b33ab",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkOverlap": 200,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        1460
+      ],
+      "id": "78d733e9-512f-40b8-bd78-d0bf553d21c4",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "returnAll": true,
+        "filter": {
+          "driveId": {
+            "__rl": true,
+            "value": "My Drive",
+            "mode": "list",
+            "cachedResultName": "My Drive",
+            "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+          },
+          "folderId": {
+            "__rl": true,
+            "value": "1hP1Sg3fDjandrZEZr-9wdkOPTHmnA9AH",
+            "mode": "list",
+            "cachedResultName": "Transcripción videos youtube",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1hP1Sg3fDjandrZEZr-9wdkOPTHmnA9AH"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -740,
+        1140
+      ],
+      "id": "560e920f-4142-4d35-b6d9-90a7563288f1",
+      "name": "Google Drive1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1040,
+        1160
+      ],
+      "id": "f9dda906-049f-401a-be31-28d1e4a698d5",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {}
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1NX1AHAItBEq0XUIWch8RG3a5oPab3LPF",
+          "mode": "list",
+          "cachedResultName": "Documentos para pinecone",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1NX1AHAItBEq0XUIWch8RG3a5oPab3LPF"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -940,
+        1640
+      ],
+      "id": "9a181297-86dc-4d91-bf51-34bda825b3ea",
+      "name": "Google Drive Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -720,
+        1640
+      ],
+      "id": "2f3f5e16-7eb5-4a70-932e-55d925ae36a2",
+      "name": "Google Drive2"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "ejemplon8n",
+          "mode": "list",
+          "cachedResultName": "ejemplon8n"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1,
+      "position": [
+        -500,
+        1640
+      ],
+      "id": "0fe31272-4d43-4653-af97-0822daac022f",
+      "name": "Pinecone Vector Store1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -580,
+        1880
+      ],
+      "id": "cbc33adb-49f1-42e9-af51-8e2b58bb82a9",
+      "name": "Embeddings OpenAI1"
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        1920
+      ],
+      "id": "d6b72ed0-f3c9-4ef1-a3d0-7afb581f49a2",
+      "name": "Default Data Loader1"
+    },
+    {
+      "parameters": {
+        "chunkOverlap": 200,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        2140
+      ],
+      "id": "653389b1-ba98-4a8a-a9e1-2c437a03963b",
+      "name": "Recursive Character Text Splitter1"
+    },
+    {
+      "parameters": {
+        "name": "Preguntas",
+        "description": "Datos que ha preguntado el usuario"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        300
+      ],
+      "id": "69928f7f-63b3-47e4-97cc-940c85a78251",
+      "name": "Answer questions with a vector store"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.1,
+      "position": [
+        2400,
+        500
+      ],
+      "id": "658dc79d-e9da-4221-93da-891b22e7d702",
+      "name": "OpenAI Chat Model1"
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "ejemplon8n",
+          "mode": "list",
+          "cachedResultName": "ejemplon8n"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        460
+      ],
+      "id": "36e3859f-f623-4f50-a3bf-6c340418da25",
+      "name": "Pinecone Vector Store2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2060,
+        640
+      ],
+      "id": "cdeacb61-5ce7-4909-ab58-82c5c1e79ef1",
+      "name": "Embeddings OpenAI2"
+    },
+    {
+      "parameters": {
+        "name": "ClickUp",
+        "description": "Llama a este workflow si hay que crear tareas en clickup",
+        "workflowId": {
+          "__rl": true,
+          "value": "zEJU8uWi7p83iAac",
+          "mode": "list",
+          "cachedResultName": "Clickup tarea"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        1720,
+        840
+      ],
+      "id": "9958524b-777b-49b6-b8c6-0ff9a8d5f50c",
+      "name": "Tarea ClickUp"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        600,
+        680
+      ],
+      "id": "b52b8eb4-cfe6-49d8-868e-ab7156f5d8c5",
+      "name": "Window Buffer Memory"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f0a0da0a-c9d8-401a-92eb-f776c7bebc53",
+              "name": "messages[0].text.body",
+              "value": "={{ $json.messages[0].text.body }}",
+              "type": "string"
+            },
+            {
+              "id": "7f5fe21c-0f62-4f72-8166-b090fdde9faa",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        600,
+        220
+      ],
+      "id": "6dd01a84-a4f3-46e9-8460-18dda50392e6",
+      "name": "Edit Fields1"
+    }
+  ],
+  "connections": {
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WhatsApp Business Cloud": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "WhatsApp Business Cloud",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "WhatsApp Business Cloud1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear eventos": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar eventos": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar emails": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar email": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear nota personal": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive1": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Google Drive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Drive2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive2": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader1": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter1": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader1",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Answer questions with a vector store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store2": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store2",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tarea ClickUp": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "e8ffe7d0-9c8b-4f6d-836e-2d4e7b2f005a",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-04-23T20:54:09.108Z",
+      "updatedAt": "2025-04-23T20:54:09.108Z",
+      "id": "g0Y4unH76zW0VzkQ",
+      "name": "WhatsApp"
+    },
+    {
+      "createdAt": "2025-04-23T20:59:57.136Z",
+      "updatedAt": "2025-04-23T20:59:57.136Z",
+      "id": "Xq0NhXBZ2HnDESQS",
+      "name": "Agente"
+    },
+    {
+      "createdAt": "2025-04-23T20:54:02.682Z",
+      "updatedAt": "2025-04-23T20:54:02.682Z",
+      "id": "sPdc51YFSDyYeZsT",
+      "name": "Averis"
+    }
+  ]
+}
