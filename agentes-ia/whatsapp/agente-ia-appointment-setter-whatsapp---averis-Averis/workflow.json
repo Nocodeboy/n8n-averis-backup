@@ -1,0 +1,2085 @@
+{
+  "createdAt": "2025-05-01T10:07:42.155Z",
+  "updatedAt": "2025-05-05T19:17:55.584Z",
+  "id": "TA85iiM3xls3SbQi",
+  "name": "Agente IA Appointment Setter WhatsApp - Averis",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ad567ab3-81ea-45d6-a2e3-a6a9dd204a06",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -6220,
+        560
+      ],
+      "id": "1ce898a0-64ba-4bd8-b2fd-3843c87cfc4d",
+      "name": "Webhook",
+      "webhookId": "ad567ab3-81ea-45d6-a2e3-a6a9dd204a06"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "24c275ee-aef2-4b03-bf22-4ca69aa05e98",
+              "name": "serverUrl",
+              "value": "={{ $json.body.server_url }}",
+              "type": "string"
+            },
+            {
+              "id": "a15eb467-42de-4299-a389-667647ccc613",
+              "name": "instanceName",
+              "value": "={{ $json.body.instance }}",
+              "type": "string"
+            },
+            {
+              "id": "13f6d482-fb2d-42a2-958e-e82273d6679c",
+              "name": "apiKey",
+              "value": "={{ $json.body.apikey }}",
+              "type": "string"
+            },
+            {
+              "id": "557486dd-9057-4d07-8c8a-19583a79b9f9",
+              "name": "message.messageId",
+              "value": "={{ $json.body.data.key.id }}",
+              "type": "string"
+            },
+            {
+              "id": "79493ec9-a117-496c-88bf-65254c376d20",
+              "name": "message.chatId",
+              "value": "={{ $json.body.data.key.remoteJid }}",
+              "type": "string"
+            },
+            {
+              "id": "1208a065-1670-40c7-9b9d-5c8c87cedd3f",
+              "name": "message.messageType",
+              "value": "={{ $json.body.data.message.conversation ? 'text': '' }}{{ $json.body.data.message.extendedTextMessage ? 'text': '' }}{{ $json.body.data.message.audioMessage ? 'audio': '' }}{{ $json.body.data.message.imageMessage ? 'image': '' }}",
+              "type": "string"
+            },
+            {
+              "id": "2e0a8ca5-35b9-4d4d-9005-1e66ac828eeb",
+              "name": "message.messageContent",
+              "value": "={{ $json.body.data.message.extendedTextMessage?.text || '' }}{{ $json.body.data.message.imageMessage?.caption || '' }}{{ $json.body.data.message.conversation || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "2f72443f-eace-44fa-8a81-5f3bf1ab5e88",
+              "name": "message.messageTimeStamp",
+              "value": "={{ $json.body.date_time.toDateTime().toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "a8c0f64c-2ad7-42c8-9af0-eb792f298cdd",
+              "name": "userName",
+              "value": "={{ $json.body.data.pushName }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -6000,
+        560
+      ],
+      "id": "a9faeddb-7284-4480-be5f-df9aba8860d6",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.messageType }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "e397999f-f0d4-47db-8619-c188b5e3616b"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "338e3688-336d-4e2a-a3a9-d81e6bbd4e11",
+                    "leftValue": "={{ $json.messageType }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b8f82334-7775-4e5d-9d7c-f6402af55910",
+                    "leftValue": "={{ $json.messageType }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "other"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -3580,
+        460
+      ],
+      "id": "dfe0ba79-d9d8-406b-aefb-1f0d2c81c9d0",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Edit Fields').item.json.serverUrl }}/chat/getBase64FromMediaMessage/{{ $('Edit Fields').item.json.instanceName }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Edit Fields').item.json.apiKey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message.key.id",
+              "value": "={{ $json.messageId }}"
+            },
+            {
+              "name": "convertToMp4",
+              "value": "={{ Boolean(false) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3200,
+        200
+      ],
+      "id": "c3b17f03-6c16-4c12-96b4-f5b29641d8c1",
+      "name": "descargar audio"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "base64",
+        "options": {
+          "mimeType": "={{ $json.mimetype }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -2980,
+        200
+      ],
+      "id": "6742dc07-327d-4cf8-a9f6-d8695567bd02",
+      "name": "convertir audio"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -2760,
+        200
+      ],
+      "id": "91e3a245-2eca-490b-917a-79bf0dc8363a",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Edit Fields').item.json.serverUrl }}/chat/getBase64FromMediaMessage/{{ $('Edit Fields').item.json.instanceName }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Edit Fields').item.json.apiKey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message.key.id",
+              "value": "={{ $json.messageId }}"
+            },
+            {
+              "name": "convertToMp4",
+              "value": "={{ Boolean(false) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3200,
+        400
+      ],
+      "id": "c00db36c-907e-4b5a-9a16-0018b931a21d",
+      "name": "descargar imagen"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "base64",
+        "options": {
+          "mimeType": "={{ $json.mimetype }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -2980,
+        400
+      ],
+      "id": "8139099d-db47-4403-92a1-a58df6f692a9",
+      "name": "convertir imagen"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a54b459d-e8df-47e1-be8c-a8a476ab93c3",
+              "name": "content",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "1b078c6c-6824-43e2-8bff-8a56fca7a1c9",
+              "name": "timestamp",
+              "value": "={{ $('Json Parse').item.json.messageTimeStamp }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2520,
+        200
+      ],
+      "id": "6f010773-4dbf-457f-97f7-d1770e4e4b0e",
+      "name": "audio content"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "text": "Describe la imagen",
+        "inputType": "base64",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -2760,
+        400
+      ],
+      "id": "5e427d3e-4837-4288-b256-3efa64f0a9c3",
+      "name": "describe imagen",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a54b459d-e8df-47e1-be8c-a8a476ab93c3",
+              "name": "content",
+              "value": "=<image>\n{{ $json.content }}\n</image>",
+              "type": "string"
+            },
+            {
+              "id": "29e2c943-8bb0-4199-84dd-16d098894ddd",
+              "name": "timestamp",
+              "value": "={{ $('Json Parse').item.json.messageTimeStamp }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2520,
+        400
+      ],
+      "id": "b3eb4fba-6d87-4815-9d1e-e80b7a9c1cf4",
+      "name": "image content"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bcea6c99-72fa-44d3-acc6-ecfdec887583",
+              "name": "content",
+              "value": "={{ $json.messageContent }}",
+              "type": "string"
+            },
+            {
+              "id": "6abb6aff-1f4a-4ab5-aece-c2bf1d27a59d",
+              "name": "timestamp",
+              "value": "={{ $('Json Parse').item.json.messageTimeStamp }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2540,
+        620
+      ],
+      "id": "abb8f531-62e8-4b41-b247-a9f8dbf33749",
+      "name": "text content"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d2599831-cc84-4aa6-acf7-77ed624f72ab",
+              "name": "content",
+              "value": "={{ $json.messages.join(\"\\n\") }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1560,
+        400
+      ],
+      "id": "50e5e2fe-a91d-4d55-8a19-52cc8af1636d",
+      "name": "mensaje"
+    },
+    {
+      "parameters": {
+        "operation": "push",
+        "list": "={{ $('Edit Fields').item.json.message.chatId }}",
+        "messageData": "={{ JSON.stringify($('Edit Fields').item.json.message) }}",
+        "tail": true
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -5400,
+        560
+      ],
+      "id": "d1a3fe16-afcc-46ec-976d-5225515a8034",
+      "name": "push mensaje",
+      "credentials": {
+        "redis": {
+          "id": "2nvHuldOkXKkzOTY",
+          "name": "Redis localhost"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "message",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -4300,
+        460
+      ],
+      "id": "caec24c9-ae49-4331-990e-d7f91bb354ff",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ JSON.parse($json.message) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4080,
+        460
+      ],
+      "id": "089ebfb3-3a67-4464-9fb8-1fe5ff364819",
+      "name": "Json Parse"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        -2220,
+        400
+      ],
+      "id": "254cfb33-0a5b-4569-879d-93a298e754b7",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "timestamp"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        -2000,
+        400
+      ],
+      "id": "c16026e7-ee45-4f2b-9aad-c36d5e842bd7",
+      "name": "Sort"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "content",
+              "renameField": true,
+              "outputFieldName": "messages"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -1780,
+        400
+      ],
+      "id": "a85ad922-617c-42ab-ac96-e2f989a15b22",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -5180,
+        560
+      ],
+      "id": "4546f874-349c-42d2-b957-db8376cc8433",
+      "name": "Wait1",
+      "webhookId": "39be8185-9563-41b4-84d8-3f7650c1b4bf"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "18445dcf-1967-40d1-aec2-6d2196b1364b",
+              "leftValue": "={{ JSON.parse($json.message.last()).messageId }}",
+              "rightValue": "={{ $('Edit Fields').item.json.message.messageId }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -4740,
+        560
+      ],
+      "id": "32374966-5940-4cfd-a359-2be894c3014b",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -4520,
+        660
+      ],
+      "id": "4b36c0ec-fdf1-4ea2-8d3c-2ef3a625a637",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "message",
+        "key": "={{ $('Edit Fields').item.json.message.chatId }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -4960,
+        560
+      ],
+      "id": "3d03af09-5d75-45bb-8b21-2451762ca067",
+      "name": "obtener todos mensajes",
+      "credentials": {
+        "redis": {
+          "id": "2nvHuldOkXKkzOTY",
+          "name": "Redis localhost"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('Edit Fields').item.json.message.chatId }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -4520,
+        460
+      ],
+      "id": "aca9b874-d2a4-4fa2-84d9-8cc8c3d59429",
+      "name": "borrar todos mensajes",
+      "credentials": {
+        "redis": {
+          "id": "2nvHuldOkXKkzOTY",
+          "name": "Redis localhost"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserAutofixing",
+      "typeVersion": 1,
+      "position": [
+        400,
+        580
+      ],
+      "id": "0a497a9f-8b56-4157-997f-deccc173c702",
+      "name": "Auto-fixing Output Parser"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"response\": {\n      \"part_1\": \"Parte uno de la respuesta\",\n      \"part_2\": \"Parte dos de la respuesta (opcional).\",\n      \"part_3\": \"Parte tres de la respuesta (opcional).\"\n    }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        520,
+        780
+      ],
+      "id": "81493a83-d3f3-4e48-8a1a-bf8b6b12e4ca",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Texto de entrada:\n{{ $json.output }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=# Formatea el texto de entrada de acuerdo a las instrucciones.\n\n---------------\n\n## Instrucciones\n- Devuelve un mensaje de salida dividido en 1, 2, o 3 partes, dependiendo de la lingitud del texto de entrada.\n- El mensaje de salida debe sonar relajado y amigable.\n- Elimina estos caracteres:\n \"*\", \"¿\", \"¡\", \"#\"\n- Utiliza signos de interrogación \"?\" **solo en el final de las frases que sean preguntas.**\n- **No** es necesario que las 3 partes contengan un mensaje.\n- Si el texto de entrada contine una lista, déjala sola en una parte.\n- En la respuesta no se puede devolver mensajes como \"Utilizando la herramienta Conocimiento para buscar...\" o cosas similares.\n- **IMPORTANTE: No añadas ni elimines información esencial del texto de entrada. Respeta fielmente el contenido original. Solamente ajusta la forma (ej. eliminar caracteres, dividir en partes, ajustar estilo) para cumplir las instrucciones dadas.**\n\n## **IMPORTANTE**\n- Si haces bien tu trabajo te voy a pagar un sueldo de $5,000 USD al mes.\n- **SIEMPRE debes completar al menos una parte con texto**."
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        320,
+        360
+      ],
+      "id": "6e109fe5-c21d-4301-a9ca-a4ad51c20e7a",
+      "name": "Verificador de Respuesta",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        340,
+        780
+      ],
+      "id": "f7a01c41-5bbf-411e-ac1a-2ba6af5ec157",
+      "name": "4o mini Verificador",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Edit Fields').item.json.serverUrl }}/message/sendText/{{ $('Edit Fields').item.json.instanceName }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Edit Fields').item.json.apiKey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('Edit Fields').item.json.message.chatId }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $('Verificador de Respuesta').item.json.output.response.part_1 }}"
+            },
+            {
+              "name": "delay",
+              "value": "={{ 2000 }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        780,
+        360
+      ],
+      "id": "8a60167d-6598-4cea-9114-3dd24548aa59",
+      "name": "Enviar Parte1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4b92a1f4-d4bc-4689-87cf-1be40aa49c27",
+              "leftValue": "={{ $('Verificador de Respuesta').item.json.output.response.part_2 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1000,
+        360
+      ],
+      "id": "398b489c-daaa-49ba-9dec-98ca9d7f7c45",
+      "name": "If Parte 2"
+    },
+    {
+      "parameters": {
+        "amount": "={{ 2+$('Verificador de Respuesta').item.json.output.response.part_2.length*0.01 }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1220,
+        360
+      ],
+      "id": "a8d1f943-4010-4a54-bde0-bcd3dbd0bcd8",
+      "name": "Wait",
+      "webhookId": "fccc56ac-adbb-4a82-9af6-1f3a00fa08ff"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Edit Fields').item.json.serverUrl }}/message/sendText/{{ $('Edit Fields').item.json.instanceName }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Edit Fields').item.json.apiKey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('Edit Fields').item.json.message.chatId }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $('Verificador de Respuesta').item.json.output.response.part_2 }}"
+            },
+            {
+              "name": "delay",
+              "value": "={{ 2000 }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1440,
+        360
+      ],
+      "id": "ec3f075c-4d65-4005-a431-504800555560",
+      "name": "Enviar Parte2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4b92a1f4-d4bc-4689-87cf-1be40aa49c27",
+              "leftValue": "={{ $('Verificador de Respuesta').item.json.output.response.part_3 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1660,
+        360
+      ],
+      "id": "026ffffa-7b45-4325-bf29-0f1631f78502",
+      "name": "If Parte 3"
+    },
+    {
+      "parameters": {
+        "amount": "={{ 2+$('Verificador de Respuesta').item.json.output.response.part_3.length*0.01 }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1880,
+        360
+      ],
+      "id": "05d86c14-a612-4d9f-b8aa-d6a6e1229f3a",
+      "name": "Wait2",
+      "webhookId": "610f359e-8fe3-480f-9042-e011a3c9fb43"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Edit Fields').item.json.serverUrl }}/message/sendText/{{ $('Edit Fields').item.json.instanceName }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Edit Fields').item.json.apiKey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('Edit Fields').item.json.message.chatId }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $('Verificador de Respuesta').item.json.output.response.part_3 }}"
+            },
+            {
+              "name": "delay",
+              "value": "={{ 2000 }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2100,
+        360
+      ],
+      "id": "d2fd598f-ef97-46dc-9f54-dadf7dc2243a",
+      "name": "Enviar Parte3"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2320,
+        360
+      ],
+      "id": "6808ee2f-af65-4df9-942a-cc1a418f67b3",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "fabimarklai@gmail.com",
+          "mode": "list",
+          "cachedResultName": "fabimarklai@gmail.com"
+        },
+        "start": "={{ $fromAI(\"start\",\"date and time for when the event should start\") }}",
+        "end": "={{ $fromAI(\"end\",\"date and time for when the event should end\") }}",
+        "additionalFields": {
+          "summary": "={{ $fromAI(\"title\",\"title of the event\") }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        -860,
+        580
+      ],
+      "id": "294cf2fb-e0d7-4fdf-96e6-deb4543ea9ef",
+      "name": "Calendar Create",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "PjIIfi9LOQkzzoCD",
+          "name": "Google Calendar daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "fabimarklai@gmail.com",
+          "mode": "list",
+          "cachedResultName": "fabimarklai@gmail.com"
+        },
+        "limit": 20,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        -720,
+        580
+      ],
+      "id": "61a1d068-c5c5-4778-9927-943d09ed8a6d",
+      "name": "Calendar Read",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "PjIIfi9LOQkzzoCD",
+          "name": "Google Calendar daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "=fabimarklai@gmail.com",
+          "mode": "id"
+        },
+        "eventId": "={{ $fromAI(\"id\",\"the id of the event\") }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        -580,
+        580
+      ],
+      "id": "0f1942e4-f057-4bf2-ba24-15b08102646d",
+      "name": "Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "PjIIfi9LOQkzzoCD",
+          "name": "Google Calendar daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1KrcTkhpSvGmtrefCIs3pdOtSJr9H8JQqFzrikFkDsM4",
+          "mode": "list",
+          "cachedResultName": "WhatsApp Ai Agent Appointment Setter - AI Agent WhatsApp Voice and Vision - FabiMarkl.com",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KrcTkhpSvGmtrefCIs3pdOtSJr9H8JQqFzrikFkDsM4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 689245338,
+          "mode": "list",
+          "cachedResultName": "Appointments",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KrcTkhpSvGmtrefCIs3pdOtSJr9H8JQqFzrikFkDsM4/edit#gid=689245338"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "detectAutomatically",
+              "readRowsUntil": "firstEmptyRow"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        -440,
+        580
+      ],
+      "id": "6c688c26-aeb8-40e5-90bf-f1976f1c6716",
+      "name": "Google Sheets - Read",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ae7wYVNQMP6fIWzo",
+          "name": "Google Sheets daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1KrcTkhpSvGmtrefCIs3pdOtSJr9H8JQqFzrikFkDsM4",
+          "mode": "list",
+          "cachedResultName": "WhatsApp Ai Agent Appointment Setter - AI Agent WhatsApp Voice and Vision - FabiMarkl.com",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KrcTkhpSvGmtrefCIs3pdOtSJr9H8JQqFzrikFkDsM4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 689245338,
+          "mode": "list",
+          "cachedResultName": "Appointments",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KrcTkhpSvGmtrefCIs3pdOtSJr9H8JQqFzrikFkDsM4/edit#gid=689245338"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{ $fromAI(\"email\",\"the email address that the user tells you\") }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Appointment Date",
+              "displayName": "Appointment Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Booking Status",
+              "displayName": "Booking Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Time Zone",
+              "displayName": "Time Zone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Intake Form",
+              "displayName": "Intake Form",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Reminder Sent",
+              "displayName": "Reminder Sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Email Consent",
+              "displayName": "Email Consent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Added to Contacts",
+              "displayName": "Added to Contacts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        -300,
+        580
+      ],
+      "id": "72aa8158-a11d-49fe-ac65-c541c816b526",
+      "name": "Google Sheets - Add Row",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ae7wYVNQMP6fIWzo",
+          "name": "Google Sheets daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1KrcTkhpSvGmtrefCIs3pdOtSJr9H8JQqFzrikFkDsM4",
+          "mode": "list",
+          "cachedResultName": "WhatsApp Ai Agent Appointment Setter - AI Agent WhatsApp Voice and Vision - FabiMarkl.com",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KrcTkhpSvGmtrefCIs3pdOtSJr9H8JQqFzrikFkDsM4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 689245338,
+          "mode": "list",
+          "cachedResultName": "Appointments",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KrcTkhpSvGmtrefCIs3pdOtSJr9H8JQqFzrikFkDsM4/edit#gid=689245338"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{ $fromAI(\"email\",\"the email address of the user gave you earlier\") }}",
+            "Appointment Date": "={{ $fromAI(\"date\",\"the appointment date and time converted to Germany Timezone that the user comfirmed as his appointment\") }}",
+            "Booking Status": "={{ $fromAI(\"status\",\"the status of the appointment which is either conformed or cancelled\") }}",
+            "Time Zone": "={{ $fromAI(\"time_zone\",\"the time zone and location that the user tells you\") }}",
+            "Name": "={{ $fromAI(\"name\",\"the name of the user\") }}",
+            "Phone": "={{ $fromAI(\"phone\",\"the phone number that the user tells you. Always save the phone number with the country code that is associated with the time zone the user mentioned. But do not use a \"+\" sign and no space between the county code and the actual number.\") }}",
+            "Intake Form": "={{ $fromAI(\"intake_form\",\"specific topics or issues the user likes to discuss during the appointment\") }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Appointment Date",
+              "displayName": "Appointment Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Booking Status",
+              "displayName": "Booking Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Time Zone",
+              "displayName": "Time Zone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Intake Form",
+              "displayName": "Intake Form",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Newsletter Optin",
+              "displayName": "Newsletter Optin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        -140,
+        580
+      ],
+      "id": "8f535972-bc12-4505-bcc0-b1bd1644d2d6",
+      "name": "Google Sheets - Update Row",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ae7wYVNQMP6fIWzo",
+          "name": "Google Sheets daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -1000,
+        580
+      ],
+      "id": "952ad9fb-9f04-4257-a5e6-9c8e709bf6e0",
+      "name": "Window Buffer Memory1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -1140,
+        580
+      ],
+      "id": "87a07a28-8be2-499d-a306-46d98cefceb4",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $fromAI(\"email\",\"the email address of the user gave you earlier\") }}",
+        "subject": "={{ $fromAI(\"subject\",\"the email subjectline that just is [New Booking] + Booking date and time converted to the user timezone that he mentioned earlier'\") }}",
+        "message": "={{ $fromAI(\"body\",\"the email body that contains the message that the booking of the user was confirmed along with booking date, email, name, timezone, what user wants to discuss during the appointment\") }}",
+        "options": {
+          "bccList": "INSERT_YOUR_EMAIL"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        580
+      ],
+      "id": "e0b755ad-7d46-4e89-af50-9d938da68548",
+      "name": "Gmail - Send Confirmation User",
+      "webhookId": "14db8167-92cc-42dd-aed1-22ee9e8e3b1e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BwWjplhZQVpEPVPV",
+          "name": "Gmail daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "0c5fffa3-c2ac-4fed-b2df-3df4532f9980",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -4520,
+        1680
+      ],
+      "id": "ace7a2d4-96fb-4fcd-ba3f-703b536baf9c",
+      "name": "Webhook1",
+      "webhookId": "0c5fffa3-c2ac-4fed-b2df-3df4532f9980"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Tu tarea es enviar un breve mensaje de recordatorio por WhatsApp utilizando el nombre de pila de {{ $json.body.name }}. También debe mencionar que su cita sobre \"{{ $json.body.topic }}\" tendrá lugar el {{ $json.body.appointmentDate }}. Sin embargo, esa hora está basada en la hora peninsular española. Por tanto, debes convertirla a su zona horaria correcta: {{ $json.body.timezone }}. La hora actual es {{ $now }}. Firma como \"Daniel\", ya que ese es mi nombre.\n\nReglas:\nGenera únicamente el mensaje final, sin introducirlo con frases del tipo \"Claro, aquí tienes un mensaje corto para...\"\n\nNo utilices saltos de línea.\n\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -4300,
+        1680
+      ],
+      "id": "71f4475e-099c-45ee-8899-84681d12cbcb",
+      "name": "OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Recordatorio de Citas",
+        "height": 540,
+        "width": 920
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -4740,
+        1480
+      ],
+      "id": "43cd25b4-4d43-4318-b9ee-c08d36998d9e",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "=Eres un asistente de inteligencia artificial dispuesto a ayudar.\n\nTienes acceso a las siguientes herramientas:\nUna herramienta de Google Calendar que te permite crear, reprogramar y eliminar eventos en el calendario.\n\nVarias herramientas de Google Sheets:\n\n\"Google Sheet - Añadir fila\": permite añadir nuevas filas a una hoja de cálculo.\n\n\"Google Sheet - Actualizar fila\": permite actualizar filas existentes.\n\n\"Google Sheet - Leer\": permite leer el contenido de la hoja de cálculo.\n\nGmail - Enviar confirmación al usuario: permite enviar un correo de confirmación al usuario una vez se haya confirmado la reserva.\n\nLa fecha y hora actuales están en la zona horaria de España (hora peninsular): {{ $now }}.\n\nTu tarea:\nComienza preguntando al usuario:\n\"¿Te gustaría reservar una cita?\"\n\nSi el usuario responde que sí, empieza a recoger su información de contacto.\n\nDebes recopilar siempre los datos en el siguiente orden:\n\nPrimero: dirección de correo electrónico\n→ Se usará como identificador único para localizar la fila en Google Sheets.\n→ Tras recibir el correo, comprueba si ya existe una fila con esa dirección usando \"Google Sheet - Leer\".\n\nSi existe, usa \"Google Sheet - Actualizar fila\".\n\nSi no, usa \"Google Sheet - Añadir fila\" con ese correo.\n\nDespués: nombre completo\n\nDespués: número de teléfono\n\nDespués: ubicación o zona horaria\n\n❗ Solicita un solo dato cada vez.\n❗ Espera a que el usuario responda antes de continuar.\n❗ Tras cada respuesta, actualiza inmediatamente la hoja de cálculo con \"Google Sheet - Actualizar fila\", usando el correo como referencia.\n\nGuarda siempre todos los datos del usuario (correo, nombre, teléfono, zona horaria) en la hoja de cálculo.\n\n2.5) Tras obtener la zona horaria o ubicación, pregunta al usuario:\n\"¿Sobre qué tema te gustaría hablar durante la cita?\"\n\nEspera su respuesta.\n\nLuego actualiza la fila correspondiente en la hoja de cálculo con esta información como motivo o asunto de la cita.\n\nCuando hayas recogido todos los datos, ofrece 5 franjas horarias disponibles para reservar.\n\nUsa la hora peninsular española (CET/CEST) para comprobar disponibilidad.\n\nEl horario de atención disponible es:\n\nDe lunes a viernes\n\nMañanas: 09:00–12:00\n\nTardes: 13:00–17:00\n\n(Nunca ofrezcas horas entre las 12:00 y las 13:00)\n\nNo muestres ninguna franja fuera de ese horario, aunque parezca válida en la zona horaria del usuario.\n\nAsegúrate de que haya una franja de 60 minutos completamente libre:\n\nQue no se solape con ningún evento del calendario.\n\nQue comience al menos 24 horas después del momento actual.\n\nSiempre muestra las próximas 5 franjas disponibles de 60 minutos que cumplan con los criterios.\n\nMuestra las horas convertidas a la zona horaria del usuario.\n→ No menciones la hora peninsular.\n→ No hagas conversiones visibles ni pongas horas entre paréntesis.\n\nPresenta las franjas de forma sencilla y cercana, por ejemplo:\n\"Estas son las próximas franjas disponibles en tu zona horaria:\n\nJueves a las 10:00\n\nViernes a las 11:30\n...\"\n\nSi no hay opciones válidas que coincidan con lo que el usuario pide (por ejemplo, solo tardes), infórmale amablemente y ofrece lo más próximo.\n\nNunca muestres franjas no disponibles. No añadas notas ni explicaciones sobre otros eventos.\n\n❗ No debes hacer cálculos manuales con las zonas horarias.\n→ Usa la herramienta de Google Calendar para convertir y formatear las horas.\n→ Ten en cuenta el horario de verano (cuando esté en vigor) tanto en España como en la zona horaria del usuario.\n\nCuando el usuario confirme una franja, debes:\n\nCrear un evento en Google Calendar en esa fecha y hora.\n\nLas citas serán de 60 minutos por defecto, salvo que el usuario indique lo contrario.\n\nNo añadas una nueva fila en la hoja de cálculo.\n\nUsa \"Google Sheet - Actualizar fila\" para añadir la fecha y hora confirmadas en la fila correspondiente (según el correo).\n\nGuarda la hora de la cita en la hoja en hora peninsular española.\n\nTras crear el evento, envía un correo de confirmación al usuario con \"Gmail - Enviar confirmación al usuario\".\n\nEl correo debe incluir:\n\nFecha y hora de la cita en la zona horaria del usuario\n\nNombre del usuario y asunto de la reunión\n\nUn mensaje cordial de confirmación\n\nSolo debes enviar este correo una vez se haya creado el evento y actualizada la hoja de cálculo.\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -668,
+        360
+      ],
+      "id": "4b499b67-88dc-4dee-9102-8785d3d278bb",
+      "name": "Agente IA Bookings Appointment"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "push mensaje",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "descargar audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "descargar imagen",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "text content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "descargar audio": {
+      "main": [
+        [
+          {
+            "node": "convertir audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "convertir audio": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "audio content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "descargar imagen": {
+      "main": [
+        [
+          {
+            "node": "convertir imagen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "convertir imagen": {
+      "main": [
+        [
+          {
+            "node": "describe imagen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "audio content": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "describe imagen": {
+      "main": [
+        [
+          {
+            "node": "image content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "image content": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "text content": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "mensaje": {
+      "main": [
+        [
+          {
+            "node": "Agente IA Bookings Appointment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "push mensaje": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Json Parse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Json Parse": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Sort",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "mensaje",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "obtener todos mensajes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "borrar todos mensajes",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "obtener todos mensajes": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "borrar todos mensajes": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auto-fixing Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Verificador de Respuesta",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Auto-fixing Output Parser",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificador de Respuesta": {
+      "main": [
+        [
+          {
+            "node": "Enviar Parte1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "4o mini Verificador": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Verificador de Respuesta",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Auto-fixing Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Parte1": {
+      "main": [
+        [
+          {
+            "node": "If Parte 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Parte 2": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If Parte 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Enviar Parte2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Parte2": {
+      "main": [
+        [
+          {
+            "node": "If Parte 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Parte 3": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Enviar Parte3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Parte3": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calendar Create": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente IA Bookings Appointment",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calendar Read": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente IA Bookings Appointment",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente IA Bookings Appointment",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Read": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente IA Bookings Appointment",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Add Row": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente IA Bookings Appointment",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Update Row": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente IA Bookings Appointment",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agente IA Bookings Appointment",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente IA Bookings Appointment",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail - Send Confirmation User": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente IA Bookings Appointment",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "OpenAI1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente IA Bookings Appointment": {
+      "main": [
+        [
+          {
+            "node": "Verificador de Respuesta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "cc12808e-1f65-42af-8d57-53c8d82f4f8f",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-04-23T20:54:02.682Z",
+      "updatedAt": "2025-04-23T20:54:02.682Z",
+      "id": "sPdc51YFSDyYeZsT",
+      "name": "Averis"
+    },
+    {
+      "createdAt": "2025-04-23T20:59:57.136Z",
+      "updatedAt": "2025-04-23T20:59:57.136Z",
+      "id": "Xq0NhXBZ2HnDESQS",
+      "name": "Agente"
+    },
+    {
+      "createdAt": "2025-04-27T18:42:31.149Z",
+      "updatedAt": "2025-04-27T18:42:31.149Z",
+      "id": "yCzirQ8grCnJYX3H",
+      "name": "Whatsapp"
+    }
+  ]
+}
