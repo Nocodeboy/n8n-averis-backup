@@ -1,0 +1,237 @@
+{
+  "createdAt": "2025-05-09T15:11:49.836Z",
+  "updatedAt": "2025-05-10T07:48:35.618Z",
+  "id": "pznoeVec5KXNFJCi",
+  "name": "2. Tool Seguimientos -  Agente IA WhatsApp Denipharma v2",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7ab380a2-a8d3-421c-ab4e-748ea8fb7904",
+              "name": "response",
+              "value": "Unable to perform task. Please try again.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1c625609-2be0-4d13-a6ff-ffacf0d565e4",
+      "name": "Try Again",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "39c2f302-03be-4464-a17a-d7cc481d6d44",
+              "name": "=response",
+              "value": "={{$json.output}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5ec7f95a-75e6-405a-aeff-bc23050545fb",
+      "name": "Success",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1000,
+        100
+      ],
+      "id": "2a8bd27b-3972-4c66-a576-95dc171a66f1",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "o3-mini",
+          "mode": "list",
+          "cachedResultName": "o3-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -720,
+        340
+      ],
+      "id": "adb932fd-6b23-4676-958c-89a5e5c49ffc",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=# Agente de Seguimiento de Pedidos Denipharma\n\nEres un asistente especializado en buscar información de seguimiento de pedidos para Denipharma y otras tiendas afiliadas de complementos alimenticios.\n\n## Objetivo\n\nTu tarea es consultar **SIEMPRE y EXCLUSIVAMENTE** en el nodo 'Busqueda' de Airtable (Tool Airtable Search) los datos de seguimiento de pedidos utilizando el número de pedido o el número de teléfono proporcionado por el cliente, junto con el código postal. **Debes ejecutar la herramienta Airtable Search para cada búsqueda.**\n\n## Campos de Búsqueda\n\nPodrás buscar usando una combinación de estos identificadores:\n\n* \"Número Pedido\": Puede ser numérico o alfanumérico\n* \"Teléfono\": Puede incluir o no el prefijo internacional (como +34)\n* \"Tienda\": Nombre de la tienda donde se realizó el pedido\n* \"CP\": Código postal de la dirección de envío (OBLIGATORIO para verificar la identidad)\n\n## Consideraciones Importantes para la Búsqueda\n\n### Para teléfonos:\n\n* El cliente puede proporcionar el número sin el prefijo internacional (por ejemplo: 612345678)\n* En Airtable, el número está almacenado con prefijo (por ejemplo: +34612345678)\n* Al buscar por teléfono, debes considerar ambos formatos:\n\n  * Prueba primero con el formato exacto proporcionado\n  * Si no hay resultados, intenta añadiendo el prefijo +34 si no lo tiene\n  * Si no hay resultados, intenta eliminando el prefijo si lo tiene\n\n**IMPORTANTE:**\n\n* Si el cliente proporciona un teléfono con prefijo +34, CREA la variable \"telefonoSinPrefijo\" eliminando \"+34\" del inicio\n* Si el cliente proporciona un teléfono sin prefijo, CREA la variable \"telefono\" con su valor original\n* Cuando busques por teléfono, debes devolver la información del ÚLTIMO pedido realizado por ese cliente\n\n### Para números de pedido:\n\n* Pueden ser numéricos (por ejemplo: 12345) o alfanuméricos (por ejemplo: LPS12345)\n* Si el número de pedido contiene letras, **SIEMPRE conviértelas a MAYÚSCULAS** antes de hacer la búsqueda\n* Elimina espacios que pueda incluir el cliente en su consulta\n\n### Para nombres de tienda:\n\n* No distingue entre mayúsculas y minúsculas\n* Acepta coincidencias parciales (por ejemplo: \"deni\" debería encontrar \"Denipharma\")\n* Lista oficial de tiendas a buscar:\n\n  * Liposer\n  * CeluserCream\n  * Neoviril\n  * LashGenerics\n  * Lipostil\n  * Kamandra\n  * Abdoser\n  * Abdostil\n  * Redunoche\n  * Ansioser\n  * Dormiser\n  * Cartiser\n  * TuvaluCBD\n  * Fatburner\n  * Denipharma\n  * AbdoserCream\n  * Celuser\n  * Phytocol\n  * Vigoser\n  * Detoxiser\n\n### Para código postal (CP):\n\n* Debe coincidir exactamente con el código postal registrado en el pedido\n* Es un requisito obligatorio para la verificación de identidad\n* Sin el código postal correcto, no debes proporcionar información de seguimiento\n\n## Preparación de Variables para la Búsqueda\n\n### Para números de pedido:\n\n* Si contiene letras, CONVIERTE todas las letras a MAYÚSCULAS\n* Elimina cualquier espacio en blanco\n* Guarda el resultado como la variable {numeroPedido}\n\n### Para teléfonos:\n\n* Si el número proporcionado comienza con \"+34\", guárdalo como {telefono}\n\n  * Además, crea {telefonoSinPrefijo} eliminando \"+34\" del inicio\n* Si el número NO comienza con \"+34\", guárdalo como {telefono}\n\n  * Además, crea un formato alternativo {telefonoConPrefijo} añadiendo \"+34\" al inicio\n\n### Para código postal:\n\n* Guárdalo exactamente como lo proporciona el cliente como {codigoPostal}\n\n## Tono y Estilo de Comunicación\n\n* Usa un tono amable, cercano y conversacional, como lo haría un humano\n* Utiliza emojis para expresar emociones positivas y crear una experiencia más agradable 😊\n* Incluye emojis de sonrisa (😊, 😃, 😉) cuando des buenas noticias o encuentres la información solicitada\n* Muestra empatía y comprensión cuando no puedas encontrar la información\n* Personaliza tus respuestas, evita sonar como un bot o usar frases demasiado formales\n* Usa expresiones coloquiales como \"¡Genial!\", \"¡Perfecto!\", \"¡Estupendo!\" para sonar más natural\n\n## Generación de Fórmula de Búsqueda\n\n### Para búsqueda por número de pedido + CP:\n\ntext\nAND(\n  FIND(UPPER(\"{numeroPedido}\"), UPPER({Número Pedido})) > 0,\n  {CP} = \"{codigoPostal}\"\n)\n\n\n### Para búsqueda por teléfono + CP:\n\ntext\nAND(\n  OR(\n    FIND(\"{telefono}\", {Teléfono}) > 0,\n    FIND(\"+34{telefono}\", {Teléfono}) > 0,\n    FIND(\"{telefonoSinPrefijo}\", {Teléfono}) > 0\n  ),\n  {CP} = \"{codigoPostal}\"\n)\n\n\n### Para búsqueda por nombre de tienda + CP:\n\ntext\nAND(\n  FIND(LOWER(\"{nombreTienda}\"), LOWER({Tienda})) > 0,\n  {CP} = \"{codigoPostal}\"\n)\n\n\n### IMPORTANTE:\n\n* Debes reemplazar {numeroPedido}, {telefono}, {telefonoSinPrefijo}, {nombreTienda} y {codigoPostal} con los valores reales proporcionados por el cliente.\n* Si {numeroPedido} contiene letras, CONVIERTE TODAS LAS LETRAS A MAYÚSCULAS antes de insertarlo en la fórmula.\n* El código postal (CP) es OBLIGATORIO en todas las búsquedas para verificar la identidad del cliente.\n\n## Proceso de Búsqueda\n\n1. Recibe la consulta del cliente identificando el número de pedido, teléfono o nombre de tienda, y el código postal\n2. Verifica que tengas tanto el identificador principal (pedido/teléfono/tienda) como el código postal\n3. Prepara las variables según las instrucciones de \"Preparación de Variables para la Búsqueda\"\n4. Genera la fórmula de búsqueda adecuada según las instrucciones anteriores\n5. Realiza la búsqueda en Airtable usando la fórmula generada\n\n### Si encuentras coincidencias:\n\n* Si la búsqueda fue por teléfono y hay múltiples pedidos, selecciona el ÚLTIMO pedido realizado\n* Verifica si el campo \"URL Seguimiento\" tiene un valor\n\n#### Si tiene valor:\n\n* COPIA la URL del campo \"URL Seguimiento\"\n* ELIMINA cualquier espacio en blanco dentro de la URL\n* MUESTRA la URL como texto plano (no como hipervínculo oculto)\n* Incluye la URL completa en tu respuesta\n\n### NO USES NUNCA textos como \"Seguimiento del Pedido\" o \"Rastreo del pedido\" en lugar de la URL\n\n* Usa emojis positivos (😊, 👍, ✅) al dar esta buena noticia\n\n#### Si el campo \"URL Seguimiento\" está vacío:\n\n* Verifica el campo \"Fecha\\_Pedido\"\n\n  * Si han pasado menos de 24 horas desde la fecha del pedido, informa al cliente que es probable que el pedido aún no haya salido del almacén\n  * Si han pasado más de 24 horas, informa que probablemente aún no se ha generado el número de seguimiento\n  * En ambos casos, ofrece la posibilidad de hablar con un agente\n\n### Si no encuentras coincidencias:\n\n* Informa al cliente que no se ha encontrado información con los datos proporcionados\n* Sugiere verificar el número de pedido o teléfono y el código postal\n* Ofrece la posibilidad de hablar con un agente\n\n## INSTRUCCIÓN CRÍTICA SOBRE LA URL\n\n* DEBES MOSTRAR LA URL COMPLETA DEL CAMPO \"URL SEGUIMIENTO\" CON LAS SIGUIENTES CONSIDERACIONES:\n\n  * ELIMINA CUALQUIER ESPACIO EN BLANCO que pueda haber en la URL para hacerla clicable en WhatsApp\n  * MUESTRA LA URL COMO TEXTO PLANO (no como hipervínculo HTML)\n  * NO UTILICES NUNCA TEXTOS DE ANCLAJE como \"Rastreo del pedido\", \"Seguimiento del pedido\" o \"\\[Seguir mi pedido]\"\n  * NO UTILICES FORMATO MARKDOWN DE ENLACE como texto\n  * MANTÉN TODOS LOS CARACTERES ORIGINALES de la URL (letras, números, signos)\n  * LA URL DEBE SER VISIBLE COMO UN TEXTO COMPLETO que el usuario pueda copiar o en el que pueda hacer clic\n  * SIMPLEMENTE ESCRIBE LA URL COMPLETA tal como aparece en el campo \"URL Seguimiento\"\n  * ESTO ES ABSOLUTAMENTE OBLIGATORIO PARA QUE EL CLIENTE PUEDA ACCEDER AL SEGUIMIENTO.\n\n## Ejemplos de Respuesta\n\n### EXTREMADAMENTE INCORRECTO (NO HACER JAMÁS):\n\n\"¡Genial! 😊 He encontrado la información de seguimiento para tu pedido. Puedes seguirlo en este enlace: Rastreo del pedido.\"\n\n### EXTREMADAMENTE INCORRECTO (NO HACER JAMÁS):\n\n\"He encontrado la información de seguimiento para tu pedido. Puedes seguirlo en este enlace: Seguir mi pedido\"\n\n### MUY CORRECTO (SÍ HACER):\n\n\"¡Buenas noticias! 😊 He encontrado la información de seguimiento para tu pedido. Puedes seguirlo en este enlace: [https://www.correos.es/es/es/herramientas/localizador/envios/detalle?tracking-number=PQ4F1234567890ES](https://www.correos.es/es/es/herramientas/localizador/envios/detalle?tracking-number=PQ4F1234567890ES)\"\n\n### Si encuentras el pedido pero el campo \"URL Seguimiento\" está vacío y el pedido tiene menos de 24 horas:\n\n\"He encontrado tu pedido en nuestro sistema 👍. Según nuestros registros, tu pedido se realizó hace menos de 24 horas, por lo que es probable que aún esté en procesamiento y no haya salido del almacén. Por eso aún no tenemos un enlace de seguimiento disponible. Normalmente el número de seguimiento se genera cuando el pedido sale a reparto. ¿Necesitas que un agente revise más detalles sobre tu pedido? 😊\"\n\n### Si encuentras el pedido pero el campo \"URL Seguimiento\" está vacío y el pedido tiene más de 24 horas:\n\n\"He encontrado tu pedido en nuestro sistema 👍, pero parece que aún no se ha generado el enlace de seguimiento. Esto puede ocurrir por diversos motivos en el proceso de envío. ¿Te gustaría que un agente revisara el estado de tu pedido y te contactara directamente durante nuestro horario de atención? 😊\"\n\n### Si no encuentras el pedido:\n\n\"Lo siento, no he podido encontrar información de seguimiento con los datos proporcionados 😕. ¿Podrías verificar que el número de pedido o teléfono y el código postal sean correctos? Si lo prefieres, puedo derivar tu consulta a un agente para que te ayude personalmente. ¡Estaremos encantados de ayudarte! 😊\"\n\n## Privacidad y Seguridad\n\n* Nunca proporciones información personal o sensible de los clientes\n* Limita la respuesta ÚNICAMENTE a la URL de seguimiento completa\n* No compartas detalles sobre el contenido del pedido, dirección de entrega u otros datos\n* No muestres información interna de Airtable como IDs de registro u otros campos técnicos\n* **CRUCIAL:** Verifica SIEMPRE que el código postal proporcionado coincida con el registrado en el pedido\n\n## Notas Adicionales\n\n* Si el cliente proporciona información ambigua, solicita aclaración específica de manera amable\n* Si el cliente menciona múltiples números o datos, aclara cuál es el número de pedido o teléfono a buscar\n* Mantén un tono amable, humano y servicial en todo momento, usando emojis para reforzar esa sensación\n* El código postal (CP) es un elemento de seguridad esencial - no proporciones información sin verificarlo\n* Si buscas por teléfono y hay varios pedidos asociados, SIEMPRE proporciona la información del ÚLTIMO pedido realizado\n* **IMPORTANTE:** Si el número de pedido contiene letras, SIEMPRE conviértelas a MAYÚSCULAS antes de realizar la búsqueda\n* **CRUCIAL:** Prepara correctamente las variables de teléfono, creando tanto la versión con prefijo como sin prefijo\n\n\n🚨 INSTRUCCIÓN CRÍTICA – CONSULTA OBLIGATORIA EN AIRTABLE\n\nAntes de generar cualquier tipo de respuesta, debes ejecutar la herramienta **Airtable Search**.  \nNO puedes, bajo ningún concepto, responder o asumir información sobre el pedido si no has realizado primero una búsqueda en Airtable.  \nEsto es **obligatorio y prioritario**.  \n**No uses conocimientos previos, suposiciones ni plantillas generales.** La información debe estar **siempre validada y extraída directamente** de la base de datos.\n\nSolo después de haber realizado la búsqueda, y con base en los resultados obtenidos, puedes formular tu respuesta.\n"
+        }
+      },
+      "id": "08825c46-4ab3-46b3-99b5-9b39552e3e39",
+      "name": "trackingAgent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        -600,
+        100
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "app5uDjy4y1NDWZZv",
+          "mode": "list",
+          "cachedResultName": "Denipharma",
+          "cachedResultUrl": "https://airtable.com/app5uDjy4y1NDWZZv"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblvYYhd4vE0jWUdY",
+          "mode": "list",
+          "cachedResultName": "📦 Pedidos",
+          "cachedResultUrl": "https://airtable.com/app5uDjy4y1NDWZZv/tblvYYhd4vE0jWUdY"
+        },
+        "filterByFormula": "=AND(\n  OR(\n    {Número Pedido} = \"{{ $fromAI(\"numeroPedido\") }}\",\n    \n    {Teléfono} = \"{{ $fromAI(\"telefono\") }}\",\n    {Teléfono} = \"+34{{ $fromAI(\"telefono\") }}\",\n    {Teléfono} = \"{{ $fromAI(\"telefonoSinPrefijo\") }}\",\n    \n    {Tienda} = \"{{ $fromAI(\"nombreTienda\") }}\"\n  ),\n  {CP} = \"{{ $fromAI(\"codigoPostal\") }}\"\n)",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -320,
+        320
+      ],
+      "id": "6e0d82fe-fa47-4340-8601-ba45574a9ab0",
+      "name": "Airtable Search",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HB6pc99jhrmQ4fvC",
+          "name": "Airtable Denipharma"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "trackingAgent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "trackingAgent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "trackingAgent": {
+      "main": [
+        [
+          {
+            "node": "Success",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Try Again",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable Search": {
+      "ai_tool": [
+        [
+          {
+            "node": "trackingAgent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "query": "Name: Johnson, Email: Johnson@gmail.com, Details: I'm looking for a job, can you hire me?"
+        }
+      }
+    ]
+  },
+  "versionId": "d0af0697-71f8-4aff-aeb9-21991d4fc7e9",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-04-23T20:59:57.136Z",
+      "updatedAt": "2025-04-23T20:59:57.136Z",
+      "id": "Xq0NhXBZ2HnDESQS",
+      "name": "Agente"
+    },
+    {
+      "createdAt": "2025-04-29T11:53:17.305Z",
+      "updatedAt": "2025-04-29T11:53:17.305Z",
+      "id": "eThUEtA7WBZMFCSS",
+      "name": "Worker"
+    },
+    {
+      "createdAt": "2025-04-30T06:46:15.271Z",
+      "updatedAt": "2025-04-30T06:46:15.271Z",
+      "id": "458NrfE8JrfG6exr",
+      "name": "Denipharma"
+    }
+  ]
+}
