@@ -1,0 +1,3630 @@
+{
+  "createdAt": "2025-04-29T14:10:14.530Z",
+  "updatedAt": "2025-04-29T14:10:16.691Z",
+  "id": "N1O5U4u1VQeMwesT",
+  "name": "Respuesta rápida",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "kiaghasem.dev@gmail.com",
+          "mode": "list",
+          "cachedResultName": "kiaghasem.dev@gmail.com"
+        },
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('After', `the day before the date the user requested`, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Before', `the day after the date the user requested`, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        -5760,
+        1180
+      ],
+      "id": "1b6e7516-3172-45c8-b2e0-c557afcd029e",
+      "name": "get_events"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f83ea007-efce-4f53-adaa-e4f7d7f00d1e",
+              "leftValue": "={{ $json.bookCall }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -4740,
+        1400
+      ],
+      "id": "2c669f23-736b-412a-afd8-3545cc468f37",
+      "name": "Booking a Call?"
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "operation": "reply",
+        "threadId": "={{ $('When Executed by Another Workflow').item.json.threadId }}",
+        "messageId": "={{ $('When Executed by Another Workflow').item.json.messageId }}",
+        "message": "={{ $('Edit Fields1').item.json.emailBody }}",
+        "options": {
+          "replyToSenderOnly": true
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -3580,
+        1400
+      ],
+      "id": "c34424f6-7bac-4374-9a88-01f8bb326e58",
+      "name": "Send Availability",
+      "webhookId": "148ecfe3-d935-4914-b09e-58d45bb55a49"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"emailBody\": {\n      \"type\": \"string\",\n      \"description\": \"The body content of the email to be sent\"\n    },\n    \"eventName\": {\n      \"type\": \"string\",\n      \"description\": \"The name of the event. (if just sending availabilities, you can leave this empty)\"\n    },\n    \"startTime\": {\n      \"type\": \"string\",\n      \"description\": \"The start time of the event, in ISO 8601 format.(if just sending availabilities, you can leave this empty)\"\n    },\n    \"endTime\": {\n      \"type\": \"string\",\n      \"description\": \"The end time of the event, in ISO 8601 format. (if just sending availabilities, you can leave this empty)\"\n    },\n    \"bookCall\": {\n      \"type\": \"boolean\",\n      \"description\": \"True if booking a call for a specific time slot.False if sending availabilities\"\n  },\n  \"calendarAvailabilities\": {\n      \"type\": \"string\",\n      \"description\": \"Detailed calendar availabilities for time as specified by manager.\"\n    }\n  },\n  \"required\": [\n    \"emailBody\",\n    \"eventName\",\n    \"startTime\",\n    \"endTime\",\n    \"bookCall\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -5520,
+        1060
+      ],
+      "id": "603944cf-daaf-4d6f-b98c-65ed7aa30edb",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3b47abb9-ede2-4931-8cd7-e0e4a5bf9dc3",
+              "name": "emailBody",
+              "value": "={{ $json.output.emailBody }}",
+              "type": "string"
+            },
+            {
+              "id": "5196169f-1b2c-4e7e-b5ad-427e777d8ea6",
+              "name": "eventName",
+              "value": "={{ $json.output.eventName }}",
+              "type": "string"
+            },
+            {
+              "id": "d8c5889b-f4e8-40fe-becd-60b35c16f607",
+              "name": "startTime",
+              "value": "={{ $json.output.startTime }}",
+              "type": "string"
+            },
+            {
+              "id": "51e771c2-24d2-4432-bac0-85fe0097096a",
+              "name": "endTime",
+              "value": "={{ $json.output.endTime }}",
+              "type": "string"
+            },
+            {
+              "id": "c6dd2193-21d6-42bc-8935-96c5f2091428",
+              "name": "bookCall",
+              "value": "={{ $json.output.bookCall }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -5000,
+        1400
+      ],
+      "id": "a2aea43a-c130-41de-9895-7ffedb3d7607",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -1560,
+        1360
+      ],
+      "id": "ee2d3081-49a7-4cf9-b987-cfe38f055f63",
+      "name": "OpenAI Chat Model2"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('When Executed by Another Workflow').item.json.messageId }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -5900,
+        1140
+      ],
+      "id": "86a41b38-9f80-4a5f-8fea-4fb4a2a76118",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Your team deciced to send calendar availabilities. They sent an action plan to the manager.\n\nYour manager just provided feedback requiring changes. \n\nHere's the draft Email Body: \n\n{{ $('Edit Fields1').item.json.emailBody }}\n\nHere's the managers requested changes: \n\n{{ $('HITL').item.json.data.Feedback }}\n\nCreate a new action plan by filling out the schema defined.",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You work in the calendar department of the sales team for Kamexa which is an AI Automation Agency. When a new sales email comes from a prospect, requesting to book a sales call, your team acts immediately. \n\nThe request could either be to book a certain time slot for a call, or it could be a prospect expressing interest, which in that case your team finds all the available time slots and responds to the prospect via email. \n\nYour team creates an action plan and draft and sends this to your manager for approval. \n\nThe manager then provides feedback and may request for changes. \n\nIf the manager needs a change, it is your job to modify the action plan based on your managers feedback. \n\nIn the confirmation email, always mention that the time provided is in Sydney time (UTC+10).\n\nYour output must closely follow the schema defined.\n\nSign off emails as Kia, Kamexa\n\nHere is the current date/time in Sydney (UTC+10) timezone: {{ $now.weekdayLong}}, {{ $now.format('dd LLL yyyy') }} at {{ $now.format('t') }}."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -1560,
+        1820
+      ],
+      "id": "a2b8d0d7-76cf-409b-92bf-2b1beaa36386",
+      "name": "Revision Agent (Email)"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=A new request just came from the manager: \n\nHere's the email enquiry: \n\n{{ $('When Executed by Another Workflow').item.json.newEmail }}\n\nHere's a summary of the email thread for context: \n\n{{ $('When Executed by Another Workflow').item.json.threadSummary }} \n\nWe checked the email address of sender in our CRM to see if we can find any notes of previous communication. Here's what we found: \n\n{{ $('When Executed by Another Workflow').item.json.notes }}\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=# Overview\nYou work in the sales team at Kamexa which is an AI Automation Agency. You are particularly responsible for handling calendar enquiries via email. \n\nWhen a prospect requests to be booked in for a call, you handle the enquiry by checking availability and creating a draft event and email confirmation.\n\n# Tools: \n- get_events: Use this tool to check calendar availabilities for the date and time specified in the enquiry. \n- think_tool: Always this tool to think about what to do next after you get availabilities.\n\n# Instructions: \nThe emails will either have just a date - or both a time and date for the event. \n- If there is just a date, you must check availability for that day using the get_events tool and create a response email draft to provide the prospect with 2 time slots. \n- If there is both a date and time specified. You must check the availability for that slot in the calendar. If not available you must create a draft response email with 2 alternative time slots that are free. If available, then you must create a draft event and a confirmation email. \n- When someone just mentions a weekday but no specific date (like 'on Monday'), they always mean the next one coming up.\n- If there is no mention of length of meeting, always default to 30 minutes long. \n- If a timeslot is booked, just tell the customer it is booked. Don't tell them anything about the booking as it is  confidential information. \n\nYour output must follow the format of the schema required, so that your manager can check it.\n\nIn the confirmation email, always mention that the time provided is in Sydney time (UTC+10).\n\nSign off emails as: \n\nKia, Kamexa\n\nHere is the current date/time in Sydney (UTC+10) timezone: {{ $now.weekdayLong}}, {{ $now.format('dd LLL yyyy') }} at {{ $now.format('t') }}."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -5900,
+        860
+      ],
+      "id": "ea0b024e-95c7-4b5b-ab55-57f66ae6df66",
+      "name": "Calendar Agent"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"emailBody\": {\n      \"type\": \"string\",\n      \"description\": \"The body content of the email to be sent\"\n    },\n    \"eventName\": {\n      \"type\": \"string\",\n      \"description\": \"The name of the event. (if just sending availabilities, you can leave this empty)\"\n    },\n    \"startTime\": {\n      \"type\": \"string\",\n      \"description\": \"The start time of the event, in ISO 8601 format.(if just sending availabilities, you can leave this empty)\"\n    },\n    \"endTime\": {\n      \"type\": \"string\",\n      \"description\": \"The end time of the event, in ISO 8601 format. (if just sending availabilities, you can leave this empty)\"\n    },\n    \"bookCall\": {\n      \"type\": \"boolean\",\n      \"description\": \"True if booking a call for a specific time slot. False if sending availabilities\"\n  },\n  \"calendarAvailabilities\": {\n      \"type\": \"string\",\n      \"description\": \"Detailed calendar availabilities for time as specified by manager.\"\n    }\n  },\n  \"required\": [\n    \"emailBody\",\n    \"eventName\",\n    \"startTime\",\n    \"endTime\",\n    \"bookCall\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -1400,
+        1340
+      ],
+      "id": "f0a051f5-662f-41b3-941b-8c21cf6c7ff5",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Your team deciced to actually book in a call and send the confirmation email. They sent an action plan to the manager.\n\nYour manager just provided feedback requiring changes. \n\nHere's the proposed event details: \n\nName: {{ $('Edit Fields1').item.json.eventName }}\nStart Time: {{ $('Edit Fields1').item.json.startTime }}\nEnd Time: {{ $('Edit Fields1').item.json.endTime }}\n\nHere's the confirmation Email Body: \n\n{{ $('Edit Fields1').item.json.emailBody }}\n\nHere's the managers requested changes: \n\n{{ $('HITL3').item.json.data.Feedback }}\n\nCreate a new action plan by filling out the schema defined.",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You work in the calendar department of the sales team for Kamexa which is an AI Automation Agency. When a new sales email comes from a prospect, requesting to book a sales call, your team acts immediately. \n\nThe request could either be to book a certain time slot for a call, or it could be a prospect expressing interest, which in that case your team finds all the available time slots and responds to the prospect via email. \n\nYour team creates an action plan and draft and sends this to your manager for approval. \n\nThe manager then provides feedback and may request for changes. \n\nIf the manager needs a change, it is your job to modify the action plan based on your managers feedback. \n\nIn the confirmation email, always mention that the time provided is in Sydney time (UTC+10).\n\nYour output must closely follow the schema defined.\n\nSign off emails as Kia, Kamexa\n\nHere is the current date/time in Sydney (UTC+10) timezone: {{ $now.weekdayLong}}, {{ $now.format('dd LLL yyyy') }} at {{ $now.format('t') }}."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -1580,
+        920
+      ],
+      "id": "0e4c1b2f-9d6c-49ad-8712-ae8d10b5622b",
+      "name": "Revision Agent (Email)1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "openai/gpt-4.1",
+          "mode": "list",
+          "cachedResultName": "openai/gpt-4.1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -6040,
+        1080
+      ],
+      "id": "6679eb93-925d-4dff-8238-728e58c45f66",
+      "name": "OpenAI Chat Model1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=A new email was just received by a prospect: \n\nHere's the email: \n\n{{ $('When Executed by Another Workflow').item.json.newEmail }}\n\nHere's a summary of the thread of the email (for context): \n\n{{ $('When Executed by Another Workflow').item.json.threadSummary }} \n\nWe checked the email address in our CRM. Here's all the notes we found on the account associated with the email address: \n\n{{ $('When Executed by Another Workflow').item.json.notes }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You work in the sales team at Kamexa which is an AI Automation Agency. When Kamexa receives an email from a sales prospect, you must respond back to their enquiry. \n\nThe received email can either be:\n\n- a response to a cold email we've sent\n\n- a prospect emailing us for the first time with no prior communication \n\n- an existing lead/customer emailing us. In this case there will be notes in the crm. If given notes, you must read notes thoroughly to be up to date on exactly what's going on with the lead. \n\nEither way your job is to ensure you address their enquiry with the intent of booking them in for a consultation. \n\n# Tools: \n- kamexa_information: This is a RAG database containing all the FAQs regarding Kamexa. You must use this database to find the information necessary to answer the prospects enquiry. \n\n\n# Instructions: \nYou will receive the new email along with the email history as an input. You must use the kamexa_information database to find information necessary for responding to the prospects email. \n\nThen you must provide an output to your manager by following the schema defined. \n\nIf you don't have enough information or are not certain how to handle a scenario, you must output \"escalate\" as true so your manager can handle it.\n\nSign off emails as Kia, Kamexa\n\nHere is the current date/time in Sydney (UTC+10) timezone: {{ $now.weekdayLong}}, {{ $now.format('dd LLL yyyy') }} at {{ $now.format('t') }}."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -5640,
+        3520
+      ],
+      "id": "dc488095-688b-479b-a5c0-49e46af55751",
+      "name": "Email Agent"
+    },
+    {
+      "parameters": {
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.1,
+      "position": [
+        -5640,
+        4160
+      ],
+      "id": "1b7e9cbc-5002-4967-97ff-dfe83bb0f0f7",
+      "name": "Supabase Vector Store"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -5660,
+        4380
+      ],
+      "id": "73504f4b-e015-427a-bcd4-2a0233ed1542",
+      "name": "Embeddings OpenAI1"
+    },
+    {
+      "parameters": {
+        "name": "kamexa_information",
+        "description": "Information about Kamexa that you can use to answer sales queries. ",
+        "topK": 5
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1,
+      "position": [
+        -5480,
+        3920
+      ],
+      "id": "d25cae74-4160-4c68-8a3d-ba172b569876",
+      "name": "kamexa_information"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Manager just gave feedback requesting a change. \n\nHere's the draft Email your team had prepared: \n\n{{ $('Edit Fields2').item.json.emailBody }}\n\nHere's the managers requested changes: \n\n{{ $('HITL2').item.json.data.Feedback }}\n\nHere's Kamexa specific information which you can use as context for writing the email: \n\n{{ $('Email Agent').item.json.output.kamexaInformation }}\n\nRewrite the draft email in line with the managers request. ",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You work in the sales team at Kamexa which is an AI Automation Agency. When Kamexa receives an email from a sales prospect, your team responds back to their enquiry. \n\nThe prospect email can either be a response to a cold email, or it can be the prospect emailing us for the first time. \n\nEither way your team addresses their enquiry with the intent of booking them in for a consultation. \n\nThe draft response is then sent to your manager for feedback.\n\nIf the manager needs a change, it is your job to modify the email based on your managers feedback. \n\nYour output must closely follow the schema defined.\n\n\n\nDon't make anything up. \n\nSign off emails as Kia, Kamexa\n\nHere is the current date/time in Sydney (UTC+10) timezone: {{ $now.weekdayLong}}, {{ $now.format('dd LLL yyyy') }} at {{ $now.format('t') }}."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -2800,
+        3940
+      ],
+      "id": "4c745e60-ccb1-4a9e-bf6b-a2572d1a4fec",
+      "name": "Revision Agent (Email)2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8ec98281-5ff1-431a-9769-5fbc6735289f",
+              "name": "outcome",
+              "value": "=Email reply sent.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2840,
+        3200
+      ],
+      "id": "2036c490-d657-4d61-ad8b-3e2ca2ddab2c",
+      "name": "Completed Message"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8ec98281-5ff1-431a-9769-5fbc6735289f",
+              "name": "outcome",
+              "value": "=Escalated to human agent!",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3520,
+        2540
+      ],
+      "id": "d3ab9081-0d50-49b3-bd08-0dfd719f3f37",
+      "name": "Completed Message1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "openai/gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "openai/gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -5760,
+        3720
+      ],
+      "id": "e86e7acf-7fca-4395-86c9-5ee645f250ed",
+      "name": "OpenAI Chat Model3"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"emailBody\": {\n      \"type\": \"string\",\n      \"description\": \"The body content of the email reply to be sent to the prospect. (if escalate is true then this is unecessary)\"\n    },\n      \"reason\": {\n      \"type\": \"string\",\n      \"description\": \"Reasoning for your response.\"\n    },\n    \"escalate\": {\n      \"type\": \"boolean\",\n      \"description\": \"True if you are unsure and need to escalate to your manager. False if you have enough information and are sure of your answer.\"\n  },\n    \"kamexaInformation\": {\n      \"type\": \"string\",\n      \"description\": \"Summary of information you found from querying the kamexa_informatin database.\"\n  }\n  },\n  \"required\": [\n    \"emailBody\",\n    \"reason\",\n    \"escalate\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -5060,
+        4040
+      ],
+      "id": "8e3bfaad-3d92-45fa-914a-0f1ef39bbd31",
+      "name": "Structured Output Parser2"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "openai/gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "openai/gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -5260,
+        4120
+      ],
+      "id": "0e88a06e-f529-4be0-a46d-b417e284e9a6",
+      "name": "OpenAI Chat Model4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "74a43c89-3cf6-4814-ab9a-f000fb2eb7d2",
+              "name": "emailBody",
+              "value": "={{ $json.output.emailBody }}",
+              "type": "string"
+            },
+            {
+              "id": "96d65148-22fc-4acb-b2e7-7a0b892929bc",
+              "name": "reasoning",
+              "value": "={{ $json.output.reason }}",
+              "type": "string"
+            },
+            {
+              "id": "393e3445-3983-4f20-ad64-5de5033a8c60",
+              "name": "escalate",
+              "value": "={{ $json.output.escalate }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4640,
+        3680
+      ],
+      "id": "70fdc3c8-8eae-4856-b982-5abba2b7f470",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "openai/gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "openai/gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -2920,
+        4220
+      ],
+      "id": "5af4c9d3-a3e3-4a20-aa7d-237b3e9e8a45",
+      "name": "OpenAI Chat Model5"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"emailBody\": {\n      \"type\": \"string\",\n      \"description\": \"The body content of the email reply to be sent to the prospect in line with managers feedback.\"\n    },\n      \"reason\": {\n      \"type\": \"string\",\n      \"description\": \"Reasoning for your response.\"\n    }\n  },\n  \"required\": [\n    \"emailBody\",\n    \"reason\",\n    \"escalate\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -2500,
+        4220
+      ],
+      "id": "fc2e6fa1-b62b-472c-a3b3-a19f1184dab9",
+      "name": "Structured Output Parser3"
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR-ID-HERE",
+        "text": "=### Human Action Needed! ###\n\n### Sales Enquiry from  {{ $('When Executed by Another Workflow').item.json.emailAddress }}\n\n\n---------------------------------------------------------\n\n### Previous Emails Context:\n\n{{ $('When Executed by Another Workflow').item.json.threadSummary }}\n\n---------------------------------------------------------\n\n### New Email: \n\n{{ $('When Executed by Another Workflow').item.json.newEmail }}\n\n---------------------------------------------------------\n\n### Can't handle this - Here's why: \n\n{{ $('Email Agent').item.json.output.reason }}\n\n---------------------------------------------------------\n\nPlease respond to them as soon as you can! ",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -3820,
+        2540
+      ],
+      "id": "9cda5ee9-1054-46ea-98ea-3bc47673b040",
+      "name": "Telegram3",
+      "webhookId": "78ea7cea-6b85-49ab-ae3b-42e94d71d54d"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "openai/gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "openai/gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -7780,
+        2160
+      ],
+      "id": "e6c724cc-60e4-4def-8e48-efaaca2989a7",
+      "name": "OpenAI Chat Model7"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"calendar\": {\n      \"type\": \"boolean\",\n      \"description\": \"True if Calendar Email and False if Information Email\"\n    }\n  },\n  \"required\": [\n    \"newProspectEmail\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -7520,
+        2140
+      ],
+      "id": "6efd88ee-4b14-4752-8666-d696a65178a4",
+      "name": "Structured Output Parser6"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.calendar }}",
+                    "rightValue": "Calendar",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "925bd4a7-f8a4-4b93-8fb9-47f6a238c89d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Calendar"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a2580899-2579-496c-9f96-ea14fb997c4f",
+                    "leftValue": "={{ $json.output.calendar }}",
+                    "rightValue": "Email",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "false",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Email"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -7220,
+        1940
+      ],
+      "id": "ff977a7c-a553-4656-b75b-2e4fda9557ae",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=New email just came in. \n\nHere's the email: \n\n{{ $json.newEmail }}\n\nHere's a summary of the thread the email is on: \n\n{{ $json.threadSummary }}\n\nClassify it.\n",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You're a sales inbox manager. \n\nThe emails that come in from clients are either to book a call or to get more info. \n\nYour job is to classify each email as a calendar or information email. \n\nCalendar emails are those where the prospect suggests being booked in for a call. \n\nInformation emails are those which require a reply from the sales team to progress further. This could be the prospect asking for information or making an enquiry. "
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -7760,
+        1940
+      ],
+      "id": "56fb1954-adbb-44ad-ab1e-ca35915dfd05",
+      "name": "Calendar or Email"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.Approve }}",
+                    "rightValue": "Yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "0a83b8bf-1fbe-4646-a7bd-8d5efd817629"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Approved"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "327f1432-f2fd-4c09-bcf9-b03effea941f",
+                    "leftValue": "={{ $json.data.Approve }}",
+                    "rightValue": "No",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Iterate"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "749ca2c5-30f9-4acd-b9a2-5a10fc4d2b3e",
+                    "leftValue": "={{ $json.data.Approve }}",
+                    "rightValue": "Stop - Human Handling",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Human"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -4180,
+        3680
+      ],
+      "id": "e18b4c38-cd76-47e5-b27a-9c256ae5060d",
+      "name": "Decision"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "YOUR-ID-HERE",
+        "message": "=### Prospect = {{ $('When Executed by Another Workflow').item.json.emailAddress }}\n\n---------------------------------------------------------\n\n### Action = Replying to Email ###\n\n---------------------------------------------------------\n\n### Previous Emails Summary ### \n\n{{ $('When Executed by Another Workflow').item.json.threadSummary }}\n\n---------------------------------------------------------\n### Customer Email: ### \n\n{{ $('When Executed by Another Workflow').item.json.newEmail }}\n\n---------------------------------------------------------\n\n### Thought Process: ### \n\n{{ $json.reasoning }}\n\n---------------------------------------------------------\n\n### Draft Email: ### \n\n{{ $json.emailBody }}\n",
+        "responseType": "customForm",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Approve",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Yes"
+                  },
+                  {
+                    "option": "No"
+                  },
+                  {
+                    "option": "Stop - Human Handling"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Feedback"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -4440,
+        3680
+      ],
+      "id": "44621401-3ce9-46db-9498-7759695609f6",
+      "name": "HITL2",
+      "webhookId": "766857dd-1b34-4909-9a03-e184273a417c"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('When Executed by Another Workflow').item.json.messageId }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -5600,
+        3740
+      ],
+      "id": "9180269e-75dc-46e2-8a83-473acd64ae80",
+      "name": "Simple Memory2"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1,
+      "position": [
+        -5640,
+        1120
+      ],
+      "id": "4e21fbb2-5d50-4485-907f-88825014d392",
+      "name": "think_tool"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "YOUR-ID-HERE",
+        "message": "=### Prospect = {{ $('When Executed by Another Workflow').item.json.emailAddress }}\n\n### Action = Sending Availabilties ###\n\n---------------------------------------------------------\n\n### Previous Emails Summary ###\n\n{{ $('When Executed by Another Workflow').item.json.threadSummary }}\n\n---------------------------------------------------------\n\n### Customer Email ###\n\n{{ $('When Executed by Another Workflow').item.json.newEmail }}\n\n---------------------------------------------------------\n\n### Availabilities ###\n\n{{ $('Calendar Agent').item.json.output.calendarAvailabilities }}\n\n---------------------------------------------------------\n\n### Draft Email ###\n\n{{ $('Edit Fields1').item.json.emailBody }} \n\n",
+        "responseType": "customForm",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Approve",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Yes"
+                  },
+                  {
+                    "option": "No"
+                  },
+                  {
+                    "option": "Stop - Human Handling"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Feedback"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -4440,
+        1600
+      ],
+      "id": "5b1b6e60-2f44-4c57-aa18-10172cafa972",
+      "name": "HITL",
+      "webhookId": "d0e3bc2a-5584-476f-a6ed-404eaf2d2fa6"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.Approve }}",
+                    "rightValue": "Yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "0a83b8bf-1fbe-4646-a7bd-8d5efd817629"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Approved"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "327f1432-f2fd-4c09-bcf9-b03effea941f",
+                    "leftValue": "={{ $json.data.Approve }}",
+                    "rightValue": "No",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Iterate"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "749ca2c5-30f9-4acd-b9a2-5a10fc4d2b3e",
+                    "leftValue": "={{ $json.data.Approve }}",
+                    "rightValue": "Stop - Human Handling",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Human"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -4180,
+        1600
+      ],
+      "id": "d5e05e70-5aa2-4e94-b19d-dee104c017a4",
+      "name": "Decision1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.Approve }}",
+                    "rightValue": "Yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "0a83b8bf-1fbe-4646-a7bd-8d5efd817629"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Approved"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "327f1432-f2fd-4c09-bcf9-b03effea941f",
+                    "leftValue": "={{ $json.data.Approve }}",
+                    "rightValue": "No",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Iterate"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "749ca2c5-30f9-4acd-b9a2-5a10fc4d2b3e",
+                    "leftValue": "={{ $json.data.Approve }}",
+                    "rightValue": "Stop - Human Handling",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Human"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -4180,
+        1160
+      ],
+      "id": "55685851-e6ab-4a12-ae12-317974e3daf4",
+      "name": "Decision2"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "YOUR-ID-HERE",
+        "message": "=### Prospect = {{ $('When Executed by Another Workflow').item.json.emailAddress }}\n\n### Action = Booking Call + Email Confirmation ###\n\n---------------------------------------------------------\n\n### Previous Emails ###\n\n{{ $('When Executed by Another Workflow').item.json.threadSummary }}\n\n---------------------------------------------------------\n\n### Customer Email ### \n\n{{ $('When Executed by Another Workflow').item.json.newEmail }}\n\n---------------------------------------------------------\n\n### Availabilities ### \n\n{{ $('Calendar Agent').item.json.output.calendarAvailabilities }}\n\n---------------------------------------------------------\n\n### Event Details ### \n\n{{ $('Edit Fields1').item.json.eventName }}\nFrom: {{ $('Edit Fields1').item.json.startTime }}\nTo: {{ $('Edit Fields1').item.json.endTime }}\n\n---------------------------------------------------------\n\n### Draft Email ### \n\n{{ $('Edit Fields1').item.json.emailBody }} \n",
+        "responseType": "customForm",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Approve",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Yes"
+                  },
+                  {
+                    "option": "No"
+                  },
+                  {
+                    "option": "Stop - Human Handling"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Feedback"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -4440,
+        1160
+      ],
+      "id": "16f87acf-61ec-474c-ad04-4c4c491a27ca",
+      "name": "HITL3",
+      "webhookId": "8858a1f9-4b91-4bde-96e4-09bdb090ce61"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8c816866-eec9-4c02-a7df-e37a4c1fc89f",
+              "leftValue": "={{ $json.output.escalate }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -5100,
+        3540
+      ],
+      "id": "a34341ca-311d-4106-ad82-dccd8b38e07b",
+      "name": "Escalate?"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "emailAddress"
+            },
+            {
+              "name": "threadId"
+            },
+            {
+              "name": "messageId"
+            },
+            {
+              "name": "notes"
+            },
+            {
+              "name": "newEmail"
+            },
+            {
+              "name": "threadSummary"
+            },
+            {
+              "name": "contactId"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -8020,
+        1940
+      ],
+      "id": "a394690a-5ee4-4576-b29f-efba4e20cd99",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -3840,
+        3880
+      ],
+      "id": "641b3c9e-1f20-49fb-ae10-edc41b1a6016",
+      "name": "Done"
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "operation": "reply",
+        "threadId": "={{ $('When Executed by Another Workflow').item.json.threadId }}",
+        "messageId": "={{ $('When Executed by Another Workflow').item.json.messageId }}",
+        "message": "={{ $('Edit Fields2').item.json.emailBody }}",
+        "options": {
+          "replyToSenderOnly": true
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -3100,
+        3200
+      ],
+      "id": "c8748077-6e58-4a70-a178-f4a1708ae902",
+      "name": "Reply to Email",
+      "webhookId": "d97d7f62-6ed4-463b-8220-1193df854ba9"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -3960,
+        1280
+      ],
+      "id": "24d62530-1fb0-478e-9c7b-ef0a76bc0246",
+      "name": "Done1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -3960,
+        1720
+      ],
+      "id": "e5772966-53c6-4e11-b69f-49c246ff35c7",
+      "name": "Done2"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "kiaghasem.dev@gmail.com",
+          "mode": "list",
+          "cachedResultName": "kiaghasem.dev@gmail.com"
+        },
+        "start": "={{ $('Edit Fields1').item.json.startTime }}",
+        "end": "={{ $('Edit Fields1').item.json.endTime }}",
+        "additionalFields": {
+          "attendees": [
+            "kiaghasem.dev@gmail.com",
+            "={{ $('When Executed by Another Workflow').item.json.emailAddress }}"
+          ],
+          "summary": "={{ $('Edit Fields1').item.json.eventName }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        -3100,
+        520
+      ],
+      "id": "12276f0b-efca-4384-b7c7-d3f14f65a5ab",
+      "name": "Book in Call"
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "operation": "reply",
+        "threadId": "={{ $('When Executed by Another Workflow').item.json.threadId }}",
+        "messageId": "={{ $('When Executed by Another Workflow').item.json.messageId }}",
+        "message": "={{ $('Edit Fields1').item.json.emailBody }}",
+        "options": {
+          "replyToSenderOnly": true
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -2880,
+        520
+      ],
+      "id": "b99a41d1-5b82-49de-a9a8-6c5a423aa5d1",
+      "name": "Send Confirmation Email",
+      "webhookId": "4ee09945-afdb-48ae-94e1-5f9640bd2e36"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3aa4ee05-7c16-4513-928d-61dae542a4c3",
+              "leftValue": "={{ $('When Executed by Another Workflow').item.json.contactId }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        180,
+        420
+      ],
+      "id": "cec9ba84-0907-4ef7-9ded-0541caa2694c",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $('When Executed by Another Workflow').item.json.contactId }}/notes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR-API-HERE"
+            },
+            {
+              "name": "Version",
+              "value": "2021-07-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "YOUR-UID-HERE"
+            },
+            {
+              "name": "body",
+              "value": "=Type: Email\nFrom: Customer\nThreadId: {{ $('When Executed by Another Workflow').item.json.threadId }}\n\n{{ $('When Executed by Another Workflow').item.json.newEmail }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        760,
+        260
+      ],
+      "id": "cb70f5ed-c7ec-4e32-835b-10439b65fc79",
+      "name": "Create Note - Input4"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"name\": {\n      \"type\": \"string\",\n      \"description\": \"name of the person\"\n    }\n  },\n  \"required\": [\n    \"name\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        840,
+        700
+      ],
+      "id": "7c9d1463-1ba6-42ea-bab1-f678c53ec42e",
+      "name": "Structured Output Parser4"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here's the email: \n\n{{ $('When Executed by Another Workflow').item.json.newEmail }} ",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Your job is to read an email and identify the name of the sender. \n\nThey usually put this at the bottom of their email.\n\nYour output must follow the defined schema."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        540,
+        480
+      ],
+      "id": "207e4be1-871f-4ca6-b0eb-8824d7f11bcd",
+      "name": "Name Finder2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $('When Executed by Another Workflow').item.json.contactId }}/notes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR-API-HERE"
+            },
+            {
+              "name": "Version",
+              "value": "2021-07-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "YOUR-UID-HERE"
+            },
+            {
+              "name": "body",
+              "value": "=Type: Email\nFrom: AI Rep\nThreadId: {{ $('When Executed by Another Workflow').item.json.threadId }}\n\n{{ $('Edit Fields1').item.json.emailBody }}\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1000,
+        260
+      ],
+      "id": "2c120a81-1fe3-417e-a64f-509a7434c1b6",
+      "name": "Create Note - Output"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $json.note.contactId }}/notes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR-API-HERE"
+            },
+            {
+              "name": "Version",
+              "value": "2021-07-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "YOUR-UID-HERE"
+            },
+            {
+              "name": "body",
+              "value": "=Type: Email\nFrom: AI Rep\nThreadId: {{ $('When Executed by Another Workflow').item.json.threadId }}\n\n{{ $('Edit Fields1').item.json.emailBody }}\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1460,
+        480
+      ],
+      "id": "d38a4f03-1931-45e2-ba8c-f7cfbd892db7",
+      "name": "Create Note - Output1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $json.contact.id }}/notes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR-API-HERE"
+            },
+            {
+              "name": "Version",
+              "value": "2021-07-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "YOUR-UID-HERE"
+            },
+            {
+              "name": "body",
+              "value": "=Type: Email\nFrom: Customer\nThreadId: {{ $('When Executed by Another Workflow').item.json.threadId }}\n\n{{ $('When Executed by Another Workflow').item.json.newEmail }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1180,
+        480
+      ],
+      "id": "d1b25457-203b-43f7-b17c-a286c9ed7df7",
+      "name": "Create Note - Input3"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "openai/gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "openai/gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        460,
+        700
+      ],
+      "id": "ac92ac87-5842-4d21-a1a3-61e003883ae6",
+      "name": "OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/contacts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR-API-HERE"
+            },
+            {
+              "name": "Version",
+              "value": "2021-07-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"firstName\": \"{{ $json.output.name }}\",\n  \"email\": \"{{ $('When Executed by Another Workflow').item.json.emailAddress }}\",\n  \"locationId\": \"YOUR-ID-HERE\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        480
+      ],
+      "id": "a10045b8-800a-4a83-9001-63ec89ebba4a",
+      "name": "Create Contact"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3aa4ee05-7c16-4513-928d-61dae542a4c3",
+              "leftValue": "={{ $('When Executed by Another Workflow').item.json.contactId }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        120,
+        2520
+      ],
+      "id": "9ccf274c-541a-4939-b086-700481b4aea1",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $('When Executed by Another Workflow').item.json.contactId }}/notes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR-API-HERE"
+            },
+            {
+              "name": "Version",
+              "value": "2021-07-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "YOUR-UID-HERE"
+            },
+            {
+              "name": "body",
+              "value": "=Type: Email\nFrom: Customer\nThreadId: {{ $('When Executed by Another Workflow').item.json.threadId }}\n\n{{ $('When Executed by Another Workflow').item.json.newEmail }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        700,
+        2360
+      ],
+      "id": "612b526a-2324-4aa8-bb92-50472539eee9",
+      "name": "Create Note - Input"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"name\": {\n      \"type\": \"string\",\n      \"description\": \"name of the person\"\n    }\n  },\n  \"required\": [\n    \"name\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        780,
+        2800
+      ],
+      "id": "02a1721d-5f67-4fb9-92ef-d040da75f538",
+      "name": "Structured Output Parser5"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here's the email: \n\n{{ $('When Executed by Another Workflow').item.json.newEmail }} ",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Your job is to read an email and identify the name of the sender. \n\nThey usually put this at the bottom of their email.\n\nYour output must follow the defined schema."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        480,
+        2580
+      ],
+      "id": "1071f106-3c11-4b28-957d-fa7f65f26e15",
+      "name": "Name Finder"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $json.contact.id }}/notes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR-API-HERE"
+            },
+            {
+              "name": "Version",
+              "value": "2021-07-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "YOUR-UID-HERE"
+            },
+            {
+              "name": "body",
+              "value": "=Type: Email\nFrom: Customer\nThreadId: {{ $('When Executed by Another Workflow').item.json.threadId }}\n\n{{ $('When Executed by Another Workflow').item.json.newEmail }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        2580
+      ],
+      "id": "a3e564ab-401d-40d1-943d-9d56870a7a02",
+      "name": "Create Note - Input5"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "openai/gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "openai/gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        400,
+        2800
+      ],
+      "id": "f17cd554-ce77-44fe-8363-7b0190078512",
+      "name": "OpenAI Chat Model6"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/contacts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR-API-HERE"
+            },
+            {
+              "name": "Version",
+              "value": "2021-07-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"firstName\": \"{{ $json.output.name }}\",\n  \"email\": \"{{ $('When Executed by Another Workflow').item.json.emailAddress }}\",\n  \"locationId\": \"YOUR-ID-HERE\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        2580
+      ],
+      "id": "05d59b02-7d5e-4809-b967-e3ce295d2b36",
+      "name": "Create Contact1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3aa4ee05-7c16-4513-928d-61dae542a4c3",
+              "leftValue": "={{ $('When Executed by Another Workflow').item.json.contactId }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        180,
+        1460
+      ],
+      "id": "adbf49c7-6907-47a7-abc3-db8697bfd383",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $('When Executed by Another Workflow').item.json.contactId }}/notes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR-API-HERE"
+            },
+            {
+              "name": "Version",
+              "value": "2021-07-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "YOUR-UID-HERE"
+            },
+            {
+              "name": "body",
+              "value": "=Type: Email\nFrom: Customer\nThreadId: {{ $('When Executed by Another Workflow').item.json.threadId }}\n\n{{ $('When Executed by Another Workflow').item.json.newEmail }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        760,
+        1300
+      ],
+      "id": "f0a633ef-fd3f-46e5-8cc2-e10673d9e842",
+      "name": "Create Note - Input6"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"name\": {\n      \"type\": \"string\",\n      \"description\": \"name of the person\"\n    }\n  },\n  \"required\": [\n    \"name\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        840,
+        1740
+      ],
+      "id": "75f3e9c2-4807-4316-9abf-b56fc34d0f31",
+      "name": "Structured Output Parser7"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here's the email: \n\n{{ $('When Executed by Another Workflow').item.json.newEmail }} ",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Your job is to read an email and identify the name of the sender. \n\nThey usually put this at the bottom of their email.\n\nYour output must follow the defined schema."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        540,
+        1520
+      ],
+      "id": "c20c9b8d-9cf0-44d2-bad5-e53122b8b5fb",
+      "name": "Name Finder3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $('When Executed by Another Workflow').item.json.contactId }}/notes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR-API-HERE"
+            },
+            {
+              "name": "Version",
+              "value": "2021-07-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "YOUR-UID-HERE"
+            },
+            {
+              "name": "body",
+              "value": "=Type: Email\nFrom: AI Rep\nThreadId: {{ $('When Executed by Another Workflow').item.json.threadId }}\n\n{{ $('Edit Fields1').item.json.emailBody }}\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1000,
+        1300
+      ],
+      "id": "0c0e98b9-23c7-4f4b-82e5-e0c7e706fd9c",
+      "name": "Create Note - Output2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $json.note.contactId }}/notes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR-API-HERE"
+            },
+            {
+              "name": "Version",
+              "value": "2021-07-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "YOUR-UID-HERE"
+            },
+            {
+              "name": "body",
+              "value": "=Type: Email\nFrom: AI Rep\nThreadId: {{ $('When Executed by Another Workflow').item.json.threadId }}\n\n{{ $('Edit Fields1').item.json.emailBody }}\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1460,
+        1520
+      ],
+      "id": "76d51c8e-20ab-468f-a559-ee6aa4dfd4d0",
+      "name": "Create Note - Output3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $json.contact.id }}/notes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR-API-HERE"
+            },
+            {
+              "name": "Version",
+              "value": "2021-07-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "YOUR-UID-HERE"
+            },
+            {
+              "name": "body",
+              "value": "=Type: Email\nFrom: Customer\nThreadId: {{ $('When Executed by Another Workflow').item.json.threadId }}\n\n{{ $('When Executed by Another Workflow').item.json.newEmail }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1180,
+        1520
+      ],
+      "id": "4f81b810-a80b-4ca9-913f-d5345181d3f5",
+      "name": "Create Note - Input7"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "openai/gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "openai/gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        460,
+        1740
+      ],
+      "id": "3381dc04-c154-49ee-bbb8-ab0db5952b70",
+      "name": "OpenAI Chat Model8"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/contacts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR-API-HERE"
+            },
+            {
+              "name": "Version",
+              "value": "2021-07-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"firstName\": \"{{ $json.output.name }}\",\n  \"email\": \"{{ $('When Executed by Another Workflow').item.json.emailAddress }}\",\n  \"locationId\": \"YOUR-ID-HERE\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        1520
+      ],
+      "id": "57092843-8082-414b-a2b2-06dc2b87b34d",
+      "name": "Create Contact2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $('When Executed by Another Workflow').item.json.contactId }}/notes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR-API-HERE"
+            },
+            {
+              "name": "Version",
+              "value": "2021-07-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "YOUR-UID-HERE"
+            },
+            {
+              "name": "body",
+              "value": "=Type: Calendar Event Booked\n\nEvent Name: {{ $('Edit Fields1').item.json.eventName }}\nDate:  \n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1200,
+        260
+      ],
+      "id": "9d084ed4-e797-4102-ab19-9674e3a4d1c0",
+      "name": "Create Note - Output - Event"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3aa4ee05-7c16-4513-928d-61dae542a4c3",
+              "leftValue": "={{ $('When Executed by Another Workflow').item.json.contactId }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        140,
+        3580
+      ],
+      "id": "80ef9471-8c27-41ba-8ffa-78f7715d127f",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $('When Executed by Another Workflow').item.json.contactId }}/notes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR-API-HERE"
+            },
+            {
+              "name": "Version",
+              "value": "2021-07-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "YOUR-UID-HERE"
+            },
+            {
+              "name": "body",
+              "value": "=Type: Email\nFrom: Customer\nThreadId: {{ $('When Executed by Another Workflow').item.json.threadId }}\n\n{{ $('When Executed by Another Workflow').item.json.newEmail }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        3420
+      ],
+      "id": "dbee8719-8731-4752-9d6f-7a72ee54b5df",
+      "name": "Create Note - Input8"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"name\": {\n      \"type\": \"string\",\n      \"description\": \"name of the person\"\n    }\n  },\n  \"required\": [\n    \"name\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        800,
+        3860
+      ],
+      "id": "248f5cc3-e5a2-449e-8547-15e89923f5e4",
+      "name": "Structured Output Parser8"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here's the email: \n\n{{ $('When Executed by Another Workflow').item.json.newEmail }} ",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Your job is to read an email and identify the name of the sender. \n\nThey usually put this at the bottom of their email.\n\nYour output must follow the defined schema."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        500,
+        3640
+      ],
+      "id": "1103a37c-ca4c-4228-9a72-b2bbee6df292",
+      "name": "Name Finder4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $('When Executed by Another Workflow').item.json.contactId }}/notes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR-API-HERE"
+            },
+            {
+              "name": "Version",
+              "value": "2021-07-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "YOUR-UID-HERE"
+            },
+            {
+              "name": "body",
+              "value": "=Type: Email\nFrom: AI Rep\nThreadId: {{ $('When Executed by Another Workflow').item.json.threadId }}\n\n{{ $('Edit Fields2').item.json.emailBody }}\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        3420
+      ],
+      "id": "3eee22b5-b065-41d9-8a41-d95dace77d46",
+      "name": "Create Note - Output4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $json.note.contactId }}/notes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR-API-HERE"
+            },
+            {
+              "name": "Version",
+              "value": "2021-07-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "YOUR-UID-HERE"
+            },
+            {
+              "name": "body",
+              "value": "=Type: Email\nFrom: AI Rep\nThreadId: {{ $('When Executed by Another Workflow').item.json.threadId }}\n\n{{ $('Edit Fields2').item.json.emailBody }}\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1420,
+        3640
+      ],
+      "id": "a8ca7047-e45d-4eba-a4a5-4806b1c722b4",
+      "name": "Create Note - Output5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $json.contact.id }}/notes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR-API-HERE"
+            },
+            {
+              "name": "Version",
+              "value": "2021-07-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "YOUR-UID-HERE"
+            },
+            {
+              "name": "body",
+              "value": "=Type: Email\nFrom: Customer\nThreadId: {{ $('When Executed by Another Workflow').item.json.threadId }}\n\n{{ $('When Executed by Another Workflow').item.json.newEmail }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1140,
+        3640
+      ],
+      "id": "90f3635f-7453-4ca8-90f5-957a552cbac9",
+      "name": "Create Note - Input9"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "openai/gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "openai/gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        420,
+        3860
+      ],
+      "id": "e7da184d-3a42-4f49-9155-0fe31c655853",
+      "name": "OpenAI Chat Model9"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/contacts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR-API-HERE"
+            },
+            {
+              "name": "Version",
+              "value": "2021-07-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"firstName\": \"{{ $json.output.name }}\",\n  \"email\": \"{{ $('When Executed by Another Workflow').item.json.emailAddress }}\",\n  \"locationId\": \"YOUR-ID-HERE\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        920,
+        3640
+      ],
+      "id": "81c45fbd-962e-4b95-963d-0641152b8e66",
+      "name": "Create Contact3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://services.leadconnectorhq.com/contacts/{{ $json.note.contactId }}/notes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR-API-HERE"
+            },
+            {
+              "name": "Version",
+              "value": "2021-07-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "YOUR-UID-HERE"
+            },
+            {
+              "name": "body",
+              "value": "=Type: Calendar Event Booked\n\nEvent Name: {{ $('Edit Fields1').item.json.eventName }}\nDate:  \n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1680,
+        480
+      ],
+      "id": "b2b93625-c7c5-434c-9e29-c38bea2ff20f",
+      "name": "Create Note - Output - Event1"
+    },
+    {
+      "parameters": {
+        "content": "# Calendar or Email Agent?",
+        "height": 560,
+        "width": 1200,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -8120,
+        1760
+      ],
+      "typeVersion": 1,
+      "id": "b50cdd81-19bc-4257-9c51-794a96e11957",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# Check Availability + Draft Email",
+        "height": 640,
+        "width": 920,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -6180,
+        720
+      ],
+      "typeVersion": 1,
+      "id": "600ffc43-658a-41fa-b659-f4274864ee36",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# Draft Email",
+        "height": 1280,
+        "width": 980,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -5860,
+        3320
+      ],
+      "typeVersion": 1,
+      "id": "2f112f3f-1400-4ab1-8444-0f18b5e8a92d",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "# Human in The Loop",
+        "height": 1360,
+        "width": 1380
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -5140,
+        800
+      ],
+      "typeVersion": 1,
+      "id": "c712f5b9-605f-4b8b-8b90-011bfcaf9b00",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "# Human in The Loop",
+        "height": 660,
+        "width": 1320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -4820,
+        3540
+      ],
+      "typeVersion": 1,
+      "id": "97ca71fc-93fa-4959-a7cc-e7e02f0e584b",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "# Revision",
+        "height": 1360,
+        "width": 740,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1860,
+        800
+      ],
+      "typeVersion": 1,
+      "id": "ac55874f-bb8f-47dd-af25-3df572be0251",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "# Revision",
+        "height": 520,
+        "width": 740,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3000,
+        3880
+      ],
+      "typeVersion": 1,
+      "id": "ce75a2eb-62fa-48d9-98d8-7c457a8502d6",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "# Action",
+        "height": 380,
+        "width": 620,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3180,
+        360
+      ],
+      "typeVersion": 1,
+      "id": "08b8810e-c9b7-40be-8990-215e9b547516",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "# Action",
+        "height": 380,
+        "width": 620,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3860,
+        2420
+      ],
+      "typeVersion": 1,
+      "id": "8128f5de-bd4f-4013-a3b8-e307a72f54bd",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "# Action",
+        "height": 380,
+        "width": 360,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3720,
+        1240
+      ],
+      "typeVersion": 1,
+      "id": "666a1309-05de-442b-bdf0-19e254218709",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "# Action",
+        "height": 380,
+        "width": 620,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3200,
+        3060
+      ],
+      "typeVersion": 1,
+      "id": "d66993b8-f528-4d71-afcd-58dc38558b8c",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "# Full Context",
+        "height": 920,
+        "width": 1920,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "e5bba9ab-c63f-43ca-b445-e01bb25e15c7",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "# Full Context",
+        "height": 920,
+        "width": 1920,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        20,
+        1080
+      ],
+      "typeVersion": 1,
+      "id": "c3567e94-df6f-45fc-843a-cb78ba090d12",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "# Full Context",
+        "height": 920,
+        "width": 1920,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        20,
+        2120
+      ],
+      "typeVersion": 1,
+      "id": "b42971a5-c085-409d-adf6-2f2f7c7b3048",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "# Full Context",
+        "height": 920,
+        "width": 1920,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        20,
+        3240
+      ],
+      "typeVersion": 1,
+      "id": "15f34a17-9ee6-4153-b90d-6c0aa88150c0",
+      "name": "Sticky Note14"
+    }
+  ],
+  "connections": {
+    "get_events": {
+      "ai_tool": [
+        [
+          {
+            "node": "Calendar Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Booking a Call?": {
+      "main": [
+        [
+          {
+            "node": "HITL3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HITL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Availability": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Calendar Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Booking a Call?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Revision Agent (Email)",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Revision Agent (Email)1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Calendar Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revision Agent (Email)": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calendar Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Revision Agent (Email)",
+            "type": "ai_outputParser",
+            "index": 0
+          },
+          {
+            "node": "Revision Agent (Email)1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revision Agent (Email)1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Calendar Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Agent": {
+      "main": [
+        [
+          {
+            "node": "Escalate?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "kamexa_information",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "kamexa_information": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revision Agent (Email)2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "kamexa_information",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "HITL2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Revision Agent (Email)2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser3": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Revision Agent (Email)2",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram3": {
+      "main": [
+        [
+          {
+            "node": "Completed Message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model7": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Calendar or Email",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser6": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Calendar or Email",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Calendar Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calendar or Email": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Completed Message1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Completed Message": {
+      "main": [
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decision": {
+      "main": [
+        [
+          {
+            "node": "Reply to Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Revision Agent (Email)2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HITL2": {
+      "main": [
+        [
+          {
+            "node": "Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory2": {
+      "ai_memory": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "think_tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Calendar Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HITL": {
+      "main": [
+        [
+          {
+            "node": "Decision1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decision1": {
+      "main": [
+        [
+          {
+            "node": "Send Availability",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Revision Agent (Email)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Done2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decision2": {
+      "main": [
+        [
+          {
+            "node": "Book in Call",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Revision Agent (Email)1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Done1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HITL3": {
+      "main": [
+        [
+          {
+            "node": "Decision2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escalate?": {
+      "main": [
+        [
+          {
+            "node": "Telegram3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Calendar or Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply to Email": {
+      "main": [
+        [
+          {
+            "node": "Completed Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Book in Call": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Confirmation Email": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Create Note - Input4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Name Finder2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Note - Input4": {
+      "main": [
+        [
+          {
+            "node": "Create Note - Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser4": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Name Finder2",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Name Finder2": {
+      "main": [
+        [
+          {
+            "node": "Create Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Note - Input3": {
+      "main": [
+        [
+          {
+            "node": "Create Note - Output1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Name Finder2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Contact": {
+      "main": [
+        [
+          {
+            "node": "Create Note - Input3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Create Note - Input",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Name Finder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser5": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Name Finder",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Name Finder": {
+      "main": [
+        [
+          {
+            "node": "Create Contact1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model6": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Name Finder",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Contact1": {
+      "main": [
+        [
+          {
+            "node": "Create Note - Input5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Done1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Done2": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Create Note - Input6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Name Finder3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Note - Input6": {
+      "main": [
+        [
+          {
+            "node": "Create Note - Output2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser7": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Name Finder3",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Name Finder3": {
+      "main": [
+        [
+          {
+            "node": "Create Contact2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Note - Input7": {
+      "main": [
+        [
+          {
+            "node": "Create Note - Output3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model8": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Name Finder3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Contact2": {
+      "main": [
+        [
+          {
+            "node": "Create Note - Input7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Note - Output": {
+      "main": [
+        [
+          {
+            "node": "Create Note - Output - Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Done": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "Create Note - Input8",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Name Finder4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Note - Input8": {
+      "main": [
+        [
+          {
+            "node": "Create Note - Output4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser8": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Name Finder4",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Name Finder4": {
+      "main": [
+        [
+          {
+            "node": "Create Contact3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Note - Input9": {
+      "main": [
+        [
+          {
+            "node": "Create Note - Output5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model9": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Name Finder4",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Contact3": {
+      "main": [
+        [
+          {
+            "node": "Create Note - Input9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Note - Output1": {
+      "main": [
+        [
+          {
+            "node": "Create Note - Output - Event1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "emailAddress": "testingkia.demobot@gmail.com",
+          "threadId": "19670bbf08a6bd43",
+          "messageId": "19670bbf08a6bd43",
+          "notes": "Note#1:\n2025-04-26T03:56:06.568Z\nCommunication Type - Email\nFrom: Rep \nThreadId: 2432424324\n\nDetails:\nWe automate your entire SEO - it only costs $1000. \nThanks\n\nNote#2:\n2025-04-26T03:55:07.143Z\nCommunication Type - Email \nFrom: Customer \nThreadId: 2432424324\n\nDetails: \nHey we're super interested in exploring how you can help us automate SEO. \nThanks! ",
+          "newEmail": "Hey Kia,\n\nSorry for disappearing for a while.\n\nI was wondering if we could setup a call to discuss SEO. Can you book this for the coming monday at 4pm.\n\nWe're pretty keen to move forward with this.\n\nKind regards,\nKia",
+          "threadSummary": "No prior emails in thread",
+          "contactId": null
+        }
+      }
+    ]
+  },
+  "versionId": "b1563e2c-23f8-4262-8e2f-5e5c44f2e6ad",
+  "triggerCount": 0,
+  "tags": []
+}
