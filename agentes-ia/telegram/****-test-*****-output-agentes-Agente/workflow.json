@@ -1,0 +1,1730 @@
+{
+  "createdAt": "2025-05-16T08:06:07.835Z",
+  "updatedAt": "2025-05-16T16:24:48.387Z",
+  "id": "KmcfwtoagtFHusYv",
+  "name": "**** TEST ***** Output agentes",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"response\": {\n      \"part_1\": \"Parte uno de la respuesta\",\n      \"part_2\": \"Parte dos de la respuesta (opcional).\",\n      \"part_3\": \"Parte tres de la respuesta (opcional).\"\n    }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -1260,
+        180
+      ],
+      "id": "a24fe6f1-9602-4467-9027-885894fd80ee",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Respuesta a formatear:{{ $('AI Agent').item.json.output }}\nSi contiene signos de puntuación, omite el primer signo \"¿\" \"¡\", para que sea mas humano.\n\nDevuelve este formato:\n\n{\n\t\"response\": {\n      \"part_1\": \"Parte uno de la respuesta\",\n      \"part_2\": \"Parte dos de la respuesta (opcional).\",\n      \"part_3\": \"Parte tres de la respuesta (opcional).\"\n    }\n}",
+        "hasOutputParser": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -1440,
+        -40
+      ],
+      "id": "0d7ad7f0-78ee-4041-979e-6d1a1293f46d",
+      "name": "Verificador de Respuesta",
+      "retryOnFail": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -1460,
+        180
+      ],
+      "id": "95267e59-1c75-4e7e-b89b-ebf76a3a8ba1",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "TaWLwZCIMo3j9GPj",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "109e14b9-82eb-45e0-97e2-dab5d80f1da8",
+              "leftValue": "={{ $json.output.length < 80 }}",
+              "rightValue": "={{ $json.output.length < 60 }}\n",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1860,
+        -60
+      ],
+      "id": "42d42099-a7f7-4ace-97c0-89cd92a2d6db",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -3840,
+        220
+      ],
+      "id": "d7083ad4-d86a-40ce-b684-85f57c699058",
+      "name": "Telegram Trigger",
+      "webhookId": "1c4f6611-d006-4305-8c3b-a35690a03858",
+      "credentials": {
+        "telegramApi": {
+          "id": "tz1fYz1snqttWLEg",
+          "name": "Telegram Mi Asistente Personal"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "=# Role \nYou are a helpful assistant named vision. Keep your answer short and to the point\n\n## User Information \nUser name is {{ $('Telegram Trigger').item.json.message.from.first_name }}\n\n## Aditional Information\nTodays date is {{ $now.toLocal() }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        -2400,
+        200
+      ],
+      "id": "3a7dd64e-a921-4068-9b06-5f39938b360a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -2440,
+        440
+      ],
+      "id": "c71d26c9-a759-43b1-9029-a0fb0a390327",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -2300,
+        440
+      ],
+      "id": "e37f7d3a-45d0-4f41-a231-852d408cd841",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.voice }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "f17ce6be-7ed3-4e8f-a3a9-d8854592d16a"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Voice"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ad5f60f6-76a9-44b7-a02d-d5899894fb89",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "=Text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -3580,
+        220
+      ],
+      "id": "a3071446-599c-452a-a80d-4b4e4532d91b",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -3200,
+        20
+      ],
+      "id": "deb950b3-2c1a-46dd-83e1-d22d53517b01",
+      "name": "Get Audio",
+      "webhookId": "07c044b6-b4f8-4d6a-8860-e208dd176b90",
+      "credentials": {
+        "telegramApi": {
+          "id": "tz1fYz1snqttWLEg",
+          "name": "Telegram Mi Asistente Personal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -2960,
+        20
+      ],
+      "id": "af8a6bef-f84f-4fa7-9c5a-b2ce8a007426",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "36578e2f-a621-4033-bc03-f1045026e3e9",
+              "name": "text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3080,
+        380
+      ],
+      "id": "81bff825-7096-495b-90c2-abce767fff5f",
+      "name": "Set Value"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1620,
+        -260
+      ],
+      "id": "04ba2a23-dd5e-4b88-b1c9-68cfbe214d09",
+      "name": "Send Message",
+      "webhookId": "8098ff58-baaf-479a-a26e-a2d30b723a19",
+      "credentials": {
+        "telegramApi": {
+          "id": "tz1fYz1snqttWLEg",
+          "name": "Telegram Mi Asistente Personal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d5171300-4ca9-4551-ba37-23f72ccc5a13",
+              "name": "parte 1",
+              "value": "={{ $json.output.response.part_1 }}",
+              "type": "string"
+            },
+            {
+              "id": "e8f818ce-508a-44c6-bc42-f5e97e51ab97",
+              "name": "parte 2",
+              "value": "={{ $json.output.response.part_2 }}",
+              "type": "string"
+            },
+            {
+              "id": "55b9064e-0002-41b8-a61b-ab0cc9839b06",
+              "name": "parte 3",
+              "value": "={{ $json.output.response.part_3 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1020,
+        -40
+      ],
+      "id": "19ee5ff3-7625-412e-a198-44eb76768391",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "['parte 1'], ['parte 2'], ['parte 3']",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        -40
+      ],
+      "id": "9e8f436a-a8ca-4181-b8f1-5e6196c5f5c8",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -580,
+        -40
+      ],
+      "id": "a900e35f-3227-4b7c-9d4d-755d724e286c",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $('Loop Over Items').item.json['[\\'parte 1\\']'] }}{{ $('Edit Fields').item.json['parte 2'] }}{{ $('Edit Fields').item.json['parte 3'] }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        180,
+        -100
+      ],
+      "id": "2f876d9a-a837-4d46-a2b5-1a42d46d1267",
+      "name": "Send Message1",
+      "webhookId": "8098ff58-baaf-479a-a26e-a2d30b723a19",
+      "credentials": {
+        "telegramApi": {
+          "id": "tz1fYz1snqttWLEg",
+          "name": "Telegram Mi Asistente Personal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "24c11cca-3f55-4315-a84c-455651137ecd",
+              "name": "=tiempo",
+              "value": "={{ 2 + $json['[\\'parte 2\\']'].length * 0.01 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -340,
+        100
+      ],
+      "id": "8f42010e-2503-4553-b058-3c1814932ead",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Loop Over Items').item.json['[\\'parte 1\\']'] }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "f97d922a-ae0d-4106-9ac2-336a8597bfdf"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Corto"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e05396e3-c01c-4f47-a08a-67d01a72eaa8",
+                    "leftValue": "={{ $('Loop Over Items').item.json['[\\'parte 2\\']'] }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Medio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "66e514b6-8d95-4737-b8fd-643dd6d1b537",
+                    "leftValue": "={{ $('Loop Over Items').item.json['[\\'parte 3\\']'] }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Largo"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -160,
+        100
+      ],
+      "id": "4fed2927-ff34-49e8-b21a-95aad5e8c937",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $('Loop Over Items').item.json['[\\'parte 2\\']'] }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        180,
+        80
+      ],
+      "id": "9ba093ef-7555-4ed5-bd88-a4b97a271775",
+      "name": "Send Message2",
+      "webhookId": "8098ff58-baaf-479a-a26e-a2d30b723a19",
+      "credentials": {
+        "telegramApi": {
+          "id": "tz1fYz1snqttWLEg",
+          "name": "Telegram Mi Asistente Personal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $('Loop Over Items').item.json['[\\'parte 3\\']'] }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        180,
+        260
+      ],
+      "id": "63c3d35a-4879-4da9-8989-8e27b826e3f6",
+      "name": "Send Message3",
+      "webhookId": "8098ff58-baaf-479a-a26e-a2d30b723a19",
+      "credentials": {
+        "telegramApi": {
+          "id": "tz1fYz1snqttWLEg",
+          "name": "Telegram Mi Asistente Personal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": "="
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        480,
+        320
+      ],
+      "id": "e03b19d6-ca71-4806-b357-945d4aeb997b",
+      "name": "Wait1",
+      "webhookId": "353a6e1a-d782-4002-ae23-89023e57860e"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"response\": {\n      \"part_1\": \"Parte uno de la respuesta\",\n      \"part_2\": \"Parte dos de la respuesta (opcional).\",\n      \"part_3\": \"Parte tres de la respuesta (opcional).\"\n    }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -1600,
+        1340
+      ],
+      "id": "7ed0ca03-34df-4d44-a0bd-ec7cbee65b8f",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Respuesta a formatear:{{ $('AI Agent1').item.json.output }}\nSi contiene signos de puntuación, omite el primer signo \"¿\" \"¡\", para que sea mas humano.\n\nDevuelve este formato:\n\n{\n\t\"response\": {\n      \"part_1\": \"Parte uno de la respuesta\",\n      \"part_2\": \"Parte dos de la respuesta (opcional).\",\n      \"part_3\": \"Parte tres de la respuesta (opcional).\"\n    }\n}",
+        "hasOutputParser": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -1780,
+        1120
+      ],
+      "id": "dd49ad90-5064-40fd-9798-247fc0c77bd7",
+      "name": "Verificador de Respuesta1",
+      "retryOnFail": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -1800,
+        1340
+      ],
+      "id": "a8fad3b2-6dfa-4c9e-ab90-2d2ad1afeadf",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "TaWLwZCIMo3j9GPj",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "109e14b9-82eb-45e0-97e2-dab5d80f1da8",
+              "leftValue": "={{ $json.output.length < 80 }}",
+              "rightValue": "={{ $json.output.length < 60 }}\n",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2200,
+        1100
+      ],
+      "id": "6a8f0078-85d0-4bcc-82f0-7f0c8ac5a4b7",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -4180,
+        1380
+      ],
+      "id": "c8c54d0e-e241-4f69-b5c5-4ab65e3d3edf",
+      "name": "Telegram Trigger1",
+      "webhookId": "1c4f6611-d006-4305-8c3b-a35690a03858",
+      "credentials": {
+        "telegramApi": {
+          "id": "tz1fYz1snqttWLEg",
+          "name": "Telegram Mi Asistente Personal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "=# Role \nYou are a helpful assistant named vision. Keep your answer short and to the point\n\n## User Information \nUser name is {{ $('Telegram Trigger1').item.json.message.from.first_name }}\n\n## Aditional Information\nTodays date is {{ $now.toLocal() }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        -2740,
+        1360
+      ],
+      "id": "17a585a1-9036-4555-b0a4-b0b25ae2d506",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -2780,
+        1600
+      ],
+      "id": "e100a51f-34d4-4dc4-804a-106dc2b3d6fe",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger1').item.json.message.chat.id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -2640,
+        1600
+      ],
+      "id": "dbb99f4b-8d1e-4b78-80ed-930c9cde1547",
+      "name": "Simple Memory1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.voice }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "f17ce6be-7ed3-4e8f-a3a9-d8854592d16a"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Voice"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ad5f60f6-76a9-44b7-a02d-d5899894fb89",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "=Text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -3920,
+        1380
+      ],
+      "id": "e312dacc-51bc-4319-8a3a-77cd3c3332cd",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -3540,
+        1180
+      ],
+      "id": "f7f2af20-59b5-4c77-9e91-3cb5e789576a",
+      "name": "Get Audio1",
+      "webhookId": "07c044b6-b4f8-4d6a-8860-e208dd176b90",
+      "credentials": {
+        "telegramApi": {
+          "id": "tz1fYz1snqttWLEg",
+          "name": "Telegram Mi Asistente Personal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -3300,
+        1180
+      ],
+      "id": "dcd45f9d-c77e-49e8-ae5d-c00135bfceb1",
+      "name": "OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "36578e2f-a621-4033-bc03-f1045026e3e9",
+              "name": "text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3420,
+        1540
+      ],
+      "id": "4aa30a94-59a9-4269-8ec2-874b1585e94c",
+      "name": "Set Value1"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger1').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1960,
+        900
+      ],
+      "id": "1a71bf64-e049-4ea4-9b93-45d7021ce74b",
+      "name": "Send Message4",
+      "webhookId": "8098ff58-baaf-479a-a26e-a2d30b723a19",
+      "credentials": {
+        "telegramApi": {
+          "id": "tz1fYz1snqttWLEg",
+          "name": "Telegram Mi Asistente Personal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d5171300-4ca9-4551-ba37-23f72ccc5a13",
+              "name": "parte 1",
+              "value": "={{ $json.output.response.part_1 }}",
+              "type": "string"
+            },
+            {
+              "id": "e8f818ce-508a-44c6-bc42-f5e97e51ab97",
+              "name": "parte 2",
+              "value": "={{ $json.output.response.part_2 }}",
+              "type": "string"
+            },
+            {
+              "id": "55b9064e-0002-41b8-a61b-ab0cc9839b06",
+              "name": "parte 3",
+              "value": "={{ $json.output.response.part_3 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1360,
+        1120
+      ],
+      "id": "14e191fb-c127-482e-b641-4c7f632b63c7",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "['parte 1'], ['parte 2'], ['parte 3']",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -1140,
+        1120
+      ],
+      "id": "39278ccf-73d5-4893-b974-6bafd347c2dc",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger1').item.json.message.chat.id }}",
+        "text": "={{ $('Split Out1').item.json['[\\'parte 2\\']'] }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -140,
+        960
+      ],
+      "id": "3e47a86f-6954-4de7-8cfa-485676512252",
+      "name": "Send Message5",
+      "webhookId": "8098ff58-baaf-479a-a26e-a2d30b723a19",
+      "credentials": {
+        "telegramApi": {
+          "id": "tz1fYz1snqttWLEg",
+          "name": "Telegram Mi Asistente Personal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger1').item.json.message.chat.id }}",
+        "text": "={{ $json['[\\'parte 1\\']'] }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -900,
+        1120
+      ],
+      "id": "bc8bab22-a619-4d53-90c4-e2369b89c8ec",
+      "name": "Send Message6",
+      "webhookId": "8098ff58-baaf-479a-a26e-a2d30b723a19",
+      "credentials": {
+        "telegramApi": {
+          "id": "tz1fYz1snqttWLEg",
+          "name": "Telegram Mi Asistente Personal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4b92a1f4-d4bc-4689-87cf-1be40aa49c27",
+              "leftValue": "={{ $('Split Out1').item.json['[\\'parte 2\\']'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -660,
+        1120
+      ],
+      "id": "2afde624-9169-42d2-bac7-a3af18203427",
+      "name": "If Parte "
+    },
+    {
+      "parameters": {
+        "amount": "={{ $('Split Out1').item.json['[\\'parte 2\\']'].length * 0.01 }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -380,
+        960
+      ],
+      "id": "bd7f6d40-287a-4491-af9d-997d549f9ea8",
+      "name": "Wait4",
+      "webhookId": "353a6e1a-d782-4002-ae23-89023e57860e"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4b92a1f4-d4bc-4689-87cf-1be40aa49c27",
+              "leftValue": "={{ $('Split Out1').item.json['[\\'parte 3\\']'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        180,
+        1140
+      ],
+      "id": "4397457b-46d8-4790-b76d-89547b21b1da",
+      "name": "If Parte 4"
+    },
+    {
+      "parameters": {
+        "amount": "={{ $('Split Out1').item.json['[\\'parte 3\\']'].length * 0.01 }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        440,
+        1000
+      ],
+      "id": "d630fca1-f00d-4fe3-abe9-913de2f87dfb",
+      "name": "Wait5",
+      "webhookId": "c2f6de3c-f4f0-4bf0-9246-6190d7258b86"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        980,
+        1160
+      ],
+      "id": "a953690e-eead-4474-ade7-092c7f20dd69",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger1').item.json.message.chat.id }}",
+        "text": "={{ $('Split Out1').item.json['[\\'parte 3\\']'] }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        700,
+        1000
+      ],
+      "id": "6f2e6a69-b183-4d80-b0cb-69906c6b9ab8",
+      "name": "Send Message8",
+      "webhookId": "8098ff58-baaf-479a-a26e-a2d30b723a19",
+      "credentials": {
+        "telegramApi": {
+          "id": "tz1fYz1snqttWLEg",
+          "name": "Telegram Mi Asistente Personal"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Verificador de Respuesta",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificador de Respuesta": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Verificador de Respuesta",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "Send Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Verificador de Respuesta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get Audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Value",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Audio": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Value": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Send Message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Message2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Message3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        []
+      ]
+    },
+    "Send Message1": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Message2": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Message3": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Verificador de Respuesta1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificador de Respuesta1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Verificador de Respuesta1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send Message4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Verificador de Respuesta1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "Get Audio1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set Value1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Audio1": {
+      "main": [
+        [
+          {
+            "node": "OpenAI1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Value1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Send Message6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Message5": {
+      "main": [
+        [
+          {
+            "node": "If Parte 4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Message6": {
+      "main": [
+        [
+          {
+            "node": "If Parte ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Parte ": {
+      "main": [
+        [
+          {
+            "node": "Wait4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If Parte 4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait4": {
+      "main": [
+        [
+          {
+            "node": "Send Message5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Parte 4": {
+      "main": [
+        [
+          {
+            "node": "Wait5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait5": {
+      "main": [
+        [
+          {
+            "node": "Send Message8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Message8": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {
+    "Telegram Trigger": [
+      {
+        "json": {
+          "update_id": 142816475,
+          "message": {
+            "message_id": 46,
+            "from": {
+              "id": 543142820,
+              "is_bot": false,
+              "first_name": "►︎ Dani◄︎",
+              "username": "daniii23",
+              "language_code": "es",
+              "is_premium": true
+            },
+            "chat": {
+              "id": 543142820,
+              "first_name": "►︎ Dani◄︎",
+              "username": "daniii23",
+              "type": "private"
+            },
+            "date": 1747391142,
+            "text": "Que puedes hacer??"
+          }
+        }
+      }
+    ],
+    "Telegram Trigger1": [
+      {
+        "json": {
+          "update_id": 142816488,
+          "message": {
+            "message_id": 76,
+            "from": {
+              "id": 543142820,
+              "is_bot": false,
+              "first_name": "►︎ Dani◄︎",
+              "username": "daniii23",
+              "language_code": "es",
+              "is_premium": true
+            },
+            "chat": {
+              "id": 543142820,
+              "first_name": "►︎ Dani◄︎",
+              "username": "daniii23",
+              "type": "private"
+            },
+            "date": 1747412391,
+            "text": "Cuentame que puedes hacer"
+          }
+        }
+      }
+    ]
+  },
+  "versionId": "28209312-e4e8-4b76-aad1-c0efc74368cf",
+  "triggerCount": 1,
+  "tags": [
+    {
+      "createdAt": "2025-04-23T20:59:57.136Z",
+      "updatedAt": "2025-04-23T20:59:57.136Z",
+      "id": "Xq0NhXBZ2HnDESQS",
+      "name": "Agente"
+    }
+  ]
+}
