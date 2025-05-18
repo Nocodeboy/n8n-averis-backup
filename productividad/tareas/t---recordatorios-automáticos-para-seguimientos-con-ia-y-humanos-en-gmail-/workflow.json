@@ -1,0 +1,603 @@
+{
+  "createdAt": "2025-04-29T19:59:58.953Z",
+  "updatedAt": "2025-04-30T06:37:20.683Z",
+  "id": "V8OGq9dAUdV6n9p6",
+  "name": "T - Recordatorios automáticos para seguimientos con IA y humanos en Gmail",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "id": "af83fa96-dcec-4da8-a877-ebf80530c203",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        540,
+        700
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "mode": "id",
+          "value": "<your-calendar>"
+        },
+        "timeMin": "={{ $now.minus({ day: 4 }) }}",
+        "timeMax": "={{ $now.minus({ day: 2 }) }}",
+        "options": {}
+      },
+      "id": "a0dc037e-8f0c-476d-ae9a-d8c09042e324",
+      "name": "Get Past Events",
+      "type": "n8n-nodes-base.googleCalendar",
+      "position": [
+        720,
+        700
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "5bc683a8-d31c-4fbc-a660-bb677f0ecb96",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        1200,
+        740
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{\n{\n ...$('Loop Over Items').first().json,\n followUp: $json.isEmpty()\n}\n}}",
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "15b16fe1-0f0f-4d15-8be3-4d6a6fef0166",
+      "name": "Flag to Follow Up",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1580,
+        900
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "73f38d1b-75c6-4372-8e81-a2db61b045a8",
+              "operator": {
+                "name": "filter.operator.equals",
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "",
+              "rightValue": ""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5b7f9423-3470-41e8-b6c1-30dce04af545",
+      "name": "Only Follow Ups",
+      "type": "n8n-nodes-base.filter",
+      "position": [
+        1400,
+        740
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "limit": 1,
+        "filters": {
+          "q": "=(from:{{ $json.attendees.find(attendee => !attendee.self)?.email }} OR to:{{ $json.attendees.find(attendee => !attendee.self)?.email }})",
+          "receivedAfter": "={{ $json.end.dateTime }}"
+        }
+      },
+      "id": "7fa61036-f00e-4a22-bf05-fded04af7039",
+      "name": "Get Emails Since",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        1400,
+        900
+      ],
+      "webhookId": "08fbccff-cce6-461a-b040-f5a74920c803",
+      "typeVersion": 2.1,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n \"type\": \"object\",\n \"properties\": {\n \"slots\": {\n \"type\": \"array\",\n \"items\": {\n \"type\": \"object\",\n \"properties\": {\n \"start\": { \"type\": \"string\" },\n \"end\": { \"type\": \"string\" }\n }\n }\n }\n }\n}"
+      },
+      "id": "b48961f8-db28-41f5-8e99-57968710395d",
+      "name": "Output",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        2140,
+        920
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "resource": "calendar",
+        "calendar": {
+          "__rl": true,
+          "mode": "id",
+          "value": "<your-calendar>"
+        },
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start_Time', ``, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End_Time', ``, 'string') }}",
+        "options": {
+          "timezone": {
+            "__rl": true,
+            "mode": "id",
+            "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Timezone', ``, 'string') }}",
+            "__regex": "([-+/_a-zA-Z0-9]*)"
+          }
+        }
+      },
+      "id": "ad77e3b2-a72f-4d35-bf15-c45cc671534d",
+      "name": "Availability",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "position": [
+        2020,
+        920
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "f7a86a2b-7614-45d9-8794-7d3d9b474779",
+      "name": "Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        1900,
+        920
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=### Details of the previous call as following\ntitle: {{ $json.summary }}\ndate: {{ $json.start.dateTime }} {{ $json.start.timeZone }}\nduration: {{ DateTime.fromISO($json.end.dateTime).diffTo(DateTime.fromISO($json.start.dateTime), 'minutes') }} minutes",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a calendar availability assistant. Analyse the previous meeting and help me find a similar available slot for the next meeting.\n* take into consideration the day, time of day and duration of the previous meeting and try to set the same or similar for the next\n* next meeting should be in the future.\n* return a list of available slots so that I can forward them to the user.\n\nToday's date is {{ $now }}."
+        }
+      },
+      "id": "64491d72-a42d-40fb-8559-f31d73e724ad",
+      "name": "Meeting Availability Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1920,
+        740
+      ],
+      "typeVersion": 1.7
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cf09c95c-f25e-4fd7-bade-a0feaeaffb3b",
+              "name": "message",
+              "type": "string",
+              "value": "=Hey, just noticed there wasn't a follow-up email to {{ $('Only Follow Ups').item.json.attendees.find(x => !x.self).email }} after your last call a few days ago.\n\nHere's are a few available slots to book the next call.\n{{\n$json.output.slots\n .filter(slot => !DateTime.fromISO(slot.start).isWeekend())\n .map(slot => `* ${DateTime.fromISO(slot.start).format('cccc, DDD @ hh:mm')} - ${DateTime.fromISO(slot.end).format('hh:mm')}`)\n.join('\\n')\n}}\n\nLet me know which I should book or let me know if it's okay to dismiss."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "954c02e1-eed4-4f6a-951f-c23b349228cb",
+      "name": "Generate Message",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2260,
+        740
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "mode": "id",
+          "value": "<your-calendar>"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', ``, 'string') }}",
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "id": "6b949b6a-a100-41ad-8010-ef47410a58db",
+      "name": "Meetings",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "position": [
+        3360,
+        940
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "10258376-3a03-4ad8-8f09-a0e0f10e4f22",
+      "name": "Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        3180,
+        940
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.data.text }}",
+        "options": {
+          "systemMessage": "=You are a meeting booking agent. Your task is to book the meeting requested if confirmed by the user or otherwise do nothing if the user wants to disregard. No need to ask for further approval.\n\nAI: {{ $('Generate Message').first().json.message }}"
+        }
+      },
+      "id": "078e9ca9-9028-4c72-bd08-16733aede2fc",
+      "name": "Meeting Booking Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        3180,
+        760
+      ],
+      "typeVersion": 1.7
+    },
+    {
+      "parameters": {
+        "operation": "removeItemsSeenInPreviousExecutions",
+        "dedupeValue": "={{ $json.id }}",
+        "options": {}
+      },
+      "id": "78d32c39-483e-4728-abb8-a28c0c9391b4",
+      "name": "Mark as Seen",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "position": [
+        900,
+        700
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "content": "## 1. Get Recent Meetings\n[Learn more about the GCalendar node](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlecalendar)\n\nFor this template, a scheduled trigger is set to fire every morning to pull in past meetings from 2-3 days ago. A \"Remove Duplicates\" node ensures we don't double process events more than once between runs.",
+        "height": 420,
+        "width": 620,
+        "color": 7
+      },
+      "id": "7065d560-769a-4f22-bd70-9bad793f8533",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        460,
+        500
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 2. Check If Any Messages Since\n[Read more about the Gmail node](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.gmail)\n\nNext, we want to check if there has been any messages/contact between the lead and the user since the meeting ended. Where there is not, it could be a good opportunity to remind the user to reengage the lead as to not lose them.",
+        "height": 600,
+        "width": 680,
+        "color": 7
+      },
+      "id": "22b3911f-77f8-4a51-83f3-72729bd747bb",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1100,
+        540
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 3. Suggest Availability For Next Call\n[Read more about AI Agents](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.agent/)\n\nOnce filtered for applicable leads, we can use an AI Agent to suggest another meeting slot for them. An AI Agent can analyse the previous meeting details and use that information to suggest a similar date and time.",
+        "height": 580,
+        "width": 620,
+        "color": 7
+      },
+      "id": "c03d8aa1-2e83-40bc-83bf-e3c8b78d1dc0",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1800,
+        540
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 4. Get Human Approval\n[Learn more about n8n's Human-in-the-loop features](https://docs.n8n.io/advanced-ai/examples/human-fallback/)\n\nOf course, we don't want the AI to actually book the meeting unless the user confirms it is something he/she wants to do and the best way to confirm is just to ask the user directly! Thanks for n8n's Human-in-the-loop feature, we can achieve this with a number of messaging protocols.\n\nHere, we're using the Gmail node's **Send-and-wait-for-approval** mode. This will send an email to the user and give them a textbox to tell our agent what they want to do next.",
+        "height": 520,
+        "width": 540,
+        "color": 7
+      },
+      "id": "fb24c34a-5b05-40fa-b204-ba1b440634b6",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2440,
+        500
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 5. Book the meeting If Accepted\n[Learn more about the AI Agent node](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.agent/)\n\nFinally, the response from the user combined with the suggested availability slots are given to another AI agent which can book meetings. If the user accepted and confirmed a date, this agent will book the meeting on behalf of the user. If the user declined, then the agent takes no action.",
+        "height": 560,
+        "width": 640,
+        "color": 7
+      },
+      "id": "afe7f30c-806c-495f-9eff-26cf1fc768fe",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3000,
+        540
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Try it out!\n### This n8n template extends the idea of sales leads follow-up reminders by having an AI agent suggest and book the next call or message to reengage the prospect.\n\nWhat makes this template practical for use is that it uses the Human-in-the-loop approach to wait for a user's approval before actually making the booking. Without, this could be annoying for both the user and the recipient!\n\n### How it works\n* A scheduled trigger checks your google calendar for sales meetings which happened a few days ago.\n* For each event, gmail search is used to figure out if a follow-up message has been sent or received from the other party since the meeting. If none, we want to remind ourselves to reengage the lead.\n* For leads applicable for follow-up, we first get an AI Agent to find available meeting slots in the calendar.\n* These slots and reminder are sent to the user via send-and-approval mode of the gmail node. The user replies in natural language either picking a slot, suggesting an entirely new slot or declines the request.\n* When accepted, another AI Agent books the meeting in the calendar with the proposed dates and lead.\n\n### How to use\n* Update all calendar nodes (+subnodes) to point to the right calendar. If this is a shared-purpose calendar, you may need to either filter or create a new calendar.\n* Update the gmail nodes to point to the right accounts.\n\n### Customising the template\n* Not using Google? Swap out for Microsoft or otherwise.\n* Try swapping out or adding in additional send-for-approval methods such as telegram or whatsapp.\n\n### Need Help?\nJoin the [Discord](https://discord.com/invite/XPKeKXeB7d) or ask in the [Forum](https://community.n8n.io/)!",
+        "height": 980,
+        "width": 420
+      },
+      "id": "a19b903b-a55f-4f5f-9a6c-9685cfb934a1",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "=<your-email-here>",
+        "subject": "=Book a follow-up meeting with {{ $('Only Follow Ups').item.json.attendees.find(x => !x.self).email }}?",
+        "message": "={{ $json.message }}",
+        "responseType": "freeText",
+        "options": {}
+      },
+      "id": "05a6fe63-b619-4495-8818-3af1a7405a69",
+      "name": "Send for Human Approval",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        2660,
+        780
+      ],
+      "webhookId": "76b88312-1c54-482e-abdd-e699159577f0",
+      "typeVersion": 2.1
+    }
+  ],
+  "connections": {
+    "Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Meeting Availability Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Meeting Booking Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Output": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Meeting Availability Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meetings": {
+      "ai_tool": [
+        [
+          {
+            "node": "Meeting Booking Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Availability": {
+      "ai_tool": [
+        [
+          {
+            "node": "Meeting Availability Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark as Seen": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Past Events": {
+      "main": [
+        [
+          {
+            "node": "Mark as Seen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Only Follow Ups",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Emails Since",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Only Follow Ups": {
+      "main": [
+        [
+          {
+            "node": "Meeting Availability Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Message": {
+      "main": [
+        [
+          {
+            "node": "Send for Human Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Emails Since": {
+      "main": [
+        [
+          {
+            "node": "Flag to Follow Up",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Past Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Flag to Follow Up": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send for Human Approval": {
+      "main": [
+        [
+          {
+            "node": "Meeting Booking Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meeting Availability Agent": {
+      "main": [
+        [
+          {
+            "node": "Generate Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "89961827-ddd1-4f57-97a3-49de800047d3",
+  "triggerCount": 0,
+  "tags": []
+}
