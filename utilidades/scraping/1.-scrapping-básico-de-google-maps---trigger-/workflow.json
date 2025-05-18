@@ -1,0 +1,145 @@
+{
+  "createdAt": "2025-04-29T13:30:03.302Z",
+  "updatedAt": "2025-04-29T13:32:16.451Z",
+  "id": "LcfLQ2kuJbVt4ngh",
+  "name": "1. Scrapping básico de Google Maps - Trigger",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "b3fa3a35-a4c8-4a0a-b121-27e07d3beaae",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -380,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "c20yHkSbKSVp5EFJ",
+          "mode": "list",
+          "cachedResultName": "🛠️Scrape Demo"
+        },
+        "options": {}
+      },
+      "id": "efc62a84-cb31-4e89-8063-ebe1d77168e6",
+      "name": "Execute Workflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        -160,
+        200
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "id": "39fc5f9c-d764-41ab-9679-a2a12ee03633",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        60,
+        200
+      ],
+      "webhookId": "df85adf6-6c79-495e-9a80-b13b0d4df2c8"
+    },
+    {
+      "parameters": {},
+      "id": "ce7ced96-1d84-46f5-8263-11ec14099437",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -600,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## I actually don't think the Wait node is necessary\n",
+        "height": 355.2694215797759
+      },
+      "id": "f1169210-c468-45e3-97df-76b130fea589",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {
+    "When clicking ‘Test workflow’": [
+      {
+        "json": {
+          "query": "insert list of queries here for google map search"
+        }
+      }
+    ]
+  },
+  "versionId": "52400d80-f63e-4f0d-aeda-93d63d7cdb8e",
+  "triggerCount": 0,
+  "tags": []
+}
