@@ -1,0 +1,182 @@
+{
+  "createdAt": "2025-04-29T16:59:32.205Z",
+  "updatedAt": "2025-05-02T18:04:23.313Z",
+  "id": "psQiRGO9n1Z2Npao",
+  "name": "Integración de Google Search Console  para Monitorización de Rendimiento SEO",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        180
+      ],
+      "id": "49afa524-3fe8-489b-bd69-ec13f864d977",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://searchconsole.googleapis.com/v1/urlInspection/index:inspect",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"inspectionUrl\": \"YOUR_PAGE\",\n  \"siteUrl\": \"YOUR_DOMAIN\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        380
+      ],
+      "id": "153e8f3d-c9b2-4a7f-8f6b-25c11439e75d",
+      "name": "Inspect URL"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://searchconsole.googleapis.com/webmasters/v3/sites/YOUR_DOMAIN/searchAnalytics/query",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"startDate\": \"2025-02-26\",\n  \"endDate\": \"2025-03-26\",\n  \"dimensions\": [\"query\", \"date\"],\n  \"dimensionFilterGroups\": [{\n    \"filters\": [{\n      \"dimension\": \"page\",\n      \"operator\": \"equals\",\n      \"expression\": \"YOUR_PAGE\"\n    }]\n  }],\n  \"rowLimit\": 10000\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        180
+      ],
+      "id": "6730735d-3290-40dd-a3aa-aa16aa469aff",
+      "name": "Get Daily Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://searchconsole.googleapis.com/webmasters/v3/sites/YOUR_DOMAIN/searchAnalytics/query",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"startDate\": \"2025-02-26\",\n  \"endDate\": \"2025-03-26\",\n  \"dimensions\": [\"query\"],\n  \"dimensionFilterGroups\": [{\n    \"filters\": [{\n      \"dimension\": \"page\",\n      \"operator\": \"equals\",\n      \"expression\": \"YOUR_PAGE\"\n    }]\n  }],\n  \"rowLimit\": 25000\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a0ab469f-3dc7-4f38-8f01-5d11e91716ae",
+      "name": "Get Page Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.item.json.rows || $input.item.json;\n\n// Map each row to a cleaner format\nreturn rows.map(row => {\n  return {\n    query: row.keys[0],\n    clicks: row.clicks,\n    impressions: row.impressions,\n    ctr: row.ctr,\n    position: row.position\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "294903fb-044b-4c5f-8b6f-314cf38b0cb9",
+      "name": "Flatten Page Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.item.json.rows || $input.item.json;\n\n// Map each row to a cleaner format with query, date and metrics\nreturn rows.map(row => {\n  return {\n    query: row.keys[0],\n    date: row.keys[1],\n    clicks: row.clicks,\n    impressions: row.impressions,\n    ctr: row.ctr,\n    position: row.position\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        180
+      ],
+      "id": "42bc6a9d-122a-409c-8697-39fb5f8ec491",
+      "name": "Flatten Daily Data"
+    },
+    {
+      "parameters": {
+        "content": "Este flujo permite conectarse a la API de Google Search Console para extraer datos clave como impresiones, clics, CTR y posición media. Además, permite inspeccionar URLs específicas de tu sitio para verificar su estado de indexación, resultados enriquecidos y fecha del último rastreo. Los datos extraídos se preparan automáticamente para facilitar su análisis inmediato.\n\n2. Set Up Google Cloud Credentials\n\n\n\n\n\nGo to the Google Cloud Console.\n\n\n\nCreate a new project or select an existing one.\n\n\n\nNavigate to “APIs & Services” > “Credentials.”\n\n\n\nClick “Create Credentials” and choose “OAuth client ID.”\n\n\n\nSet the application type to “Web application.”\n\n\n\nAdd your n8n redirect URI (e.g., https://your-n8n-domain.com/rest/oauth2-credential/callback).\n\n\n\nSave and copy your Client ID and Client Secret.\n\n3. Enable the Google Search Console API\n\n\n\n\n\nIn the Google Cloud Console, go to “APIs & Services” > “Library.”\n\n\n\nSearch for “Search Console API.”\n\n\n\nClick on it and enable the API for your project.\n\n4. Add Google Credentials to n8n\n\n\n\n\n\nIn your n8n dashboard, go to “Credentials.”\n\n\n\nClick “New Credential” and select “Google API.”\n\n\n\nEnter your Client ID and Client Secret.\n\n\n\nSet the scope to:\nhttps://www.googleapis.com/auth/webmasters.readonly\n\n\n\nAuthenticate and save the credential.\n\n5. Import the Workflow Template\n\n\n\n\n\nDownload the workflow template included with this product.\n\n\n\nIn n8n, click “Import” and upload the workflow JSON file.\n\n\n\nOpen the imported workflow.",
+        "height": 920,
+        "width": 440
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -840,
+        -280
+      ],
+      "id": "d20e4f11-b0cc-4d2f-b181-d92b49113d5e",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get Daily Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Page Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Inspect URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Daily Data": {
+      "main": [
+        [
+          {
+            "node": "Flatten Daily Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Page Data": {
+      "main": [
+        [
+          {
+            "node": "Flatten Page Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "1cadd6fa-83a3-4234-896a-a0844fe48abc",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-04-29T11:12:24.236Z",
+      "updatedAt": "2025-04-29T11:12:24.236Z",
+      "id": "vlD9ysZ6ePOldrKn",
+      "name": "SEO"
+    }
+  ]
+}
