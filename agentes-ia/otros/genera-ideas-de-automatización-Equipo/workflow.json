@@ -1,0 +1,492 @@
+{
+  "createdAt": "2025-04-27T21:26:39.271Z",
+  "updatedAt": "2025-05-04T18:13:54.229Z",
+  "id": "5OooyOtP36G48W1a",
+  "name": "Genera ideas de Automatización",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "37f6d1d2-abb0-4652-ba54-47950140d88a",
+              "name": "Title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "6160cbf4-a7e3-42f8-aa10-1771fa6f4012",
+              "name": "Text",
+              "value": "={{ $json.selftext }}",
+              "type": "string"
+            },
+            {
+              "id": "ac5b7449-0feb-47da-9c9d-f0ed9fbc5284",
+              "name": "Author",
+              "value": "={{ $json.author }}",
+              "type": "string"
+            },
+            {
+              "id": "2b8f968d-25b5-4dd0-ba78-f79a93faf56c",
+              "name": "Upvotes",
+              "value": "={{ $json.ups }}",
+              "type": "string"
+            },
+            {
+              "id": "5556cf68-0a69-4ba5-a2cd-44d6c4208d72",
+              "name": "Date",
+              "value": "={{ $json.created.toDateTime('s').format('yyyy-MM-dd') }}",
+              "type": "string"
+            },
+            {
+              "id": "d23f9a22-bbec-48fe-83a8-abb8ee7c6f17",
+              "name": "URL",
+              "value": "={{ $json.url }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -860,
+        40
+      ],
+      "id": "c8361193-ba3e-46dc-8ed1-16141ac86b8d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -720,
+        220
+      ],
+      "id": "90473eff-2fe4-434e-920e-02d31c5b7009",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "subreddit": "coaching",
+        "limit": 30,
+        "filters": {
+          "category": "new"
+        }
+      },
+      "type": "n8n-nodes-base.reddit",
+      "typeVersion": 1,
+      "position": [
+        -1000,
+        40
+      ],
+      "id": "fbbcee00-a41f-4f5d-85a8-96f7fc9f12a3",
+      "name": "Reddit2",
+      "credentials": {
+        "redditOAuth2Api": {
+          "id": "CBUpv1RygDKvf2im",
+          "name": "Reddit account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1160,
+        40
+      ],
+      "id": "07bcb66a-2e1b-46a3-9669-4d0022a3f636",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "message.content"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        40
+      ],
+      "id": "4a5419ce-a983-40c0-aea3-41ae80f86abf",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Rol:\n\nEres un Hacker de Viabilidad y Escalabilidad de IA que analiza ideas de automatización para evaluar su potencial como modelo de negocio real.\n\nTarea:\n\nAnalizar cada idea recibida para detectar posibles riesgos de viabilidad, escalabilidad o implementación.\nEvaluar si la idea tiene suficiente tracción potencial y facilidad de ejecución como para no ser una solución mediocre.\nProporcionar sugerencias prácticas de mejora o alternativas más sólidas si es necesario.\n\n\nEvaluación de Viabilidad: ¿La idea tiene un mercado realista, un dolor fuerte y es técnicamente factible?\nEvaluación de Escalabilidad: ¿Puede crecer fácilmente en clientes, ingresos o uso sin que los costes se disparen?\nSugerencia de Optimización: Recomendación específica para hacer la idea más viable, escalable o menos dependiente de factores frágiles.\nEjemplo de Análisis:\n\nIdea recibida: Un sistema que automatiza la selección de memes personalizados para redes sociales de empresas.\n\nEvaluación de Viabilidad: El dolor de crear memes no es prioritario para la mayoría de negocios, y la demanda pagadora sería baja. Además, generar contenido humorístico efectivo automáticamente es técnicamente muy complejo.\n\nEvaluación de Escalabilidad: El servicio podría escalar en volumen, pero la calidad inconsistente afectaría la retención y la percepción de marca.\n\nLa cuestión es que debes ofrecer una respuesta accionable. Centrate en la utilidad para aplicar ya y sin teorias raras. Descarta ideas poco realistas. \n\n{\n  \"titulo\": \"Sistema de Trading Algorítmico para Análisis de Datos Históricos y Gestión de Riesgos\",\n  \"evaluacion_viabilidad\": {\n    \"mercado_realista\": \"Existe un mercado significativo para soluciones de trading algorítmico, especialmente entre traders activos y fondos de inversión.\",\n    \"dolor_fuerte\": \"La necesidad de reducir riesgos y maximizar rendimientos es crítica en el trading.\",\n    \"factibilidad_tecnica\": \"Las herramientas actualizadas permiten una implementación viable, aunque la competencia es alta.\"\n  },\n  \"evaluacion_escalabilidad\": {\n    \"escalabilidad\": \"Se pueden añadir nuevas características (análisis adicionales, más mercados, etc.) sin un aumento excesivo de costos.\"\n  },\n  \"sugerencia_optimizacion\": [\n    \"Ofrecer pruebas gratuitas o versiones demo para atraer a clientes iniciales.\",\n    \"Considerar alianzas estratégicas con brokers para mayores integraciones y ofertas.\"\n  ]\n}\nlas ideas: {{ $json.content }}\n"
+            }
+          ]
+        },
+        "simplify": false,
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        20,
+        40
+      ],
+      "id": "5232dfc8-990a-46c0-bfdd-02ea6551d34b",
+      "name": "Viabilizador",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Rol\n\nEres un Arquitecto de Soluciones de IA que analiza publicaciones de Reddit para identificar oportunidades de automatización y sugerir soluciones relevantes.\n\nTarea:\n\t•\tAnalizar la publicación de Reddit para detectar puntos de dolor específicos o desafíos operativos.\n\t•\tIdentificar posibles soluciones de automatización basadas en IA que puedan abordar estos problemas.\n\t•\tProporcionar sugerencias breves y prácticas de implementación.\n\nFormato de salida (3 oraciones por sección):\n\t•\tPotencial de Automatización: Lista los procesos específicos que podrían ser automatizados.\n\t•\tSugerencia de Solución: Recomienda herramientas o enfoques de IA relevantes.\n\nAnálisis de ejemplo:\n\nLa publicación describe la clasificación manual de tickets de soporte al cliente, que lleva más de 4 horas diarias. Los principales puntos de dolor incluyen errores de categorización y tiempos de respuesta retrasados. Este proceso muestra un alto potencial de automatización mediante procesamiento de lenguaje natural y algoritmos de clasificación.\n\nSugerencia de Solución: Implementar un sistema de clasificación de tickets usando GPT para la categorización automática y la asignación de prioridades. Esto podría reducir el tiempo de clasificación manual en un 80% y mejorar la precisión de las respuestas. La integración con el sistema de tickets existente podría lograrse mediante conexiones API.\n\nEl problema que debes leer:{{ $json.Text }}\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -420,
+        -40
+      ],
+      "id": "c3536a1c-f75d-4c93-b3f8-879cf5b97011",
+      "name": "Generador de ideas",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.Text }}",
+        "options": {
+          "categories": "Negativo, positivo\n",
+          "systemPromptTemplate": "Eres un analizador de sentimientos altamente inteligente y preciso. Analiza el sentimiento del texto proporcionado. Categorizalo en una de las siguientes opciones: categorias. Usa las instrucciones de formato proporcionadas. Solo entrega la respuesta en formato JSON"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.sentimentAnalysis",
+      "typeVersion": 1,
+      "position": [
+        -720,
+        40
+      ],
+      "id": "26a55532-4dbc-4995-83df-c5861c927fc8",
+      "name": "Análisis de sentimiento"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1RD918H_lQVfOP1HLASMLf9Te4KNsVnbIQipUCBwHxgM",
+          "mode": "list",
+          "cachedResultName": "reels",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RD918H_lQVfOP1HLASMLf9Te4KNsVnbIQipUCBwHxgM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RD918H_lQVfOP1HLASMLf9Te4KNsVnbIQipUCBwHxgM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Evaluacion Viabilidad": "={{ $json.choices[0].message.content.evaluaciones[0].evaluacion_viabilidad }}",
+            "Título ": "={{ $json.choices[0].message.content.evaluaciones[0].titulo }}",
+            "Dolor fuerte": "={{ $json.choices[0].message.content.evaluaciones[0].evaluacion_viabilidad.dolor_fuerte }}",
+            "Factibilidad tecnica": "={{ $json.choices[0].message.content.evaluaciones[0].evaluacion_viabilidad.factibilidad_tecnica }}",
+            "Escalabilidad": "={{ $json.choices[0].message.content.evaluaciones[1].evaluacion_escalabilidad.escalabilidad }}",
+            "Sugerencia 1": "={{ $json.choices[0].message.content.evaluaciones[9].sugerencia_optimizacion[0] }}",
+            "Sugerencia 2": "={{ $json.choices[0].message.content.evaluaciones[9].sugerencia_optimizacion[1] }}",
+            "Sugerencia 3": "={{ $json.choices[0].message.content.sugerencia_optimizacion[2] }}",
+            "Mercado realista": "={{ $json.choices[0].message.content.evaluaciones[0].evaluacion_viabilidad.mercado_realista }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "Título ",
+              "displayName": "Título ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Evaluacion Viabilidad",
+              "displayName": "Evaluacion Viabilidad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Mercado realista",
+              "displayName": "Mercado realista",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Dolor fuerte",
+              "displayName": "Dolor fuerte",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Factibilidad tecnica",
+              "displayName": "Factibilidad tecnica",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Escalabilidad",
+              "displayName": "Escalabilidad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Sugerencia 1",
+              "displayName": "Sugerencia 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Sugerencia 2",
+              "displayName": "Sugerencia 2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Sugerencia 3",
+              "displayName": "Sugerencia 3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "videoDuration",
+              "displayName": "videoDuration",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        300,
+        40
+      ],
+      "id": "c68eaa7c-6982-4cf7-9a42-bd03bf0b866f",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Ae7wYVNQMP6fIWzo",
+          "name": "Google Sheets daniel@averis.es"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Análisis de sentimiento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Análisis de sentimiento",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reddit2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Reddit2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Viabilizador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generador de ideas": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Análisis de sentimiento": {
+      "main": [
+        [
+          {
+            "node": "Generador de ideas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Viabilizador": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "61bc7050-a029-47cb-a57c-1e09cff1246a",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-04-29T19:42:59.836Z",
+      "updatedAt": "2025-04-29T19:42:59.836Z",
+      "id": "FdDXpcY55Jz87uYM",
+      "name": "Equipo"
+    },
+    {
+      "createdAt": "2025-04-29T19:43:02.719Z",
+      "updatedAt": "2025-04-29T19:43:02.719Z",
+      "id": "f4Ktt9X5htypJhIJ",
+      "name": "Ideas"
+    }
+  ]
+}
