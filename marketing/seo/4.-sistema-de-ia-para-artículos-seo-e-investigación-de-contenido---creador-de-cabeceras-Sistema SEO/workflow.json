@@ -1,0 +1,104 @@
+{
+  "createdAt": "2025-05-14T20:05:10.993Z",
+  "updatedAt": "2025-05-14T20:06:32.475Z",
+  "id": "rtHX8eXnSlpOyYJ9",
+  "name": "4. Sistema de IA para artículos SEO e Investigación de Contenido - Creador de Cabeceras",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "researchAnalysis",
+              "type": "any"
+            },
+            {
+              "name": "outline",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d6d1d74a-96b3-4433-9f4f-6977d85fdd53",
+      "name": "Workflow Input Trigger"
+    },
+    {
+      "parameters": {
+        "model": "claude-3-5-haiku-20241022",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.2,
+      "position": [
+        220,
+        180
+      ],
+      "id": "925c6706-fc23-4d62-bfc9-6e36e2d19ccb",
+      "name": "Anthropic Chat Model"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Context\n\nTodays date: {{ $now }}.\nOutline of our text: {{ $json.outline }}.\nResearch analysis: {{ $json.researchAnalysis }}.\n\n# Important\n\nOutput only the brief and nothing more. Don't output any filler words.",
+        "options": {
+          "systemMessage": "=# Role\nYou are a Brief Creation Specialist who provides clear instructions for headline writing agents.\n\n# Objective\nCreate a structured brief that guides headline writing agents in creating SEO-optimized, engaging headlines.\n\n# Input Processing\n1. Research Document Analysis:\n   - Extract primary and secondary keywords\n   - Identify key value propositions\n   - Note target audience characteristics\n   - Highlight key statistics/data points\n\n2. Content Outline Analysis:\n   - Identify main topic angle\n   - Extract core message\n   - Note key content elements\n\n# Brief Output Instructions\nProvide the following for the headline writing agent:\n\n1. Keyword Requirements:\n   - Primary keyword to include: [specify]\n   - Secondary keywords to consider: [list]\n   - Required keyword placement: [specify]\n\n2. Headline Parameters:\n   - Character count range\n   - Required elements (numbers, year, etc.)\n\n3. Value Propositions:\n   - Main benefit to highlight\n   - Supporting benefits\n   - Unique selling points\n\n4. Target Audience Considerations:\n   - Primary pain points to address\n   - Content type expectations\n\n5. Format Requirements:\n   - Required headline types (how-to, listicle, question, etc.)\n   - Special formatting instructions\n\n# Notes\n- Don't write headlines\n- Focus on providing clear instructions\n- Include all necessary context from research\n- Specify any mandatory elements\n- Note any restrictions or limitations\n\n# Important\n\nWrite in full explicit sentences, not just bullet points."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        220,
+        0
+      ],
+      "id": "10ec96ad-263f-4c4a-a7ab-317b128e22c8",
+      "name": "Headline  Brief Creator"
+    }
+  ],
+  "connections": {
+    "Workflow Input Trigger": {
+      "main": [
+        [
+          {
+            "node": "Headline  Brief Creator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Headline  Brief Creator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "d16312ae-ef70-4aff-bbf8-542a24fc67ac",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-05-14T20:03:21.385Z",
+      "updatedAt": "2025-05-14T20:03:21.385Z",
+      "id": "qYWvr9l3vKT2WSBu",
+      "name": "Sistema SEO"
+    }
+  ]
+}
