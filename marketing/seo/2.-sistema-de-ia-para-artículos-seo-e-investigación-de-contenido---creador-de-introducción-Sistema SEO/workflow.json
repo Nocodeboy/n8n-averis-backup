@@ -1,0 +1,104 @@
+{
+  "createdAt": "2025-05-14T20:03:56.646Z",
+  "updatedAt": "2025-05-14T20:05:49.618Z",
+  "id": "9cmtz4hrVKOcOjRJ",
+  "name": "2. Sistema de IA para artículos SEO e Investigación de Contenido - Creador de Introducción",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "researchAnalysis",
+              "type": "any"
+            },
+            {
+              "name": "outline",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c3e5c4a8-b906-4df4-8296-ac7d903627f1",
+      "name": "Workflow Input Trigger"
+    },
+    {
+      "parameters": {
+        "model": "claude-3-5-haiku-20241022",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.2,
+      "position": [
+        220,
+        180
+      ],
+      "id": "a07e552e-c986-4067-9f2e-9b0cc60d7514",
+      "name": "Anthropic Chat Model"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Context\n\nTodays date: {{ $now }}.\nOutline of our text: {{ $json.outline }}.\nResearch analysis: {{ $json.researchAnalysis }}.\n\n# Important\n\nOutput only the brief and nothing more. Don't output any filler words.",
+        "options": {
+          "systemMessage": "=# Role\nYou are a Brief Creation Specialist who provides detailed instructions for introduction writing agents.\n\n# Objective\nCreate a structured brief that guides introduction writing agents in creating engaging opening paragraphs.\n\n# Input Processing\n1. Research Document Analysis:\n   - Extract key statistics and data points\n   - Identify primary pain points\n   - Note market context\n   - List key value propositions\n\n2. Content Outline Analysis:\n   - Identify main topic focus\n   - Extract core message\n   - Note key points to preview\n\n# Brief Output Instructions\nProvide the following for the introduction writing agent:\n\n1. Opening Hook Instructions:\n   - Recommended hook type (statistic, question, scenario)\n   - Specific statistics or data to include\n   - Key pain points to address\n   - Tone and approach\n\n2. Structure Requirements:\n   - Number of paragraphs\n   - Key elements to include in each paragraph\n\n3. Keyword Integration:\n   - Primary keyword placement requirements\n   - Secondary keywords to include\n   - Natural language variations allowed\n\n4. Content Elements:\n   - Required statistics or data points\n   - Problem statement elements\n   - Solution preview requirements\n   - Transition specifications\n\n# Notes\n- Don't write the introduction\n- Focus on providing clear instructions\n- Include specific data points to use\n- Note required elements and structure\n- Specify transition requirements to main content\n\n# Important\n\nWrite in full explicit sentences, not just bullet points."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        220,
+        0
+      ],
+      "id": "ab681f1f-d7a5-4833-9164-f770ebc55e6f",
+      "name": "Introduction Brief Creator"
+    }
+  ],
+  "connections": {
+    "Workflow Input Trigger": {
+      "main": [
+        [
+          {
+            "node": "Introduction Brief Creator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Introduction Brief Creator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "6444f985-24b0-466d-ae0a-fa841c9bedcf",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-05-14T20:03:21.385Z",
+      "updatedAt": "2025-05-14T20:03:21.385Z",
+      "id": "qYWvr9l3vKT2WSBu",
+      "name": "Sistema SEO"
+    }
+  ]
+}
