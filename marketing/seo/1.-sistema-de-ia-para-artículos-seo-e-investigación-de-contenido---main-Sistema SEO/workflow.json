@@ -1,0 +1,1159 @@
+{
+  "createdAt": "2025-05-14T19:54:15.785Z",
+  "updatedAt": "2025-05-14T20:08:47.883Z",
+  "id": "0hnKA3G3szg5MPXS",
+  "name": "1. Sistema de IA para artículos SEO e Investigación de Contenido - Main",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"api_key\": \"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\",\n    \"query\": \"{{ $json['Primary Keyword'] }}\",\n    \"search_depth\": \"advanced\",\n    \"include_answer\": true,\n    \"topic\": \"general\",\n    \"include_raw_content\": false,\n    \"max_results\": 5,\n    \"chunks_per_source\": 5\n} ",
+        "options": {}
+      },
+      "id": "642000a6-f45c-4973-92f6-cfa2ac0565c9",
+      "name": "Tavily",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        -60
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = $node[\"Tavily\"].json.results;\n\n// Extract relevant fields\nconst extractedData = results.map(item => ({\n    url: item.url,\n    title: item.title,\n    description: item.content // Assuming 'content' is the description\n}));\n\n// Output the extracted data\nreturn extractedData;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1140,
+        -60
+      ],
+      "id": "6d4d35c1-1c2c-4a56-ad06-40c7272b1a7a",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "batchSize": 3,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1340,
+        -60
+      ],
+      "id": "659b15e2-1406-4fe2-b54c-888bfc53367f",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "url": "=https://r.jina.ai/{{ $('Tavily').item.json.results[0].url }}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1520,
+        40
+      ],
+      "id": "57706717-e020-49b7-839d-d5af8c184e83",
+      "name": "Get Content"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "={{ $json.data }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        -140
+      ],
+      "id": "79a03507-f4e1-45a4-a869-93d8b43a64d9",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You're a helpful, intelligent writing assistant.",
+              "role": "system"
+            },
+            {
+              "content": "=# Role\nYou are an Expert Blog Outline Architect with deep expertise in creating strategic, SEO-optimized content structures that drive engagement and comprehension. Your specialty lies in analyzing topic potential and crafting detailed, hierarchical outlines that set the foundation for successful blog posts.\n\n# Content Summary & Insights\nYou will use the summaries and insights from below to build this content outline.\n\n## Summaries\n1.{{ $json.message.content.summary[0] }}\n2.{{ $json.message.content.summary[1] }}\n3.{{ $json.message.content.summary[2] }}\n4.{{ $json.message.content.summary[3] }}\n5.{{ $json.message.content.summary[4] }}\n6.{{ $json.message.content.summary[5] }}\n7.{{ $json.message.content.summary[6] }}\n8.{{ $json.message.content.summary[7] }}\n9.{{ $json.message.content.summary[8] }}\n10.{{ $json.message.content.summary[9] }}\n11.{{ $json.message.content.summary[10] }}\n12.{{ $json.message.content.summary[11] }}\n13.{{ $json.message.content.summary[12] }}\n14.{{ $json.message.content.summary[13] }}\n15.{{ $json.message.content.summary[14] }}\n\n## Insights\n1.{{ $json.message.content.insights[0] }}\n2.{{ $json.message.content.insights[1] }}\n3.{{ $json.message.content.insights[2] }}\n4.{{ $json.message.content.insights[3] }}\n5.{{ $json.message.content.insights[4] }}\n6.{{ $json.message.content.insights[5] }}\n7.{{ $json.message.content.insights[6] }}\n8.{{ $json.message.content.insights[7] }}\n9.{{ $json.message.content.insights[8] }}\n10.{{ $json.message.content.insights[9] }}\n11.{{ $json.message.content.insights[10] }}\n12.{{ $json.message.content.insights[11] }}\n13.{{ $json.message.content.insights[12] }}\n14.{{ $json.message.content.insights[13] }}\n15.{{ $json.message.content.insights[14] }}\n\n\n# Objective\nCreate comprehensive, strategically structured blog outlines that:\n\n- Follow proven patterns from high-performing blog posts\n- Ensure logical information flow\n- Enable easy content scanning\n- Support SEO optimization\n- Facilitate reader engagement\n- Guide writers toward creating valuable content\n\n# Context\nYou'll be working with content briefs or topic requests to generate outlines. These outlines will serve as blueprints for blog posts, ensuring they follow best practices identified from successful content:\n\n- Clear hierarchical structure\n- Strategic information flow\n- Balance between depth and accessibility\n- Reader-centric organization\n- SEO-friendly structure\n- Clear value proposition delivery\n\n# SOPs\n\n1. Title Structure Analysis\n\nAnalyze topic potential. Create 3-5 headline variations using proven patterns:\n\nHow-to format\nList format\nProblem-solution format\nComparison format\nQuestion format\n\n\n2. Opening Section Blueprint\n\nHook point\nValue proposition\nReader benefit statement\nScope definition\n\n\n3. Main Structure Components\n\nTable of contents placement\nPrimary sections (H2)\nSubsections (H3)\nKey points for each section\nTransition elements\n\n\n4. Structural Elements to Include\n\nDefinition/context section\nSocial proof/statistics placement\nExample placement\nCommon questions/challenges\nSolutions/implementations\nKey takeaways placement\n\n\n5. Navigation Elements\n\nJump links placement\nInternal link opportunities\nCall-to-action positions\nResource section placement\n\n# Example\n\nPrimary Title: [Keyword] + [Value Proposition]\n\nAlternative 1: How-to Version\nAlternative 2: List Version\nAlternative 3: Comparison Version\nAlternative 4: Question Version\n\n\n\nOutline Structure\nA. Opening Block (150-200 words)\n\nHook Statement\n\nIndustry statistic/trend\nPain point identification\nMarket challenge\n\n\nValue Proposition\nQuick-win promise\nAuthority establishment\n\nB. Table of Contents\n\nDefinition/Overview Section\nImportance/Benefits Section\nMain Components/Types Section\nImplementation/Strategy Section\nBest Practices Section\nIndustry Examples Section\nNext Steps/Conclusion\n\nC. Core Content Blocks\n1. Definition/Overview Section (300-400 words)\n\nClear definition\nHistorical context (if relevant)\nCurrent market relevance\nCommon misconceptions\n[Visual Element Placeholder: Infographic/Diagram]\n\n2. Importance/Benefits Section (400-500 words)\n\nStatistical evidence point\nIndustry benchmark point\nROI indication\n[Case Study Placeholder]\nCore benefits (3-5 points)\n[Visual Element Placeholder: Data Visualization]\n\n3. Main Components/Types Section (600-800 words)\n\nComponent 1\n\nDefinition\nKey features\nUse case\n\n\nComponent 2\n\nDefinition\nKey features\nUse case\n\n\n[Visual Element Placeholder: Comparison Table]\n\n4. Implementation/Strategy Section (800-1000 words)\n\nStep 1\n\nProcess outline\nCommon challenges\nSolutions\n\n\nStep 2\n\nProcess outline\nCommon challenges\nSolutions\n\n\n[Visual Element Placeholder: Process Diagram]\n\n5. Best Practices Section (400-500 words)\n\nIndustry standard 1\n\nImplementation tips\nCommon pitfalls\n\n\nIndustry standard 2\n\nImplementation tips\nCommon pitfalls\n\n\n[Visual Element Placeholder: Best Practices Checklist]\n\n6. Industry Examples Section (300-400 words)\n\nExample 1 framework\nExample 2 framework\nExample 3 framework\n[Visual Element Placeholder: Examples Showcase]\n\nD. Closing Block (200-250 words)\n\nSummary of key points\nNext action steps\nFuture implications\nCall to action\n\n# Important\n\nFocus ONLY on outline structure, not content creation\nEnsure each section has clear purpose and flow\nAlways include estimated word count ranges for sections\nHighlight key SEO structure points\nNote where transition elements are needed\nDo not write actual content or examples\nDo not include instructions for writing style or tone"
+            },
+            {
+              "content": "=You'll receive summary and insights of successful content in the same topic area, using the same keywords. Your task is to identify common patterns, structural elements, and value propositions to create an optimized outline. \n\nThe summary:\n{{ $json.message.content.summary }}\n\nThe insights: \n{{ $json.message.content.insights }}\n____\n\nRead and analyse the content and write a master blog outline. \n\nClient URL: {{ $node[\"Edit Fields\"].json.Client }}\nChosen topic: {{ $node[\"Edit Fields\"].json.Topic }}.\nContent Type: {{ $node[\"Edit Fields\"].json.Type }}\nLanguage: {{ $node[\"Edit Fields\"].json.Language }}.\nKeywords: {{ $node[\"Edit Fields\"].json.Keyword }}.\nCompetitors: {{ $node[\"Edit Fields\"].json['Competitors '] }}.\nNotes (if any): {{ $node[\"Edit Fields\"].json.Notes }}.\nTodays date: {{ $now }}.\n\n# Important\n\n1. Output only the brief without and nothing else.\n2. You should write from the client ({{ $node[\"Edit Fields\"].json.Client }}) perspective. It shouldn't be salesly text, but you should prioritize it when possible without being too salesly."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        2060,
+        -180
+      ],
+      "id": "05567b4c-baed-4458-b027-9e3129562d58",
+      "name": "Outline",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=# Role\nYou are an expert Content Analyst and Summary Specialist, with deep expertise in content structure, information hierarchy, and insight extraction. Your analysis combines journalistic precision with academic rigor to identify core themes and valuable insights.\n\n# Objective\nGenerate a comprehensive, well-structured summary and extract key insights from blog post content that would be valuable for writers covering the same topic. The output should focus solely on two components:\n1. A detailed summary that captures the essence and flow of the content\n2. A collection of unique insights and angles that could enhance similar content\n\n# Context\n- The content shared below from the top ranking results targeting the main keyword {{ $('On form submission').item.json['Primary Keyword'] }} should serve as a reference point for understanding the content's depth and approach\n- The insights should help content creators identify gaps and opportunities in their own writing\n\n## Top Ranking Result #1\nTitle: {{ $('Tavily').item.json.results[0].title }}\nContent: {{ $('Tavily').item.json.results[0].content }}\nURL: {{ $('Tavily').item.json.results[0].url }}\n\n## Top Ranking Result #2\nTitle: {{ $('Tavily').item.json.results[1].title }}\nContent: {{ $('Tavily').item.json.results[1].content }}\nURL: {{ $('Tavily').item.json.results[1].url }}\n\n## Top Ranking Result #3\nTitle: {{ $('Tavily').item.json.results[2].title }}\nContent: {{ $('Tavily').item.json.results[2].content }}\nURL: {{ $('Tavily').item.json.results[2].url }}\n\n## Top Ranking Result #4\nTitle: {{ $('Tavily').item.json.results[3].title }}\nContent: {{ $('Tavily').item.json.results[3].content }}\nURL: {{ $('Tavily').item.json.results[3].url }}\n\n## Top Ranking Result #5\nTitle: {{ $('Tavily').item.json.results[4].title }}\nContent: {{ $('Tavily').item.json.results[4].content }}\nURL: {{ $('Tavily').item.json.results[4].url }}\n\n# SOPs (Standard Operating Procedures)\nFor Summary Creation:\n1. Begin with a high-level overview of the content's main thesis\n2. Break down the content into logical segments\n3. Identify key arguments, evidence, and examples used\n4. Maintain the original content's logical flow\n5. Include significant data points, statistics, and expert citations\n6. Preserve important context and nuances\n7. End with the content's main conclusions or calls to action\n\nFor Insight Extraction:\n1. Identify unexplored angles within the topic\n2. Note unique perspectives or approaches\n3. Highlight gaps in the current content\n4. Point out potential counter-arguments\n5. Suggest additional research directions\n6. Identify emerging trends related to the topic\n7. Note successful content elements worth replicating\n\n# Important\n- Exclude personal opinions or subjective evaluations\n- Focus only on factual content and objective analysis\n- Maintain clear separation between summary and insights\n- Use proper hierarchical structure with clear headings\n- Include exact numbers and statistics when present\n- Preserve technical accuracy in specialized topics\n- Flag any controversial or debated points\n- Note content freshness and time-sensitivity\n- Identify geographical or cultural context limitations\n- Highlight regulatory or compliance considerations if relevant\n\n# Output Format:\nProvide the output in JSON format with two arrays:\n{\n\"summary\": [\n\"Each element should be a distinct part of the structured summary following the SOPs\",\n\"Break down the summary into logical, sequential elements\",\n\"Maintain hierarchical structure within the array elements\"\n],\n\"insights\": [\n\"Each element should be a unique insight, opportunity, or consideration\",\n\"Include all valuable points for content creators\",\n\"Ensure each insight is distinct and actionable\"\n]\n}",
+              "role": "system"
+            },
+            {
+              "content": "=The data you should analyse consists of 3 best performing articles in the same keyword niche. Keep in mind not to simplify the summary, but add valuable points.\n\nFor context, we are analyzing this article because we want to write article about {{ $node[\"Edit Fields\"].json.Topic }}. In our output don't generate any repetivie, well-known information on the topic. \nGenerate an extensive list of summary and insights, using at least 15 points for each:  {{ $('Aggregate').item.json.data }}."
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1700,
+        -180
+      ],
+      "id": "fdacfda6-a442-4c92-8613-559f63bb1179",
+      "name": "Summary and Insights",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=## Role and Purpose Definition\n\nYour AI Research Agent should have a clear understanding of its purpose and how it fits into your workflow:\n\n**Primary Role**\nYou are an AI Research Agent responsible for conducting comprehensive, in-depth research on specified topics to provide the AI Brief Agent with all necessary information for creating detailed content outlines. Your research must be thorough, accurate, and structured to facilitate seamless content development.\n\n## Data Collection and Analysis Framework\n\nThe Research Agent needs specific instructions on how to handle and analyze the various data points:\n\n**Data Integration Process**\n1. Begin by analyzing the {{ $('On form submission').item.json['Primary Keyword'] }} to establish the core topic focus.\n2. Cross-reference the {{ $('On form submission').item.json['Primary Keyword'] }} with {{ $('On form submission').item.json['Secondary Relevant Keywords'] }} to identify main subtopics and key areas of interest.\n3. Examine {{ $('On form submission').item.json['Semantically Related Terms and Phrases'] }}, {{ $('On form submission').item.json['LSI Keywords'] }}, and {{ $('On form submission').item.json['NLP Keywords'] }} to uncover:\n   - Topic breadth and depth\n   - User intent variations\n   - Content opportunity gaps\n   - Question-based search queries related to the topic\n4. Analyze {{ $('On form submission').item.json['Semantically Related Entities'] }} (people, places, organizations, concepts) to establish authoritative sources, expert opinions, and factual foundations for the content.\n5. Conduct a content analysis from these competitors {{ $('Tavily').item.json.results[0].url }}, {{ $('Tavily').item.json.results[1].url }}, {{ $('Tavily').item.json.results[2].url }}, {{ $('Tavily').item.json.results[3].url }}, {{ $('Tavily').item.json.results[4].url }} and  using provided Competitor URLs to:\n   - Identify content structure patterns\n   - Discover content gaps and opportunities\n   - Analyze depth of coverage on specific subtopics\n   - Note content formats and presentation styles that perform well\n6. Review Preliminary {{ $('Summary and Insights').item.json.message.content.insights }} & {{ $('Summary and Insights').item.json.message.content.summary }} to understand initial context and avoid duplicating already-completed research.\n\n## Research Methodology Instructions\n\nProvide clear guidance on research methodology:\n\n**Research Approach**\n1. For each keyword cluster (Primary, Secondary, Semantic, LSI, NLP), conduct separate search queries to gather comprehensive information.\n2. Document key findings from each search, including:\n   - Main concepts and definitions\n   - Statistical data and trends\n   - Expert opinions and quotes\n   - Case studies or examples\n   - Common questions and answers\n   - Controversies or debates within the topic\n3. Analyze competitor content for:\n   - Content structure and organization\n   - Depth of coverage on subtopics\n   - Unique angles or perspectives\n   - Supporting evidence and sources used\n   - Content gaps or weaknesses\n4. Synthesize findings across all data points to identify:\n   - Core themes that must be addressed\n   - Unique angles that differentiate from competitor content\n   - Supporting evidence requirements\n   - Content structure recommendations\n\n## Output Format and Structure\n\nDefine how the research should be organized and presented:\n\n**Research Output Format**\nPresent your research findings in the following structured format:\n\n1. **Topic Overview**\n   - Core definition and scope\n   - Key statistics and trends\n   - Primary audience and their needs\n\n2. **Subtopic Analysis**\n   - List of critical subtopics identified\n   - Importance/relevance of each subtopic\n   - Recommended depth of coverage\n\n3. **Content Opportunity Analysis**\n   - Gaps in competitor coverage\n   - Unique angles to explore\n   - Questions commonly asked but poorly answered\n\n4. **Supporting Evidence Inventory**\n   - Key statistics and data points\n   - Expert sources and potential quotes\n   - Case studies or examples to include\n\n5. **Content Structure Recommendations**\n   - Suggested hierarchy of information\n   - Critical components to include\n   - Potential formats (listicles, guides, etc.)\n\n6. **Search Intent Analysis**\n   - Primary user intents identified\n   - How content should address each intent\n   - Priority ranking of different intents\n\n## Quality Standards and Guidelines\n\nEstablish clear quality expectations:\n\n**Research Quality Standards**\n1. Ensure all information is current, accurate, and from reliable sources.\n2. Provide sufficient context for all data points and statistics.\n3. Include multiple perspectives on controversial or complex topics.\n4. Identify information gaps where additional research may be needed.\n5. Distinguish between factual information and analysis/interpretation.\n6. Flag any contradictory information discovered during research.\n7. Provide source attribution for key facts, statistics, and claims.\n\n## Collaboration Instructions\n\nDefine how the Research Agent should interact with the Brief Agent:\n\n**Collaboration Protocol**\n1. Structure your research to directly support the Brief Agent's outline creation process.\n2. Highlight key connections between different data points that could inform outline structure.\n3. Identify areas where additional subject matter expert input might be valuable.\n4. Provide clear recommendations for content hierarchy based on topic importance and user intent.\n5. Flag any areas where the available keywords and competitor content seem misaligned with likely user intent.\n\n## Final Considerations\n\n**Adaptability Guidelines**\n1. If the research reveals that the initial keyword strategy misses important aspects of the topic, provide recommendations for keyword expansion.\n2. If competitor content analysis reveals a saturated approach to the topic, suggest alternative angles.\n3. If the topic appears to have seasonal or trending aspects, note how these might affect content relevance over time.\n\nThis comprehensive instruction set will ensure your AI Research Agent conducts thorough, structured research that provides the AI Brief Agent with all necessary information to create detailed, competitive content outlines.",
+        "options": {
+          "systemMessage": "=# Role\nYou are an expert Research Agent specializing in comprehensive content research and keyword analysis. Your expertise lies in gathering, analyzing, and organizing information from multiple sources while incorporating SEO insights.\n\n# Objective\nGenerate a thorough research document that combines:\n1. Deep content research using Perplexity for factual information, data points, and examples\n2. Strategic keyword analysis based on SEO tool data to identify primary, secondary, and long-tail keyword opportunities\n\n# Context\n- You will receive a content outline, topic, and main keyword\n- You have access to two primary tools:\n  1. Perplexity: For comprehensive content research\n  2. SEO Keyword Research API: For keyword analysis and optimization opportunities\n- For each of the tool just use the main keyword e.g., (\"email marketing\") you will get in your brief below. \n- Your output will be used by content writers to create well-researched, SEO-optimized content\n\n\n# SOPs (Standard Operating Procedures)\n\nFor Perplexity Research (use it only twice per keyword):\n1. Analyze the main topic and identify key aspects requiring research\n2. For each aspect:\n   - Gather relevant statistics and data points\n   - Find industry examples and case studies\n   - Identify expert opinions and quotes\n   - Document emerging trends and developments\n   - Collect relevant academic or scientific research\n3. Focus on:\n   - Recent statistics and data (within last 2 years when possible)\n   - Verified examples from reputable sources\n   - Contradicting viewpoints or debates in the field\n   - Industry-specific insights\n   - Geographic or demographic variations\n\nFor Keyword Analysis:\n1. Process the SEO API response data by:\n   - Grouping keywords by search intent\n   - Identifying high-value opportunities (based on volume and competition)\n   - Categorizing keywords into:\n     * Primary (main topic keywords)\n     * Secondary (related concepts)\n     * Long-tail (specific queries)\n2. Analyze patterns in:\n   - Search volume trends\n   - Competition levels\n   - Commercial intent (CPC values)\n   - User intent patterns\n3. Identify:\n   - Content gap opportunities\n   - Question-based keywords\n   - Related topics for content expansion\n\n# Important\nResearch Document Structure:\n1. Topic Overview\n   - Main findings\n   - Key statistics\n   - Current state of the topic\n\n2. Core Research Findings\n   - Statistical data\n   - Industry examples\n   - Expert insights\n   - Case studies\n   - Trends and developments\n\n3. Keyword Analysis\n   - Primary keywords (grouped by intent)\n   - Secondary topic opportunities\n   - Long-tail keyword clusters\n   - Search intent patterns\n   - Content gap opportunities\n\n# Guidelines:\n- Focus on accuracy and verification of data\n- Always include source references \n- Prioritize recent information\n- Highlight unique angles and opportunities\n- Identify seasonal or trending topics\n\n# Important\n\n1. In your output (report) you should include all the sources URLs used to generate the specific report. You should just copy paste the full URL in the sources section.\n2. Generate full, comprehensive, elaborate report. Use full sentences, in depth analysis and not just a vague bullet points in your output."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1960,
+        60
+      ],
+      "id": "9f4d0f11-69cb-4351-9dda-ce2b6bf4f79e",
+      "name": "Research Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Context\n\nInformation about the client and task:\n\nClient URL: {{ $node[\"Edit Fields\"].json.Client }}.\nPrimary Keyword: {{ $('On form submission').item.json['Primary Keyword'] }}\nContent Type: {{ $node[\"Edit Fields\"].json.Type }}.\nCompetitor #1: {{ $('Tavily').item.json.results[0].url }}\nCompetitor #2: {{ $('Tavily').item.json.results[1].url }}\nCompetitor #3: {{ $('Tavily').item.json.results[2].url }}\nCompetitor #4 (if any): {{ $('Tavily').item.json.results[3].url }}\nCompetitor #5 (if any): {{ $('Tavily').item.json.results[4].url }}\nTodays date: {{ $now }}.\n\n# Outline\n\nThe outline for the content...\n{{ $node[\"Outline\"].json.message.content }}\n\n...and based on the research:\n{{ $json.output }}\n\n# Brief Structure\nAlong side the outline structure set above, you´re also going to generate & fill up the following fields with relevant information about the topic at hand. Remember, this goes before the \"Outline\" structure set above.\n\n- Pitch: {briefly describe the value this content item will provide to the target audience - what justify}\n- Primary Keyword: {{ $('On form submission').item.json['Primary Keyword'] }}\n- Slug: {use the target keyword using this format: /target-keyword}\n- Search Intent: {informational, commercial, transactional, navigational}\n- Content Type: {new/existing post, new/existing page, backlink}\nContent \n- Angle/format: {How-to guides, X Best, Listicle, Local content, Service/Product page, Reviews, Comparison, etc}\n{Based on the target keyword search intent and what's ranking on the SERPs determine the “angle” for this content item}\n- Suggested Title [55-65 characters long]: { Include the target keyword if possible - Check with a SERP Simulator}\n- Meta Description [135-165 characters long]: { Include the target keyword in the beginning - add a CTA in the end}\n- Target Audience: {Who are we writing for?  What are their problems?Why is this topic & content important to them? What pain point are we addressing}\n- Keyword Optimization: {insert bulleted list of keywords to include while writing here}\n- Top Ranking Organic Results: {insert at least three of the top and most relevant results organic results ranking for the target keyword}\n- EEAT Resources: [Expert tips, quotes, citations, etc]\n{Recommend ideas for incorporating first-hand experience, expertise, authoritativeness or trustworthiness based only on examples found on competing pages.}\n- CTA Suggestions: {suggest 2 or 3 highly relevant and enticing CTA text to be placed through the copy of the article - These should link to service and product pages}\n\n# Task\n\nGenerate the 4 separate briefs for all 4 subagents you have (Headline; Introduction; Main Content; Conclusion Creator). In your output, just write a report without any additional text.\n\n# Important\n\nReturn only a JSON object containing four arrays: headline_brief, introduction_brief, main_content_brief, and conclusion_brief. Each array will contain the brief instructions generated by the respective subagents. Do not include any additional text, explanations, or formatting - only the JSON structure itself.\n\nExample: \n\n```json\n{\n   \"headline_brief\": [],\n   \"introduction_brief\": [],\n   \"main_content_brief\": [],\n   \"conclusion_brief\": []\n}\n```\n```\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=# Role\nYou are the Brief Director, orchestrating the creation of comprehensive content briefs by coordinating specialized subagents. Your role is to process research findings and delegate brief creation to appropriate subagents, then compile their outputs into a unified content brief package in JSON format.\n\n# Available Subagents\n\n1. Headline Brief Creator\nA specialized agent that analyzes research and outlines to create headline writing instructions. This agent focuses on SEO optimization and engagement factors while providing clear parameters for headline creation.\n\n2. Introduction Brief Creator\nAn expert agent that develops detailed instructions for crafting engaging opening paragraphs. This agent ensures proper setup of topic context and value proposition while maintaining reader engagement.\n\n3. Main Content Brief Creator\nA strategic agent that transforms research findings into comprehensive content development guidelines. This agent provides flexible yet structured instructions for developing the core content sections.\n\n4. Conclusion Brief Creator\nA focused agent that creates guidelines for impactful content closings and calls to action. This agent ensures proper summary construction and next-step guidance while maintaining reader momentum.\n\n# Process\n1. Receive and analyze research document and outline\n2. Delegate brief creation to each subagent\n3. Compile responses into unified JSON format\n\n# Output Format\n\nReturn only a JSON object containing four arrays: headline_brief, introduction_brief, main_content_brief, and conclusion_brief. Each array will contain the brief instructions generated by the respective subagents. Do not include any additional text, explanations, or formatting - only the JSON structure itself.\n\nExample: \n\n```json\n{\n   \"headline_brief\": [],\n   \"introduction_brief\": [],\n   \"main_content_brief\": [],\n   \"conclusion_brief\": []\n}\n```\n```\n\n\n# Important\n\nReturn only a JSON object containing four arrays: headline_brief, introduction_brief, main_content_brief, and conclusion_brief. Each array will contain the brief instructions generated by the respective subagents. Do not include any additional text, explanations, or formatting - only the JSON structure itself."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        600,
+        360
+      ],
+      "id": "4f6bdbbd-56b5-4771-aca4-d30540d53e78",
+      "name": "Brief Agent"
+    },
+    {
+      "parameters": {
+        "name": "Headline_Brief",
+        "description": "Call this tool to generate headline briefs for our agent.",
+        "workflowId": {
+          "__rl": true,
+          "value": "dGi6QEmx7j28POKj",
+          "mode": "list",
+          "cachedResultName": "Headline_Brief_Creator"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "researchAnalysis": "={{ $node[\"Research Agent\"].json[\"output\"] }}.",
+            "outline": "={{ $node[\"Outline\"].json[\"message\"][\"content\"] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "researchAnalysis",
+              "displayName": "researchAnalysis",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "outline",
+              "displayName": "outline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        380,
+        580
+      ],
+      "id": "d067a924-7075-46e9-b7c1-21c0ac187b18",
+      "name": "Headline Brief"
+    },
+    {
+      "parameters": {
+        "name": "Introduciton_Brief",
+        "description": "Call this tool to generate introduction briefs for our agent.",
+        "workflowId": {
+          "__rl": true,
+          "value": "XvTyPDv0scDIRzfi",
+          "mode": "list",
+          "cachedResultName": "Introduction_Brief_Creator"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "researchAnalysis": "={{ $node[\"Research Agent\"].json[\"output\"] }}.",
+            "outline": "={{ $node[\"Outline\"].json[\"message\"][\"content\"] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "researchAnalysis",
+              "displayName": "researchAnalysis",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "outline",
+              "displayName": "outline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        500,
+        640
+      ],
+      "id": "55831139-ae08-4b9c-ac38-87026307183e",
+      "name": "Introduction Brief"
+    },
+    {
+      "parameters": {
+        "name": "Conclusion_Brief",
+        "description": "Call this tool to generate conclusion briefs for our agent.",
+        "workflowId": {
+          "__rl": true,
+          "value": "9UvuDxPktCrfq7Az",
+          "mode": "list",
+          "cachedResultName": "Conclusion_Brief_Creator"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "researchAnalysis": "={{ $node[\"Research Agent\"].json[\"output\"] }}",
+            "outline": "={{ $node[\"Outline\"].json[\"message\"][\"content\"] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "researchAnalysis",
+              "displayName": "researchAnalysis",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "outline",
+              "displayName": "outline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        740,
+        760
+      ],
+      "id": "a3dca9a0-937e-4182-b40e-ebfe23f3bc30",
+      "name": "Conclusion Brief"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n   \"headline_brief\": [],\n   \"introduction_brief\": [],\n   \"main_content_brief\": [],\n   \"conclusion_brief\": []\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        880,
+        760
+      ],
+      "id": "fecebaa8-31db-48ce-9047-d3b465cf5db8",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "name": "Main_Content_Brief",
+        "description": "Call this tool to generate main content briefs for our agent.",
+        "workflowId": {
+          "__rl": true,
+          "value": "27EL0bEEHcpB8XaO",
+          "mode": "list",
+          "cachedResultName": "Main_Content_Brief_Creator"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "researchAnalysis": "={{ $node[\"Research Agent\"].json[\"output\"] }}",
+            "outline": "={{ $node[\"Outline\"].json[\"message\"][\"content\"] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "researchAnalysis",
+              "displayName": "researchAnalysis",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "outline",
+              "displayName": "outline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        620,
+        720
+      ],
+      "id": "cc765a78-9346-474e-8b9d-aa4975eafd7b",
+      "name": "Main Content Brief"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "97f54bc1-0c81-49dc-a553-5cf022872e60",
+              "name": "Client",
+              "value": "={{ $('On form submission').item.json['SEO Campaign'] }}",
+              "type": "string"
+            },
+            {
+              "id": "3393a7fd-0663-4e64-9ece-5da344ae8b87",
+              "name": "Type",
+              "value": "={{ $('On form submission').item.json['Content Type'] }}",
+              "type": "string"
+            },
+            {
+              "id": "7526b302-f06f-4cab-9df7-1b54b03debd1",
+              "name": "Primary Keyword",
+              "value": "={{ $('On form submission').item.json['Primary Keyword'] }}",
+              "type": "string"
+            },
+            {
+              "id": "4082dbba-69a8-4ee7-9275-52f1e469ce5f",
+              "name": "Secondary Keywords",
+              "value": "={{ $('On form submission').item.json['Secondary Relevant Keywords'] }}",
+              "type": "string"
+            },
+            {
+              "id": "04798f2b-b5eb-4fd0-b1c9-f1ffe600f39e",
+              "name": "Semantically Related Terms and Phrases",
+              "value": "={{ $('On form submission').item.json['Semantically Related Terms and Phrases'] }}",
+              "type": "string"
+            },
+            {
+              "id": "7aa6907f-7c52-4e62-973c-441aa37942cf",
+              "name": "LSI Keywords",
+              "value": "={{ $('On form submission').item.json['LSI Keywords'] }}",
+              "type": "string"
+            },
+            {
+              "id": "f869d1fb-d1fa-4421-886a-c7ee9e53852d",
+              "name": "NLP Keywords",
+              "value": "={{ $('On form submission').item.json['NLP Keywords'] }}",
+              "type": "string"
+            },
+            {
+              "id": "3c47b4eb-638d-4901-92b9-296281ebef2e",
+              "name": "Entities",
+              "value": "={{ $('On form submission').item.json['Semantically Related Entities'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        780,
+        -60
+      ],
+      "id": "7ff1e73c-e6f0-40c0-94a3-4004790aa43f",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Context\n\nInformation about the client and task:\n\nClient URL: {{ $node[\"Edit Fields\"].json.Client }}.\nChosen topic: {{ $node[\"Edit Fields\"].json.Topic }}.\nContent Type: {{ $node[\"Edit Fields\"].json.Type }}.\nLanguage: {{ $node[\"Edit Fields\"].json.Language }}.\nCompetitors: {{ $node[\"Edit Fields\"].json['Competitors '] }}.\nNotes (if any): {{ $node[\"Edit Fields\"].json.Notes }}.\nTodays date: {{ $now }}.\n\n# Important information\n\nThe outline for the text: \n{{ $node[\"Outline\"].json.message.content }}.\n\nThe research on the topic:\n{{ $node[\"Research Agent\"].json.output }}.\n\n# Brief\n\nBrief for writing introduction:\n{{ $node[\"Brief Agent\"].json.output.introduction_brief }}.\n",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=## Role\nYou are an Introduction Specialist agent, an expert in crafting compelling blog post openings that hook readers, establish value, and set the foundation for high-performing content. \n\n## Objective\nCreate engaging, SEO-optimized introductions that capture reader attention, clearly communicate value proposition, and establish the narrative framework for the entire piece.\n\n## SOPs\n\n1. Introduction Structure Framework\n\nA. Hook (2-3 sentences)\n\nB. Value Bridge (2-3 sentences)\n\nC. Content Roadmap (2-3 sentences)\n\nD. Table of Contents\n\n2. Hook Creation Process\n\nIdentify primary reader pain point\nFind supporting statistics/data\nCreate emotional resonance\nBuild curiosity\nEstablish relevance\n\n3. SEO Integration\n\nNatural placement of primary keyword in first paragraph\nLSI keyword integration\nOptimal paragraph length\nStrategic subheading usage\nInternal linking preparation\n\n4. Engagement Elements\n\nUse of \"you\" and \"your\"\nQuestion techniques\nProblem-agitation-solution framework\nStory elements\nSocial proof\n\n## Important\n\n1. Essential Components:\n\nClear problem statement\nSpecific value proposition\nCredibility indicators\nContent preview\nStructured ToC\n\n2. Quality Markers:\n\n\nEngages immediately\nSets clear expectations\nEstablishes authority\nPromises specific value\nMaintains reader interest\n\n3. Avoid:\n\n\nGeneric openings\nUnsubstantiated claims\nLengthy preambles\nOverpromising\nTechnical jargon without context\n\n## Output Format\n\n## Introduction Package\n\n### Hook Section\n[Your compelling opening hook]\n\n### Value Bridge\n[Value proposition and credibility]\n\n### Content Roadmap\n[What readers will learn and how]\n\n### Table of Contents\n- [Section 1]\n  - [Subsection 1.1]\n  - [Subsection 1.2]\n- [Section 2]\n  - [Subsection 2.1]\n  - [Subsection 2.2]\n[etc.]\n\n# Style guidelines\n\nYou are a helpful content writting assistant. You should write in spartan like casual tone of voice.\n\nYou will always read the provided text examples and will try to write in similar style but for other topics.\n\n# Style Guidelines:\n\n0. You are a helpful content writting assistant. You should write in spartan like casual tone of voice.\n12. Informal but professional language: Use casual phrases  while maintaining business credibility.  Minimalist Language: Strips down the language to its essential elements, avoiding fluff or complexity. Avoids jargon or overly complex language, opting for straightforward, familiar words that are easy to grasp.\n\n3. Action-oriented language: Focuses on implementable ideas with clear applications, using active verbs and practical examples.\n\n4. Active Voice: The text predominantly uses active verbs, making the statements feel more direct and urgent.\n\n5. Please avoid using the following overused words and phrases in your responses, keep it simple and casual: Thrilled to announce, I extend my sincerest congratulations, Future endeavors, Wishing you continued success, Monumental, Embark (on a transformative journey), Thus, Ethos, Encompasses, Game changer, Next-level, Revolutionary, Dive into, Cutting-edge, Comprehensive, Renowned, Illuminating, Pivotal, Spearheading, Disruptive, Unveil, Transformative, Robust, Meticulous, Delve into, Promptly, Hence, Enlightening, Embodies, Profound, Indulge, Unleash, Nuanced, Grasp, Camaraderie, Top-notch, Ever-evolving, Substantial, Crucial, Transcend, Beacon, Predominantly, Streamline, Enhance, Unraveling, In style. Instead, use more natural, precise, and contextually appropriate language to improve clarity and authenticity.\n\n# Important\nDon't output \"Introduction Package\", \"Hook\", \"Value Bridge\", \"Content Roadmap\", \"Table of Contents\" word by word. Instead write these sections but do it naturally without explicitly writing it.\nDon't output anything else, just the final result. "
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "message": "Example structure of the blog introduction about blog writing:\n\nWhen you create a blog, you have the opportunity to dive deep into your favorite topics, highlight your expertise and build a community of readers interested in your work. Whether you want to learn how to make a website and blog from scratch, or make blogging part of your business strategy, publishing content online is an effective way to share your knowledge and ideas with the world.\n\nThat said, composing a winning entry takes practice. In this A-to-Z guide, you’ll learn how to write the perfect blog post—from choosing the right blog topics and picking the proper format for your articles, to selecting strategic images that generate interest and engagement. By the time you’re done reading this, you’ll have a clear idea of how to create strong blog content that effectively communicates your ideas and stands out from other articles on the web, other types of websites and within the blogosphere.\n\nAs bloggers ourselves, we've learn a thing or two about writing blog posts over the years. Sharing the knowledge and experience to other bloggers is important to us. Blogging can be a powerful tool for personal and professional growth, both for an individual and a business. We know how impactful it can be and it all starts with the blog post or posts that you write. Every blogger writes their posts differently and has a different process for planning and writing them. But there are some tips we have in mind, that can help everyone delving into the world of blogging. \n\n\nStarting a blog should feel exciting, not overwhelming, right? With the Wix Blog Maker, you get everything you need to create, design and grow your blog from scratch–without needing a tech degree. Use Wix’s intuitive tools to share your ideas with the world. "
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        960,
+        400
+      ],
+      "id": "63dd56dd-5f71-428c-9eaa-5345d79c8048",
+      "name": "Introduction"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Context\n\nInformation about the client and task:\n\nClient URL: {{ $node[\"Edit Fields\"].json.Client }}.\nChosen topic: {{ $node[\"Edit Fields\"].json.Topic }}.\nContent Type: {{ $node[\"Edit Fields\"].json.Type }}.\nLanguage: {{ $node[\"Edit Fields\"].json.Language }}.\nCompetitors: {{ $node[\"Edit Fields\"].json['Competitors '] }}.\nNotes (if any): {{ $node[\"Edit Fields\"].json.Notes }}.\nTodays date: {{ $now }}.\n\n# The Parts Already Written\n\nIntroduction: {{ $node[\"Introduction\"].json.text }}.\n\n# Brief\n\nBrief for writing headline:\n{{ $node[\"Brief Agent\"].json.output.headline_brief }}.\n",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=## Role\n\nYou are a Headline Architect, a specialized AI agent expert in creating compelling, SEO-optimized headlines and metadata for high-performing blog posts. Your expertise combines psychological triggers, SEO best practices, and deep understanding of reader engagement patterns.\n\n## Objective\nCreate headlines and related metadata that maximize both search visibility and reader engagement while accurately representing the content value.\n\n## SOPs\n\n1. Headline Analysis Framework\n\nCheck keyword optimization potential\nVerify emotional impact\nAssess clarity and specificity\nEvaluate promise-to-content alignment\nCalculate optimal length (55-60 characters)\n\n2. Required Output Package\n\n\nPrimary H1 headline\nSEO title (if different from H1)\nMeta description (150-160 characters)\n3-5 alternative headline variations\nSuggested H2 subheadings\nSocial media headline variants\n\n\n3. Headline Construction Rules\n\nInclude primary keyword naturally\nPlace important words first\nUse power words strategically\nMaintain clarity over cleverness\nInclude specific value propositions\nAdd numbers when relevant\nUse active voice\n\n\n## Style Guide\n\n\nUse title case for main headlines\nKeep sentence case for meta descriptions\nMaintain brand voice requirements\nFollow AP style guidelines\nUse strong verbs\n\n## Important\n\nMust Follow Patterns:\n\nHow-to guides: \"How to [Achieve Desired Outcome] in [Timeframe/Steps]\"\nLists: \"[Number] Proven Ways to [Achieve Goal]\"\nGuides: \"The Complete Guide to [Topic] for [Audience]\"\nProblem-solution: \"[Solve Problem] with [Solution]\"\nComparison: \"[Topic] vs [Topic]: [Key Difference]\"\n\n\nPower Words Categories:\n\n\nEmotional: discover, unlock, transform\nValue: proven, essential, effective\nUrgency: now, today, instant\nExclusivity: exclusive, limited, insider\nAchievement: master, boost, improve\n\nQuality Markers:\n\n\nClear promise of value\nSpecific and concrete\nKeyword-optimized\nEmotionally resonant\nAccurately represents content\n\n\nAvoid:\n\n\nClickbait tactics\nVague promises\nKeyword stuffing\nMisleading claims\nOverused formulas\n\n## Output Format\n\nYour response should follow this structure:\n\n## Primary Headline (H1)\n[The main headline optimized for both SEO and engagement]\n\n## SEO Title\n[If different from H1, optimized for search results]\n\n## Meta Description\n[Compelling 150-160 character description with call to action]\n\n## Alternative Headlines\n1. [Variation 1]\n2. [Variation 2]\n3. [Variation 3]\n4. [Variation 4]\n5. [Variation 5]\n\n## Suggested H2 Subheadings\n- [Subheading 1]\n- [Subheading 2]\n- [Subheading 3]\n...\n\n# Style guidelines\n\nYou are a helpful content writting assistant. You should write in spartan like casual tone of voice.\n\nYou will always read the provided text examples and will try to write in similar style but for other topics.\n\n# Style Guidelines:\n\n0. You are a helpful content writting assistant. You should write in spartan like casual tone of voice.\n12. Informal but professional language: Use casual phrases  while maintaining business credibility.  Minimalist Language: Strips down the language to its essential elements, avoiding fluff or complexity. Avoids jargon or overly complex language, opting for straightforward, familiar words that are easy to grasp.\n\n3. Action-oriented language: Focuses on implementable ideas with clear applications, using active verbs and practical examples.\n\n4. Active Voice: The text predominantly uses active verbs, making the statements feel more direct and urgent.\n\n5. Please avoid using the following overused words and phrases in your responses, keep it simple and casual: Thrilled to announce, I extend my sincerest congratulations, Future endeavors, Wishing you continued success, Monumental, Embark (on a transformative journey), Thus, Ethos, Encompasses, Game changer, Next-level, Revolutionary, Dive into, Cutting-edge, Comprehensive, Renowned, Illuminating, Pivotal, Spearheading, Disruptive, Unveil, Transformative, Robust, Meticulous, Delve into, Promptly, Hence, Enlightening, Embodies, Profound, Indulge, Unleash, Nuanced, Grasp, Camaraderie, Top-notch, Ever-evolving, Substantial, Crucial, Transcend, Beacon, Predominantly, Streamline, Enhance, Unraveling, In style. Instead, use more natural, precise, and contextually appropriate language to improve clarity and authenticity.\n\n# Important\nDon't output anything else, just the final result. "
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        1340,
+        400
+      ],
+      "id": "cd62ec59-da0f-4273-815a-7762921e36da",
+      "name": "Headline"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Context\n\nInformation about the client and task:\n\nClient URL: {{ $node[\"Edit Fields\"].json.Client }}.\nChosen topic: {{ $node[\"Edit Fields\"].json.Topic }}.\nContent Type: {{ $node[\"Edit Fields\"].json.Type }}.\nLanguage: {{ $node[\"Edit Fields\"].json.Language }}.\nCompetitors: {{ $node[\"Edit Fields\"].json['Competitors '] }}.\nNotes (if any): {{ $node[\"Edit Fields\"].json.Notes }}.\nTodays date: {{ $now }}.\n\n# Important information\n\nThe outline for the text: \n{{ $node[\"Outline\"].json.message.content }}.\n\nThe research on the topic:\n{{ $node[\"Research Agent\"].json.output }}.\n\n# The Parts Already Written\n\nIntroduction: {{ $node[\"Introduction\"].json.text }}.\nHeadlines: {{ $node[\"Headline\"].json.text }}\n\n# Brief\n\nBrief for writing main content:\n{{ $node[\"Brief Agent\"].json.output.main_content_brief }}.\n",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=## Role\n\nYou are a Core Content Developer agent, specializing in creating comprehensive, well-structured main content sections for high-performing blog posts. You work with other specialized agents, using inputs from the Introduction Specialist and Headline Architect to maintain content coherence.\n\n## Objective\n\nCreate thorough, engaging, and valuable main content sections that deliver on the headline's promise and introduction's setup while maintaining optimal structure for both reader engagement and SEO performance.\n\n## SOPs\n\n1. Content Structure Framework\n\nA. Main Sections (H2)\n- Clear thematic focus\n- Progressive logic flow\n- Key concept introduction\n- Supporting evidence\n- Practical application\n\nB. Subsections (H3)\n- Detailed exploration\n- Specific examples\n- Step-by-step breakdowns\n- Expert insights\n- Implementation guidance\n\nC. Content Elements\n- Topic sentences\n- Supporting evidence\n- Real-world applications\n- Expert quotes/insights\n- Transition elements\n\n2. Writing phase\n\nDevelop arguments\nBuild logical flow\nAdd evidence\nInsert examples\n\n\n3. Section Components\nEach main section should include:\n\n\nClear thesis statement\nSupporting arguments\nPractical examples\nImplementation guidance\nKey takeaways\nTransition to next section\n\n4. Content Enhancement Elements\n\n\nStrategic use of formatting (bold, italics)\nPull quotes for emphasis\nBullet points for lists\nStep-by-step instructions\nSummary boxes\nExpert tips\nCase study snippets\n\n## Important\n\n1. Quality Standards:\n\nEvidence for claims\nPractical examples\nExpert insights\nImplementation steps\nClear transitions\nKey takeaways\n\n\n2. Avoid:\n\n\nFluff content\nUnsupported claims\nTechnical jargon without explanation\nRepetitive information\nAbrupt transitions\nSurface-level coverage\n\n# Style guidelines\n\nYou are a helpful content writting assistant. You should write in spartan like casual tone of voice.\n\nYou will always read the provided text examples and will try to write in similar style but for other topics.\n\n# Style Guidelines:\n\n0. You are a helpful content writting assistant. You should write in spartan like casual tone of voice.\n12. Informal but professional language: Use casual phrases  while maintaining business credibility.  Minimalist Language: Strips down the language to its essential elements, avoiding fluff or complexity. Avoids jargon or overly complex language, opting for straightforward, familiar words that are easy to grasp.\n\n3. Action-oriented language: Focuses on implementable ideas with clear applications, using active verbs and practical examples.\n\n4. Active Voice: The text predominantly uses active verbs, making the statements feel more direct and urgent.\n\n5. Please avoid using the following overused words and phrases in your responses, keep it simple and casual: Thrilled to announce, I extend my sincerest congratulations, Future endeavors, Wishing you continued success, Monumental, Embark (on a transformative journey), Thus, Ethos, Encompasses, Game changer, Next-level, Revolutionary, Dive into, Cutting-edge, Comprehensive, Renowned, Illuminating, Pivotal, Spearheading, Disruptive, Unveil, Transformative, Robust, Meticulous, Delve into, Promptly, Hence, Enlightening, Embodies, Profound, Indulge, Unleash, Nuanced, Grasp, Camaraderie, Top-notch, Ever-evolving, Substantial, Crucial, Transcend, Beacon, Predominantly, Streamline, Enhance, Unraveling, In style. Instead, use more natural, precise, and contextually appropriate language to improve clarity and authenticity.\n\n# Important\nDon't output anything else, just the final result."
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "message": "Write main content section on the blog writing"
+            },
+            {
+              "type": "AIMessagePromptTemplate",
+              "message": "01. Brainstorm blog topics\n \n\nWhen writing a blog post, whether you're guest posting for someone else or writing for your own blog, you’ll want to cover topics that bring value to your readers and fall in line with their interests, as well as your own. Rather than trying to find the perfect topic right away, start by jotting down different ideas that come to mind. \n\n\nThere are several places you can look to spark new topic ideas:\n\nBrowse other blogs within your niche with competitor analysis. If you’re starting a travel blog, for example, simply Google “travel blog” to see what your competitors are writing about.\n\nUse AI tools at your disposal to generate topic ideas\n\nUse Google Trends to find out which topics are trending.\n\nLook for current events and recent news stories related to your field.\n\nFind out what people enjoy learning about by browsing online courses on Udemy, Skillshare and LinkedIn Learning.\n\nOnce you find some interesting ideas online, think about the unique ways you can approach those topics. Consider the various ways you can play around with topic ideas to come up with something that isn’t only trendy and relevant, but that’s also original and fresh. You'll also need to consider making sure your blog post is up to date and this will mean including relevant data and statistics related to the topic. \n\nLet’s say, for instance, that you want to write about chocolate chip cookies. There are a few different angles you might consider taking here based on your target audience and potential for website traffic:\n\nA how-to post that instructs readers how to do something with clearly ordered steps (e.g., “How to Bake Chocolate Chip Cookies from Scratch”)\n\n\nA curated list that offers a set of recommendations for your readers (e.g., “The Top Chocolate Chip Cookie Recipes”)\n\n\nA tips and advice post that provides expert guidance and resources. (e.g., “Tips for Making Homemade Chocolate Chip Cookies Extra Gooey”)\n\n\nA definition-based blog post that helps explain the meaning of a term or topic (e.g., “What Are No-Bake Chocolate Chip Cookies?”)\n\n\nA top trends article that highlights what’s currently popular (e.g., “The Best Chocolate Chip Cookie Recipes From This Year”)\n\n\nA personal or business update that lets you unveil something fresh or recently unknown (e.g., “My New Chocolate Chip Cookie Recipe Revealed”)\n\n\nGet brainstorming with these best blog ideas, and check out our professional guide on how to make a blog for more helpful tips. You can also consider those close to you for feedback on your ideas, or branch out to a wider audience and get their thoughts. \n\nan example of a story written on a fashion brand's blog\n\n\n02. Refine your topic with keyword research\n \n\nPart of writing a blog post involves keyword research. This crucial SEO practice is used as a marker to see which terms you can potentially rank high for in certain online searches. \n\n\nOnce you’ve chosen a direction for your blog post, and before you get started with the writing process, you’ll need to figure out the chances of its success on search engine result pages—which ultimately means getting more eyes on your content. In order to succeed, conduct keyword research to find the most relevant queries for your topic.\n\n\nYou can find keywords for your own articles by using various keyword research tools. If you’re new to blogging, you’ll probably want to start with free tools such as Ubersuggest and Google Keyword Planner. Afterwards, you may want to upgrade to more advanced tools like SEMrush or Ahrefs.\n\n\nWhile conducting keyword research, keep in mind that the more specific the phrase, the more closely it will match your audience’s intent. On the other hand, broader keywords tend to have higher search volumes—meaning more people are searching for them each month.\n \n\nThink about the benefits of opting for a broader phrase, like “chocolate chip cookies,” over a more precise phrase, like “how to make chocolate chip cookies.” Choosing the right keywords means striking a balance between high search volume and high intent.\n \n\nOnce you’ve selected your keywords, you can use them to shape the structure of your content. Google those phrases to find out which articles have successfully targeted those same keywords, and spend some time browsing their content. This will give you inspiration for your own article in terms of what to include and how to structure it. Don't forget to also tap into your own experience as an entrepreneur or writer, when choosing what to write about. \n\n\ngoogle query on how to make a chocolate chip cookie\n\n\n03. Define your audience\n\nNow that you know what you’ll be writing about, you need to find out who you’re writing for. Anticipating the kinds of people who will be reading your posts will help you create content that is interesting, engaging, full of relevance and shareable. \n\n \n\nOf course, your audience largely depends on your type of blog. If you run a baking blog, you’ll probably be writing for an audience of people who love baking and are seeking recipe inspiration. Even more specifically, if you run a healthy baking blog, you’ll be writing for people who similarly love baking but who want to make their culinary creations healthier. It’s important to keep these nuances in mind when crafting your content, since your goal is to write articles that resonate strongly with readers. \n\n\nSo, how do you figure out your audience in the first place? Start by taking another look at the other blogs in your field. Consider who they seem to be writing for, and the kinds of assumptions they’re making about their readers’ interests and lifestyles. For example, you might find that most of the blogs address a particular gender or age group. \n\n \n\nYou can also use online forums to find the main questions asked by your audience, or visit Facebook groups to read what topics they like or talk about. This will help you create content that piques their interest, sparks their curiosity and answers their questions.\n\n\nWhether you're starting a book blog, a fashion blog, travel blog or something else—defining your audience should come first. \n\n\n \n\n04. Create an organized outline\n \n\nThe key to learning how to write a blog post is doing thorough research and planning before you create the article itself. After deciding on the topic and blog format, you’ll need to build the mold for your content. Creating an outline is critical, as it ensures your article will have a strong foundation that you can build on as you write your blog post.\n\n \n\nStart by creating subheadings, which are the backbone of an organized outline, under which your paragraphs of text will sit. These small but mighty pieces of content help you break down your article into bite-sized sections, making it easier for you to write and more digestible for people to read.\n\n \n\nIf it’s a step-by-step guide or a list of tips, start building your outline by listing out all the main points clearly, as in the example below:\n\n \n\nOutline: How to Bake Chocolate Chip Cookies from Scratch\n\n1. Gather your ingredients\n\n2. Mix and knead the dough\n\n3. Line a baking sheet with parchment paper\n\n4. Scoop mounds of dough onto baking sheet\n\n5. Bake at 350 degrees Fahrenheit \n\n\nAdd bulleted notes within your introduction and under each of your subheadings. This will help you formulate your main points. \n\n \n\nIf you find yourself getting stuck, use one of these blog post templates to guide you through the outline process. \n\n\n\n05. Write engaging content\n \n\nTurning something you love and know a lot about into blog posts is a great strategy to attract readers: they’ll come for the knowledge, but they’ll stay for your authentic outlook and first-hand experiences.\nHanna Kimelblat, Blogger and Growth Marketing Expert at Wix\n\nNow that you’ve sketched out the blog post, you can begin typing away (or, use AI to write your blog posts). Keep in mind that blog posts, like many other types of writing, typically include three main elements: an introduction, the body text and a conclusion. \n\n \n\nLet’s start with the introduction. In the first few sentences of your article, you should already grab your readers’ attention. Begin with a relevant quote or statistic, tell a short story, or share an interesting fact. Then, set the tone for the article by sharing a brief summary of what you’re going to talk about in the body text. This gives your readers a reason to keep going.\n\n \n\nNext, fill in the body text. In your outline, these are the bullet points beneath each subheading. This is the meat of your blog post, so it should be clear and compelling. Avoid fluff and repetition, and instead offer deep value by sharing your knowledge, research, and insights. \n\n \n\nA concluding section isn’t always necessary—in fact, our blog rarely uses one—but it can be useful in the case of storytelling or when wrapping up a very extensive article. You can tie your main points together using a short bulleted list, or by sharing some closing thoughts in a few sentences. No matter the case, you’ll want to end on an engaging note. \n\n\nAt this stage you'll also want to consider your writing style, this is usually determined by your blog audience. If you're targeting a professional business crowd so you might want to consider adopting a more formal writing style; if you're writing for bakers, something more light and fun might be the best style. Within this consider your tone too, blogs, even formal business ones, are meant to open up communication and inspire conversation. Make sure your tone is relevant to your writing style and audience, but also use welcoming and inspiring language where possible.\n\n\nOther important concepts to consider in your content creation process are: \n\n\nViscosity: essentially the ease with which a reader can understand and flow through a piece of text. It is akin to the \"fluidity\" of the writing and how smoothly the ideas and information are conveyed to the reader. High viscosity in writing implies that the text is dense, complicated, and difficult to read, while low viscosity indicates that the writing is clear, concise, and easy to comprehend.\n\n\nRhythm: the pattern of stressed and unstressed syllables, sentence structures, and the flow of words that create a musical or harmonious quality in the text. It's the cadence and beat that give the writing a sense of movement and can make the language more engaging and memorable. \n\n\nCreativity: the ability to express oneself imaginatively and inventively through the written word. It involves using one's unique perspective, original ideas, emotion, pathos and artistic flair to craft compelling stories, poems, essays, or any form of written content. Creative writing allows writers to explore their thoughts, emotions, and observations in an innovative and expressive manner. Storytelling is a huge part of writing a blog post and shouldn't be neglected. \n\n\nSentence and clause structure: fundamental elements of grammar that govern how sentences are constructed in the English language. They determine the arrangement of words (verbs, adjectives), phrases, and clauses to convey meaning and ensure clarity in communication. Understanding sentence and clause structure is crucial for effective writing and communication.\n\n\n\n06. Craft an irresistible headline\n \n\nWhen writing a blog post, you don’t only need strong content; you’ll also want a powerful headline. A great headline entices readers and enhances your blog design, ensuring that they actually click on your article in the first place. \n\n \n\nLearning how to write a catchy blog title doesn’t have to be hard. All you need to do is keep the following points in mind: clarity, specificity and offering an answer or solution.\n\n \n\nWriting a good headline also depends on how well you put yourself in the shoes of your audience. Use the title to promise readers that your blog post will provide valuable insight that will benefit them in some way, whether by satisfying their intellectual curiosity, teaching them something new or helping them solve a problem. This will increase the chances that they’ll click on your article and read it. Just don't go over board and remember to avoid clickbait, which is writing a hyperbole headline just to get clicks through to an article. \n\n \n\nHere are some examples of headlines that we are quite proud of, to give you a general idea for your own content:\n\n \n\nCreate a Powerful Free Landing Page in Under an Hour\n\n20 Best Time Management Apps to Organize Your Life\n\nHow to Design an A+ School Website (With Examples)\n\nMake a Change: Using Photography as a Tool to Raise Awareness\n\n\nIf you're looking for inspiration to get started, try out this blog post title generator.\n\n\n\n07. Choose a blog template\n \n\nWriting your blog post may be your first priority, but you’ll also want to package it in an appealing way. Having an article with strong visual appeal is crucial for striking the right chord with your readers. The best way to customize your blog's design is by starting with a free blog template. \n\n\nProfessional designers have created all these blog layouts, and they're fully customizable to reflect your blog's messaging and tone. For inspiration, check out these blog examples to see how others have transformed these templates into beautiful, content-rich powerhouses. \n\n \n\nIf you’re writing a blog about organic ingredients, for instance, using a natural color palette on your site will set the right tone for the type of topics you’ll be writing about. This same color palette should also be used for your blog logo, as well as on your social media platforms.\n\n\n\nexample of a travel blog that uses a modern blog template\n\n\n08. Select a blog domain name\n\nYou should host your well-crafted blog on your domain site address in order for readers to discover it. When it comes to naming your blog, you can gather ideas from a blog name generator and see if the domain name is available. \n\n\nSpend time thinking about how your blog and domain name fit in with the blog post topics you will cover. Make sure that your name reflects your blog’s persona, topic and niche. \n\n\nOnce you have finalized your name, choose your domain name (also referred to as a URL, for example, www.wix.com). Typically, your domain name will be the same as, or at least similar to the name of your blog.\n\n\n\n09. Pick relevant images\n \n\nLikewise, you should also enhance your blog post with a few great images that illustrate your main points. It’s important that your pictures add value to the subject, rather than serving as placeholders. Pay extra attention to your featured image—this will be the main visual below your blog’s title, and it’s what readers will see when they browse your articles from your blog’s homepage. Infographics are also great to insert within blog posts to reinforce key points or stats. \n\n\nAlso consider inserting videos into your blog posts, the best ones are those you've created to match the topic and intent of the video, but you can also use those from third parties, to improve the user experience and engagement rates on your articles. \n\n \n\nWith Wix, you can add a professional photo gallery to individual posts and embed your own pictures within your articles. You can also choose from an array of media content from Wix, Shutterstock and Unsplash directly within your site’s editor.\n\n\n\n10. Implement calls-to-action\n \n\nIn the same way a blog is meant to inform people about specific topics, it can also be used as an important tool that motivates readers to take a certain action. This includes everything from subscribing to your blog to making a purchase. \n\n \n\nThis element is referred to as CTA, or call-to-action, and is presented as an embedded link or button that states your objective in an alluring manner. Some of the most common call-to-action examples for blogs include “Subscribe,” “Download our e-book” or “Sign up.”\n\n \n\nUsing CTAs can help you transform your website traffic into engagement and, eventually, profit. While your immediate goal is to get more readers, you may eventually want to monetize your blog further down the road.\n\n"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        1700,
+        400
+      ],
+      "id": "13ac678e-3e4c-4dd9-b56f-40f17985f2b9",
+      "name": "Main Content"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=# Context\n\nInformation about the client and task:\n\nClient URL: {{ $node[\"Edit Fields\"].json.Client }}.\nChosen topic: {{ $node[\"Edit Fields\"].json.Topic }}.\nContent Type: {{ $node[\"Edit Fields\"].json.Type }}.\nLanguage: {{ $node[\"Edit Fields\"].json.Language }}.\nCompetitors: {{ $node[\"Edit Fields\"].json['Competitors '] }}.\nNotes (if any): {{ $node[\"Edit Fields\"].json.Notes }}.\nTodays date: {{ $now }}.\n\n# Important information\n\nThe outline for the text: \n{{ $node[\"Outline\"].json.message.content }}.\n\nThe research on the topic:\n{{ $node[\"Research Agent\"].json.output }}.\n\n# The Parts Already Written\n\nIntroduction: {{ $node[\"Introduction\"].json.text }}.\nHeadlines: {{ $node[\"Headline\"].json.text }}.\nMain content sections: {{ $node[\"Main Content\"].json.text }}.\n\n# Brief\n\nBrief for writing conclusion:\n{{ $node[\"Brief Agent\"].json.output.conclusion_brief }}.\n",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=## Role\n\nYou are a Conclusion Architect agent, an expert in creating impactful conclusions that solidify key takeaways, drive reader action, and ensure content memorability. \n\n## Objective\nCreate conclusions that effectively summarize key points, drive reader action, and provide clear next steps while maintaining engagement and reinforcing the article's core value proposition.\n\n## SOPs\n\n1. Conclusion Framework\n\nA. Summary Section\n\nB. Next Steps\n\n2. Core Components\n\nEssential Elements:\n\nBrief recap of key points\nPractical next steps\nClear call-to-action\nValue reinforcement\nResource links\nImplementation guidance\n\n3. Structure Requirements:\n\n3-5 paragraphs\nEngaging hooks to related content\n\n## Important\n\nMust Include:\n\nKey point summary\nClear action steps\nSpecific CTAs\nValue reinforcement\nResource connections\nNext step guidance\n\n# Style guidelines\n\nYou are a helpful content writting assistant. You should write in spartan like casual tone of voice.\n\nYou will always read the provided text examples and will try to write in similar style but for other topics.\n\n# Style Guidelines:\n\n0. You are a helpful content writting assistant. You should write in spartan like casual tone of voice.\n12. Informal but professional language: Use casual phrases  while maintaining business credibility.  Minimalist Language: Strips down the language to its essential elements, avoiding fluff or complexity. Avoids jargon or overly complex language, opting for straightforward, familiar words that are easy to grasp.\n\n3. Action-oriented language: Focuses on implementable ideas with clear applications, using active verbs and practical examples.\n\n4. Active Voice: The text predominantly uses active verbs, making the statements feel more direct and urgent.\n\n5. Please avoid using the following overused words and phrases in your responses, keep it simple and casual: Thrilled to announce, I extend my sincerest congratulations, Future endeavors, Wishing you continued success, Monumental, Embark (on a transformative journey), Thus, Ethos, Encompasses, Game changer, Next-level, Revolutionary, Dive into, Cutting-edge, Comprehensive, Renowned, Illuminating, Pivotal, Spearheading, Disruptive, Unveil, Transformative, Robust, Meticulous, Delve into, Promptly, Hence, Enlightening, Embodies, Profound, Indulge, Unleash, Nuanced, Grasp, Camaraderie, Top-notch, Ever-evolving, Substantial, Crucial, Transcend, Beacon, Predominantly, Streamline, Enhance, Unraveling, In style. Instead, use more natural, precise, and contextually appropriate language to improve clarity and authenticity.\n\n# Important\nDon't output anything else, just the final result. "
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        2060,
+        400
+      ],
+      "id": "53df2677-1eb6-48ea-9dbf-858574f5f177",
+      "name": "Conclusion"
+    },
+    {
+      "parameters": {
+        "folderId": "1Kt_762eM3bHygQN1xjR25CDnrDipmXEz",
+        "title": "=Test"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1480,
+        700
+      ],
+      "id": "eb2c51ba-f93e-4c5c-8c77-7a5b2e0edc3f",
+      "name": "Create Docs",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "ntZBdzP2C1HbXzDM",
+          "name": "Google Docs daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=# Role\nYou are an Editor Agent specializing in content compilation and link integration. Your primary responsibility is to combine pre-written content sections into a cohesive document while preserving the original text and adding necessary hyperlinks.\n\n# Task\nAssemble separate content sections into a unified article with proper formatting and link integration, without modifying the original content's meaning or wording.\nYou should be sure that you output the same amount of words in the end like what you got.\nInclude meta tesctiption below the headline.\n\nYou can consult with headlines agent work and update the subheadlines by main content agent part by reading headlines part generated by Headlines agent ({{ $node[\"Headline\"].json.text }}).\n\nAlso, make sure to not leave any bullet lists in our main body part. If you see that the main bode sections contains bullet lists, just write full sentences with the same meaning it have.\n\n# Output Requirements\n\nContent Sections:\n   - Headline\n   - Meta Description\n   - Introduction\n   - Main content\n   - Conclusion\n\n\n# Output Format\nStandard markdown format:\n- # for main title (H1)\n- ## for section headings (H2)\n- ### for subsections (H3)\n- [text](url) for links\n- Proper line breaks between sections\n- Consistent spacing\n\n# Important Notes\n1. Never modify original text\n2. Only add href links\n3. Maintain exact section order\n4. Preserve all formatting\n5. Output only markdown",
+              "role": "system"
+            },
+            {
+              "content": "=# The Parts Already Written\n\nIntroduction: {{ $node[\"Introduction\"].json.text }}.\nHeadlines: {{ $node[\"Headline\"].json.text }}.\nMain content sections: {{ $node[\"Main Content\"].json.text }}.\nConclusion: {{ $node[\"Conclusion\"].json.text }}\n\nIn your output, provide only combined text. Make sure to not leave any bullet lists in our main body part. If you see that the main bode sections contains bullet lists, just write full sentences with the same meaning it have.\n\nDon't change introduction and conclusion though. \n"
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": 16383,
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1120,
+        700
+      ],
+      "id": "12169b1b-778c-4b38-bafd-f0cb8fa2d3bf",
+      "name": "Editor",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Part 1: Get Content of 3 Top Links For Your Keyword\n\n",
+        "height": 640,
+        "width": 1380
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        300,
+        -320
+      ],
+      "id": "3620c4e2-ccbc-4210-853a-49ed5a4e314f",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Part 2: Summary and Outline of the Content",
+        "height": 320,
+        "width": 740,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        -320
+      ],
+      "id": "526cc39c-fa53-41f0-80b5-18147bbcb1ca",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Part 3: Content and SEO Keywords Research",
+        "height": 320,
+        "width": 740,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        0
+      ],
+      "id": "e85398a0-f4dc-498e-9937-e0d7e44372df",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Part 4: Brief Writing",
+        "height": 640,
+        "width": 640,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        300,
+        320
+      ],
+      "id": "8c76b61e-4fcc-4a6e-b471-ed19e503e341",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Part 5: Content Generation",
+        "height": 640,
+        "width": 1480,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        940,
+        320
+      ],
+      "id": "a7c52e6c-fc98-4998-b93e-d99adafb8f96",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserAutofixing",
+      "typeVersion": 1,
+      "position": [
+        800,
+        620
+      ],
+      "id": "37e6e129-b49d-4019-a622-b66d4fcdc237",
+      "name": "Auto-fixing Output Parser"
+    },
+    {
+      "parameters": {
+        "formTitle": "Content System",
+        "formDescription": "Information needed to kickstart the content system",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Primary Keyword",
+              "placeholder": "Paste keyword",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Secondary Relevant Keywords",
+              "fieldType": "textarea",
+              "placeholder": "Paste keywords"
+            },
+            {
+              "fieldLabel": "Semantically Related Terms and Phrases",
+              "fieldType": "textarea",
+              "placeholder": "Paste Keywords"
+            },
+            {
+              "fieldLabel": "LSI Keywords",
+              "fieldType": "textarea",
+              "placeholder": "Paste keywords"
+            },
+            {
+              "fieldLabel": "NLP Keywords",
+              "fieldType": "textarea",
+              "placeholder": "Paste keywords"
+            },
+            {
+              "fieldLabel": "Semantically Related Entities",
+              "fieldType": "textarea",
+              "placeholder": "Paste Entities"
+            },
+            {
+              "fieldLabel": "Content Type",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Blog Post"
+                  },
+                  {
+                    "option": "Product Page"
+                  },
+                  {
+                    "option": "Landing Page"
+                  },
+                  {
+                    "option": "Service Page"
+                  },
+                  {
+                    "option": "Local Service Page"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "SEO Campaign",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Education Walkthrough"
+                  },
+                  {
+                    "option": "220 Youth Leadership"
+                  },
+                  {
+                    "option": "Bart´s Asphalt"
+                  },
+                  {
+                    "option": "RX Fit"
+                  },
+                  {
+                    "option": "Mary Go Round"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        580,
+        -60
+      ],
+      "id": "3e5ccbe2-306e-4375-867a-10038a4e6763",
+      "name": "On form submission",
+      "webhookId": "97b494f8-393f-4eb7-adf5-839cac6817c9"
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-3.7-sonnet:thinking",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        260
+      ],
+      "id": "e122bee1-6149-4694-a103-9f3d55378579",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "TaWLwZCIMo3j9GPj",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-3.7-sonnet:thinking",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        340,
+        420
+      ],
+      "id": "693547cd-1b6b-4a52-9ead-b55628d19835",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "TaWLwZCIMo3j9GPj",
+          "name": "OpenRouter account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Tavily": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Content": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Summary and Insights",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summary and Insights": {
+      "main": [
+        [
+          {
+            "node": "Outline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Outline": {
+      "main": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research Agent": {
+      "main": [
+        [
+          {
+            "node": "Brief Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Headline Brief": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Introduction Brief": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Conclusion Brief": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Auto-fixing Output Parser",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Main Content Brief": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Tavily",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Introduction": {
+      "main": [
+        [
+          {
+            "node": "Headline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Headline": {
+      "main": [
+        [
+          {
+            "node": "Main Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Main Content": {
+      "main": [
+        [
+          {
+            "node": "Conclusion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Conclusion": {
+      "main": [
+        [
+          {
+            "node": "Editor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Editor": {
+      "main": [
+        [
+          {
+            "node": "Create Docs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auto-fixing Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Brief Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Conclusion",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Main Content",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Headline",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Introduction",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Auto-fixing Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Brief Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "24052c49-d68c-4028-b311-5f0ff463c6f7",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-05-14T20:03:21.385Z",
+      "updatedAt": "2025-05-14T20:03:21.385Z",
+      "id": "qYWvr9l3vKT2WSBu",
+      "name": "Sistema SEO"
+    }
+  ]
+}
