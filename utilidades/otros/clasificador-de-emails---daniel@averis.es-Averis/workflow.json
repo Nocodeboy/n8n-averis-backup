@@ -1,0 +1,450 @@
+{
+  "createdAt": "2025-04-23T21:01:21.671Z",
+  "updatedAt": "2025-04-29T13:44:10.961Z",
+  "id": "TkC1IyqRcLVZ3rlK",
+  "name": "Clasificador de emails - daniel@averis.es",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_598898333152565132"
+        ]
+      },
+      "id": "d368019d-dfe3-43e6-bd79-c46e0af6b2bb",
+      "name": "Colaboraciones",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        -280
+      ],
+      "webhookId": "6ac8e707-d4e5-4020-99f3-d461ab470f68",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BwWjplhZQVpEPVPV",
+          "name": "Gmail daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Gmail').item.json.id }}",
+        "labelIds": [
+          "Label_8115270407844079512"
+        ]
+      },
+      "id": "9001b351-c888-4e84-927a-fb05af9991b3",
+      "name": "Negocios",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        -80
+      ],
+      "webhookId": "d5c5a599-0e36-451b-8ee4-267725f07893",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BwWjplhZQVpEPVPV",
+          "name": "Gmail daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Gmail').item.json.id }}",
+        "labelIds": [
+          "Label_8644257811659238329"
+        ]
+      },
+      "id": "b31d11bc-4d5f-4ce5-a644-e3a8dcfa7a87",
+      "name": "Newsletters",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        120
+      ],
+      "webhookId": "e11b6e77-13c0-4360-8403-64551afd17fc",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BwWjplhZQVpEPVPV",
+          "name": "Gmail daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Gmail').item.json.id }}",
+        "labelIds": [
+          "Label_6993311733852842977"
+        ]
+      },
+      "id": "eacf6e50-2678-4421-8dde-bc87f3fa6bfe",
+      "name": "Otros",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        800
+      ],
+      "webhookId": "4148d4fb-f864-46ef-82e0-6895b68da37c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BwWjplhZQVpEPVPV",
+          "name": "Gmail daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -880,
+        440
+      ],
+      "id": "53694bae-0092-49cc-bdf2-866f390f0a38",
+      "name": "When clicking ‘Test workflow’",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 5,
+        "simple": false,
+        "filters": {
+          "includeSpamTrash": false,
+          "q": "is:important",
+          "readStatus": "both"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -680,
+        440
+      ],
+      "id": "77aa4d9e-9ca7-4956-b1ed-43aaa28475ef",
+      "name": "Gmail",
+      "webhookId": "6b4c6b58-8222-4ac7-bcba-f17f25564bf4",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BwWjplhZQVpEPVPV",
+          "name": "Gmail daniel@averis.es"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.textAsHtml }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Colaboraciones",
+              "description": "=Correos electrónicos de empresas de IA o negocios relacionados con la inteligencia artificial que estén interesados en colaborar en proyectos o crear cosas conjuntamente."
+            },
+            {
+              "category": "Negocios",
+              "description": "=  Correos electrónicos relacionados con asuntos generales de negocio que no estén directamente vinculados a patrocinios o colaboraciones, como preguntas sobre automatizaciones, interés en desarrollo de automatizaciones, solicitudes de información o cualquier otro tipo de comunicación comercial. También las reuniones de Cal.com o Google Meet por defecto, salvo que sean llamadas que no estén agendadas en google claendar, que entonces serán colaboraciones."
+            },
+            {
+              "category": "Newsletters",
+              "description": "=Correos electrónicos que correspondan a boletines informativos (newsletters), los cuales incluyen actualizaciones, noticias, artículos o contenido relevante enviado periódicamente por empresas, organizaciones o particulares."
+            },
+            {
+              "category": "Personal",
+              "description": "= Correos electrónicos relacionados con asuntos personales o privados, como mensajes confidenciales, comunicaciones personales o cualquier tema no vinculado directamente al ámbito profesional o comercial."
+            },
+            {
+              "category": "Otros",
+              "description": "=Correos electrónicos que no encajan en ninguna de las categorías específicas anteriores, incluyendo mensajes variados, comunicaciones generales o cualquier contenido que no tenga un propósito claro o definido."
+            },
+            {
+              "category": "Documentos",
+              "description": "Correos electrónicos que contienen documentos adjuntos, contraseñas, o que han sido enviados por uno mismo, relacionados con el intercambio de información personal o administrativa."
+            },
+            {
+              "category": "Desarrollo",
+              "description": "Correos electrónicos relacionados con el desarrollo técnico, como consultas, respuestas, solicitudes de soporte o comunicación con otras entidades sobre temas de programación o tecnología."
+            }
+          ]
+        },
+        "options": {
+          "systemPromptTemplate": "=Clasifica el texto proporcionado por el usuario en una de las siguientes categorías: {categories}. Sigue estrictamente las instrucciones de formato indicadas a continuación. No añadas explicaciones ni comentarios."
+        }
+      },
+      "id": "abca21f6-dce0-4588-8209-e0e41212db3e",
+      "name": "Clasificador de texto",
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.1,
+      "position": [
+        -480,
+        460
+      ],
+      "id": "3972a7e2-e9fc-4fc2-8c29-1d7d1bb03806",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "includeSpamTrash": false,
+          "q": "is:important",
+          "readStatus": "unread"
+        },
+        "options": {}
+      },
+      "id": "5b76d604-8a86-4238-9855-9731aacfbb16",
+      "name": "Gmail Trigger1",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -880,
+        120
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BwWjplhZQVpEPVPV",
+          "name": "Gmail daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Gmail').item.json.id }}",
+        "labelIds": [
+          "Label_8674358230524142013"
+        ]
+      },
+      "id": "6f102e29-b67a-4ab0-8883-d2a24e499169",
+      "name": "Personal",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        640
+      ],
+      "webhookId": "e11b6e77-13c0-4360-8403-64551afd17fc",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BwWjplhZQVpEPVPV",
+          "name": "Gmail daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Gmail').item.json.id }}",
+        "labelIds": [
+          "Label_4701141165879208956"
+        ]
+      },
+      "id": "2212b01b-4a1a-463c-9d68-3a0c7c117e8f",
+      "name": "Documentos",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        480
+      ],
+      "webhookId": "e11b6e77-13c0-4360-8403-64551afd17fc",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BwWjplhZQVpEPVPV",
+          "name": "Gmail daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Gmail').item.json.id }}",
+        "labelIds": [
+          "Label_7541314513140480858"
+        ]
+      },
+      "id": "717d546b-87bb-447d-93a2-df8c6579a20b",
+      "name": "Desarrollo",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        300
+      ],
+      "webhookId": "e11b6e77-13c0-4360-8403-64551afd17fc",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BwWjplhZQVpEPVPV",
+          "name": "Gmail daniel@averis.es"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "Clasificador de texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clasificador de texto": {
+      "main": [
+        [
+          {
+            "node": "Colaboraciones",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Negocios",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Newsletters",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Personal",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Otros",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Documentos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Desarrollo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Clasificador de texto",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Clasificador de texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Gmail Trigger1": {
+      "Gmail Trigger1": {
+        "lastTimeChecked": 1747420726,
+        "possibleDuplicates": [
+          "196da644667755db",
+          "196d969f3a8abf6d"
+        ]
+      }
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "2fc7f8e4-aed4-4dcc-84e7-ac3e6e4f509a",
+  "triggerCount": 1,
+  "tags": [
+    {
+      "createdAt": "2025-04-23T20:54:02.682Z",
+      "updatedAt": "2025-04-23T20:54:02.682Z",
+      "id": "sPdc51YFSDyYeZsT",
+      "name": "Averis"
+    },
+    {
+      "createdAt": "2025-04-23T21:01:37.086Z",
+      "updatedAt": "2025-04-23T21:01:37.086Z",
+      "id": "IXM8wOyEqjygLUwl",
+      "name": "Email"
+    }
+  ]
+}
