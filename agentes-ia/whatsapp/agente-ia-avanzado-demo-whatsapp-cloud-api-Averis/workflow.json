@@ -1,0 +1,3122 @@
+{
+  "createdAt": "2025-05-03T17:22:30.329Z",
+  "updatedAt": "2025-05-14T20:35:47.798Z",
+  "id": "WOU80zJlU2F3U8AJ",
+  "name": "Agente IA Avanzado Demo Whatsapp Cloud API",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message_content }}",
+        "options": {
+          "systemMessage": "=## 1. Tu Rol y Contexto  \n**Rol:**  \nEres un coach y mentor ejecutivo especializado en alto rendimiento y desarrollo personal. No eres un chatbot típico; eres directo, retador y auténtico.  \n\n**Contexto:**  \n- Respondes en **WhatsApp o Telegram** con **texto o voz**.  \n- **ANTES de responder, SIEMPRE consultas el archivo \"Estilo\"** para que cada mensaje mantenga el tono y autenticidad de Ferran.  \n- **SIEMPRE haces las preguntas iniciales antes de continuar la conversación.**  \n- **NUNCA usas listas, numeraciones, viñetas o símbolos. Todo debe ser conversacional.**  \n- **Solo consultas la base de conocimiento si es estrictamente necesario.**  \n\n---\n\n## 2. **Reglas de Comunicación y Estilo**  \n\n🔹 **NUNCA estructures las respuestas en formato de lista.**  \n🔹 **SIEMPRE consulta el archivo de estilo antes de responder.**  \n🔹 **Evita frases motivacionales vacías o genéricas.**  \n🔹 **No uses lenguaje neutro o robótico.** Habla con energía, retando al usuario, sin rodeos.  \n🔹 **Siempre desafía al usuario.** En vez de solo dar consejos, hazle preguntas incómodas que lo hagan reflexionar.  \n\nSi un usuario dice que quiere mejorar su productividad, en lugar de darle \"tres pasos para lograrlo\", lo desafías con algo como:  \n\n*\"Vale, pero ¿qué es lo que realmente te está frenando? Porque la clave no está en hacer más cosas, sino en eliminar lo que te está distrayendo. ¿Cuál es ese hábito que sabes que te está robando tiempo pero aún no has cambiado?\"*  \n\nSi alguien menciona que le interesa emprender pero no sabe cómo empezar, no le das una estructura de \"primero haz esto, luego esto otro\". Le respondes con algo como:  \n\n*\"Tienes dos opciones: seguir dándole vueltas o ponerte manos a la obra. No necesitas la idea perfecta, solo empezar. ¿Qué acción concreta puedes tomar HOY que te acerque un paso a la independencia?\"*  \n\nTodo debe sentirse como una conversación con Ferran, no como una lista de pasos o instrucciones.  \n\n---\n\n✅ **Con este ajuste, el agente SÍ mantiene el tono de Ferran, SIN listas ni estructuras rígidas.**  \n✅ **Cada respuesta fluye de manera natural y desafiante, sin parecer una plantilla predefinida.**  \n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        3000,
+        -500
+      ],
+      "id": "bd31eb1d-f9a8-4a42-9d68-77e1832e83d3",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {
+          "temperature": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2540,
+        -200
+      ],
+      "id": "6f370782-5146-4d84-9c34-973e6ee4dbc7",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "vector_store",
+        "toolDescription": "Base de conocimiento para responder las dudas del paciente",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        3560,
+        -200
+      ],
+      "id": "de829dae-f011-4a41-91c1-1d849dca0e4e",
+      "name": "Supabase Vector Store1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "CfhQFyBpZqxDZXe2",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        3720,
+        -20
+      ],
+      "id": "d7f76a81-3738-45a8-b285-59828ed6d424",
+      "name": "Embeddings OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "a6c5d6d6-c650-4dc6-a5fe-18b8c400e8b2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -4420,
+        360
+      ],
+      "id": "8ebc0240-f6cc-46cd-b0bb-4144226edf00",
+      "name": "Webhook",
+      "webhookId": "a6c5d6d6-c650-4dc6-a5fe-18b8c400e8b2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7600cd39-f566-4fa5-a7e0-b29e05b392bd",
+              "leftValue": "={{ $json.body.event }}",
+              "rightValue": "messages.upsert",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "fc25c837-936f-44a3-bfe4-d3dd70eceb2a",
+              "leftValue": "={{ $json.body.data.key.fromMe }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -4160,
+        360
+      ],
+      "id": "cbfd20a0-f3a7-4a26-95f2-b529dea04d52",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b1373777-68c4-4d3e-8eae-c77269e2163d",
+              "name": "Whatsapp_number",
+              "value": "={{ $json.body.data.key.remoteJid }}",
+              "type": "string"
+            },
+            {
+              "id": "b3a441af-a709-4998-98ed-887fa21983cd",
+              "name": "Whastapp_name",
+              "value": "={{ $json.body.data.pushName }}",
+              "type": "string"
+            },
+            {
+              "id": "c5600e5f-cfd4-466c-baf9-dc42ea14edb1",
+              "name": "message_id",
+              "value": "={{ $json.body.data.key.id }}",
+              "type": "string"
+            },
+            {
+              "id": "135da444-8b73-4671-abaf-22e1825ede87",
+              "name": "message_type",
+              "value": "={{ !!$json.body.data.message.conversation && 'Texto' ||\n   !!$json.body.data.message.audioMessage && 'audio' ||\n   !!$json.body.data.message.imageMessage && 'image' ||\n   !!$json.body.data.message.stickerMessage && 'sticker' }}",
+              "type": "string"
+            },
+            {
+              "id": "2797e7c1-0128-4d92-9a62-167b97a8a832",
+              "name": "message_receivedDate",
+              "value": "={{ DateTime.fromSeconds($json.body.data.messageTimestamp).toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "b10b61c5-c8fa-414a-93fe-c8c0fa35aa7a",
+              "name": "apikey",
+              "value": "={{ $json.body.apikey }}",
+              "type": "string"
+            },
+            {
+              "id": "7a9960cb-1f18-4c42-835d-4be20219affb",
+              "name": "instancia",
+              "value": "={{ $json.body.instance }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3800,
+        220
+      ],
+      "id": "435c2858-d0ac-403e-9f2e-77895fafb959",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message_type }}",
+                    "rightValue": "Texto",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Texto"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "077cd860-da61-4973-b37d-2c34d2cf9de9",
+                    "leftValue": "={{ $json.message_type }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "97b51420-cf22-4718-8256-bd2bd0a3c6e6",
+                    "leftValue": "={{ $json.message_type }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e46a4113-4b7f-4e4c-a44f-0047f86f6f13",
+                    "leftValue": "={{ $json.message_type }}",
+                    "rightValue": "sticker",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Sticker"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -3360,
+        380
+      ],
+      "id": "5bcec334-f7dc-4538-87ef-3296fdb379a9",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e40758b7-c873-4f70-b434-ba759e533d83",
+              "name": "mesagge_content",
+              "value": "={{ $('Webhook').item.json.body.data.message.conversation }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2680,
+        -40
+      ],
+      "id": "3ce57c47-4127-4a3e-8fa3-404435b72d91",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0b0e4dd0-d46b-4651-ae91-d13f9e626a5b",
+              "name": "Whatsapp_number",
+              "value": "={{ $json.Whatsapp_number }}",
+              "type": "string"
+            },
+            {
+              "id": "1a27c534-a2c5-400d-88de-d070cd2dd552",
+              "name": "Whatsapp_name",
+              "value": "={{ $json.Whastapp_name }}",
+              "type": "string"
+            },
+            {
+              "id": "910c9e55-ce6b-4af3-b1b4-6768d110765f",
+              "name": "message_id",
+              "value": "={{ $json.message_id }}",
+              "type": "string"
+            },
+            {
+              "id": "099559f5-b30d-44df-a483-c0becb52a129",
+              "name": "message_content",
+              "value": "={{ $json.mesagge_content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2440,
+        -40
+      ],
+      "id": "3d8266c9-2f7a-4173-8656-f559ac544b6b",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -2180,
+        300
+      ],
+      "id": "2fdfdca0-f0f8-425d-9a51-97b2364f68e0",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "18b52fda-d39d-4a0d-8b4b-dae73d818de1",
+              "name": "imagedata64",
+              "value": "={{ $('Webhook').item.json.body.data.message.base64 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2680,
+        540
+      ],
+      "id": "8ee4a840-e7f6-4bc8-ba90-69d841b22a17",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "imagedata64",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -2420,
+        540
+      ],
+      "id": "1d6388c8-421b-4bff-bf83-e7ebff2c04ea",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6c0c61ff-4a2d-436c-ac64-35e63c0a7aa4",
+              "name": "audio64",
+              "value": "={{ $('Webhook').item.json.body.data.message.base64 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2680,
+        300
+      ],
+      "id": "28698c26-98e3-47cb-99c5-de0da37c2024",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "audio64",
+        "options": {
+          "fileName": "=file-{{ $now.format('yyyy-MM-dd:dd_HHMMSS') }}.ogg"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -2420,
+        300
+      ],
+      "id": "ae8da4ea-bcc7-488b-b3d5-5beef301e3cd",
+      "name": "Convert to File1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0b0e4dd0-d46b-4651-ae91-d13f9e626a5b",
+              "name": "Whatsapp_number",
+              "value": "={{ $('Edit Fields').item.json.Whatsapp_number }}",
+              "type": "string"
+            },
+            {
+              "id": "1a27c534-a2c5-400d-88de-d070cd2dd552",
+              "name": "Whatsapp_name",
+              "value": "={{ $('Edit Fields').item.json.Whastapp_name }}",
+              "type": "string"
+            },
+            {
+              "id": "910c9e55-ce6b-4af3-b1b4-6768d110765f",
+              "name": "message_id",
+              "value": "={{ $('Edit Fields').item.json.message_id }}",
+              "type": "string"
+            },
+            {
+              "id": "099559f5-b30d-44df-a483-c0becb52a129",
+              "name": "message_content",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1920,
+        300
+      ],
+      "id": "8f4d6395-266b-4d82-856a-3533e1bd3600",
+      "name": "Edit Fields5"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "text": "Eres un asistente virtual, analisa esta imagen. Tu respuesta debe comenzar con: \"Imagen enviada ____\"",
+        "inputType": "base64",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -2180,
+        540
+      ],
+      "id": "beebb96b-cf96-4545-865a-4fea1f543760",
+      "name": "OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0b0e4dd0-d46b-4651-ae91-d13f9e626a5b",
+              "name": "Whatsapp_number",
+              "value": "={{ $('Edit Fields').item.json.Whatsapp_number }}",
+              "type": "string"
+            },
+            {
+              "id": "1a27c534-a2c5-400d-88de-d070cd2dd552",
+              "name": "Whatsapp_name",
+              "value": "={{ $('Edit Fields').item.json.Whastapp_name }}",
+              "type": "string"
+            },
+            {
+              "id": "910c9e55-ce6b-4af3-b1b4-6768d110765f",
+              "name": "message_id",
+              "value": "={{ $('Edit Fields').item.json.message_id }}",
+              "type": "string"
+            },
+            {
+              "id": "099559f5-b30d-44df-a483-c0becb52a129",
+              "name": "message_content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1920,
+        540
+      ],
+      "id": "d53e6f74-2473-49bc-82c5-5e27abee689e",
+      "name": "Edit Fields6"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "18b52fda-d39d-4a0d-8b4b-dae73d818de1",
+              "name": "stickerdata64",
+              "value": "={{ $('Webhook').item.json.body.data.message.base64 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2680,
+        800
+      ],
+      "id": "52a640b8-0e72-4f33-9bd6-f8d6c8cff9fc",
+      "name": "Edit Fields7"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "stickerdata64",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -2420,
+        800
+      ],
+      "id": "af442961-f56a-4eaa-80e7-5f9d69f5c025",
+      "name": "Convert to File2"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "text": "Eres un asistente virtual, analisa esta imagen. Tu respuesta debe comenzar con: \"Sticker enviado ____\"",
+        "inputType": "base64",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -2180,
+        800
+      ],
+      "id": "0702df22-fd76-4871-8320-da856c02ff7f",
+      "name": "OpenAI2",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0b0e4dd0-d46b-4651-ae91-d13f9e626a5b",
+              "name": "Whatsapp_number",
+              "value": "={{ $('Edit Fields').item.json.Whatsapp_number }}",
+              "type": "string"
+            },
+            {
+              "id": "1a27c534-a2c5-400d-88de-d070cd2dd552",
+              "name": "Whatsapp_name",
+              "value": "={{ $('Edit Fields').item.json.Whastapp_name }}",
+              "type": "string"
+            },
+            {
+              "id": "910c9e55-ce6b-4af3-b1b4-6768d110765f",
+              "name": "message_id",
+              "value": "={{ $('Edit Fields').item.json.message_id }}",
+              "type": "string"
+            },
+            {
+              "id": "099559f5-b30d-44df-a483-c0becb52a129",
+              "name": "message_content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1920,
+        800
+      ],
+      "id": "3507a0b9-a24f-4360-b5dd-1dc932dc4409",
+      "name": "Edit Fields8"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Respuesta a formatear: {{ $json.output }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "# Formatea el texto de entrada de acuerdo a las instrucciones.  \n\n--------------- \n\n## Instrucciones \n\n- Devuelve un mensaje de salida dividido en 1, 2, o 3 partes, dependiendo de la longitud del texto de entrada. \n- El mensaje de salida debe sonar relajado y amigable. \n- Elimina estos caracteres:  \"*\", \"¿\", \"¡\", \"#\" \n- Utiliza signos de interrogación \"?\" **solo en el final de las frases que sean preguntas.**\n- **No** es necesario que las 3 partes contengan un mensaje. \n- Si el texto de entrada contiene una lista, déjala sola en una parte. \n- En la respuesta no se puede devolver mensajes como \"Utilizando la herramienta Conocimiento para buscar...\" o cosas similares. \n- **IMPORTANTE: No añadas ni elimines información esencial del texto de entrada. Respeta fielmente el contenido original. Solamente ajusta la forma (ej. eliminar caracteres, dividir en partes, ajustar estilo) para cumplir las instrucciones dadas.** \n\n## **IMPORTANTE** \n- Si haces bien tu trabajo te voy a pagar un sueldo de $5,000 USD al mes.\n- **SIEMPRE debes completar al menos una parte con texto**."
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        4200,
+        -480
+      ],
+      "id": "2bca5fad-6722-46c7-917c-020bf29e4512",
+      "name": "Basic LLM Chain",
+      "retryOnFail": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "options": {
+          "prompt": "Instructions:\n--------------\nTu respuesta debe ser exclusivamente un objeto JSON válido que incluya únicamente las claves:\n- \"parte_1\"\n- \"parte_2\"\n- \"parte_3\"\n\nCada clave debe tener como valor una cadena de texto (string). No incluyas texto adicional, backticks, ni formato Markdown. No uses comillas simples. Tampoco incluyas explicaciones antes o después del objeto JSON. Asegúrate de colocar dos puntos (:) después de cada clave y encerrar los valores entre comillas dobles. Cualquier salida que no sea JSON válido o que contenga texto adicional no cumplirá las restricciones.\n\n--------------\nCompletion:\n--------------\n{completion}\n--------------\n\nAbove, the Completion did not satisfy the constraints given in the Instructions.\nError:\n--------------\n{error}\n--------------\n\nPlease try again. Please only respond with an answer that satisfies the constraints laid out in the Instructions:"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserAutofixing",
+      "typeVersion": 1,
+      "position": [
+        4300,
+        -260
+      ],
+      "id": "a71a299d-fb29-44e9-b73c-03f4f66680b9",
+      "name": "Auto-fixing Output Parser"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"parte_1\": \"contenido de la primera parte de la respuesta\",\n\t\"parte_2\": \"contenido de la segunda parte de la respuesta\",\n\t\"parte_3\": \"contenido de la tercera parte de la respuesta\"\t\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        4420,
+        -100
+      ],
+      "id": "cb03d07b-aacd-46c3-b63d-29e28de0fdb3",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b8c6b215-3de9-43bf-896e-d2b694e8dddb",
+              "leftValue": "={{ $('AI Agent').item.json.output }}",
+              "rightValue": "Agent stopped due to max iterations.",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3480,
+        -500
+      ],
+      "id": "9ad95bae-f2e2-4571-8896-e023f2dff1e4",
+      "name": "Error"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        4120,
+        -100
+      ],
+      "id": "b79e6982-e17f-4cb6-9c84-190ed51c7e71",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "TaWLwZCIMo3j9GPj",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -3820,
+        500
+      ],
+      "id": "4170d777-f3f5-4a4a-8703-5e87c34b4166",
+      "name": "No Operation, do nothing2"
+    },
+    {
+      "parameters": {
+        "operation": "push",
+        "list": "={{ $json.Whatsapp_number }}",
+        "messageData": "={{ $json.message_content }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -2180,
+        -40
+      ],
+      "id": "a074e5f1-9ddf-4205-b756-c8747d02b1e7",
+      "name": "Redis",
+      "credentials": {
+        "redis": {
+          "id": "2nvHuldOkXKkzOTY",
+          "name": "Redis localhost"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1960,
+        -40
+      ],
+      "id": "af7c9e3c-e638-485d-ba16-d6bc2b22ab11",
+      "name": "Wait",
+      "webhookId": "dc06e4e3-3d42-4eac-8782-faf2b5d64d09"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "mensajes",
+        "key": "={{ $('Redis').item.json.Whatsapp_number }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1740,
+        -40
+      ],
+      "id": "9f37d063-63f6-4005-a3d1-5fde87f26d5d",
+      "name": "Redis1",
+      "credentials": {
+        "redis": {
+          "id": "2nvHuldOkXKkzOTY",
+          "name": "Redis localhost"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "54b6a403-1743-4ccd-b39c-5dcc6ab9bd52",
+              "leftValue": "={{ $json.mensajes.first() }}",
+              "rightValue": "={{ $('Webhook').item.json.body.data.message.conversation }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1520,
+        20
+      ],
+      "id": "8467f24a-b548-41b0-bb21-31fb6de2c73d",
+      "name": "If4",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -1300,
+        140
+      ],
+      "id": "8e24c769-db9d-4fcb-b698-895bcdca154b",
+      "name": "No Operation, do nothing3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0b0e4dd0-d46b-4651-ae91-d13f9e626a5b",
+              "name": "Whatsapp_number",
+              "value": "={{ $('Redis').item.json.Whatsapp_number }}",
+              "type": "string"
+            },
+            {
+              "id": "1a27c534-a2c5-400d-88de-d070cd2dd552",
+              "name": "Whatsapp_name",
+              "value": "={{ $('Redis').item.json.Whatsapp_name }}",
+              "type": "string"
+            },
+            {
+              "id": "910c9e55-ce6b-4af3-b1b4-6768d110765f",
+              "name": "message_id",
+              "value": "={{ $('Redis').item.json.message_id }}",
+              "type": "string"
+            },
+            {
+              "id": "099559f5-b30d-44df-a483-c0becb52a129",
+              "name": "message_content",
+              "value": "={{ $('Edit Fields11').item.json.mensajes_nuevos.replaceAll('\"', '').replaceAll('[','').replaceAll(',', ' ').replaceAll(']','') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -760,
+        100
+      ],
+      "id": "3361eae3-8e04-424c-8678-67931f360506",
+      "name": "Edit Fields10"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('Redis').item.json.Whatsapp_number }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1000,
+        0
+      ],
+      "id": "cec55264-dbd5-4f42-a9d6-f092abfc6cc8",
+      "name": "Redis2",
+      "credentials": {
+        "redis": {
+          "id": "2nvHuldOkXKkzOTY",
+          "name": "Redis localhost"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7d0df451-32c6-4a99-bcf0-344a9e97b494",
+              "name": "mensajes_nuevos",
+              "value": "={{$json[\"mensajes\"].slice().reverse()}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1300,
+        -60
+      ],
+      "id": "00ee3445-298d-4fb2-8eb4-4757cecabaa7",
+      "name": "Edit Fields11"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Edit Fields').item.json.Whatsapp_number }}",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        2700,
+        -200
+      ],
+      "id": "7fab4906-eea2-4780-9b40-e1d031816bf1",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "NR0jJMop66avXtir",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Este es el documento del ESTILO de Ferran Tort.",
+        "operation": "get",
+        "documentURL": "1r2BFri7UZt-Ak8xZUGSdJ-Omr1uq3CLMNr9FfC_7rDQ",
+        "simple": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Simplify', ``, 'boolean') }}"
+      },
+      "type": "n8n-nodes-base.googleDocsTool",
+      "typeVersion": 2,
+      "position": [
+        3420,
+        -200
+      ],
+      "id": "9d23bcf5-01ec-4e2f-92e3-e10ce53ff8e4",
+      "name": "Google Docs",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "Averis",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+        "messageText": "={{ $json.output.parte_1 }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        4800,
+        -500
+      ],
+      "id": "3e5c9d82-71c6-4976-ada2-9e4eb0cd0424",
+      "name": "Evolution API",
+      "credentials": {
+        "evolutionApi": {
+          "id": "YP0S0lKXr4ZWl2EW",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4b92a1f4-d4bc-4689-87cf-1be40aa49c27",
+              "leftValue": "={{ $('Basic LLM Chain').item.json.output.parte_2 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        5200,
+        -480
+      ],
+      "id": "7217fa14-7d17-4f9b-8d47-fc3e9fce26ab",
+      "name": "If Parte "
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4b92a1f4-d4bc-4689-87cf-1be40aa49c27",
+              "leftValue": "={{ $('Basic LLM Chain').item.json.output.parte_3 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        5940,
+        -480
+      ],
+      "id": "50efdf5d-7c42-4fd6-a05a-56bed438d18e",
+      "name": "If Parte 4"
+    },
+    {
+      "parameters": {
+        "amount": "={{ 2 + $('Basic LLM Chain').item.json.output.parte_3.length * 0.01 }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        6140,
+        -620
+      ],
+      "id": "95d9e6e6-d2d3-426e-b923-1e897b0be601",
+      "name": "Wait3",
+      "webhookId": "b531a35f-a5e2-48f7-843a-33fd1e99cff1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        6620,
+        -480
+      ],
+      "id": "bfc01352-156c-4c75-85a7-6b0f2d0f27b6",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "amount": "={{ 2 + $('Basic LLM Chain').item.json.output.parte_2.length * 0.01 }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        5440,
+        -580
+      ],
+      "id": "2ff9c646-b394-4f6d-852e-445b342662f3",
+      "name": "Wait4",
+      "webhookId": "a95471ab-85b5-45ca-878c-934030f3cc07"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "Averis",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+        "messageText": "={{ $('Basic LLM Chain').item.json.output.parte_2 }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        5640,
+        -580
+      ],
+      "id": "8fa862fc-1023-49cc-b102-24c76a9072ce",
+      "name": "Evolution API1",
+      "credentials": {
+        "evolutionApi": {
+          "id": "YP0S0lKXr4ZWl2EW",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "Averis",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+        "messageText": "={{ $('Basic LLM Chain').item.json.output.parte_3 }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        6340,
+        -620
+      ],
+      "id": "ac40a015-5237-465c-a4a7-dcc0fddd2785",
+      "name": "Evolution API2",
+      "credentials": {
+        "evolutionApi": {
+          "id": "YP0S0lKXr4ZWl2EW",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 4
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        -360,
+        400
+      ],
+      "id": "7b1acc2c-e41d-477c-b1ec-1318fafe81b0",
+      "name": "Merge"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        960,
+        -720
+      ],
+      "id": "252d7daf-9514-43f7-8342-f4fce95c656c",
+      "name": "Resumidor de texto"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1060,
+        -520
+      ],
+      "id": "e0a012fe-7774-4710-b924-6b4fd0e41028",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1040,
+        -60
+      ],
+      "id": "ba9c2d63-cb63-4294-ab9c-d0e0f764b3c8",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "messages": {
+          "messageValues": [
+            {
+              "message": "En caso de que el usuario pida información sobre un pedido como su estado, método de pago, número de pedido, día que se envió, día que se pagó, o cualquier información sensible, debes clasificarlo como \"true\", solo debes decir esa palabra en caso de que así sea. No hace falta que digas nada más. De lo contrario marca \"false\"."
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        960,
+        -260
+      ],
+      "id": "ab968a56-97bf-4560-8844-bd98fa4ac477",
+      "name": "Identificador de privacidad"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1020,
+        380
+      ],
+      "id": "3d3733d0-e584-4f9e-8557-85cd346ab543",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        960,
+        180
+      ],
+      "id": "3f62775c-c254-4cb2-b59e-f8c618dd79c2",
+      "name": "Conversación cerrada"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1020,
+        800
+      ],
+      "id": "5d26ebdd-c282-4451-a0d9-bfda5e6189c4",
+      "name": "OpenAI Chat Model4",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        940,
+        620
+      ],
+      "id": "28fb0e0f-c714-4960-835b-30017e8a2eee",
+      "name": "Clasificador de intención"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1040,
+        1700
+      ],
+      "id": "e6e3f608-3a3e-4c94-be91-12cd1dd0a436",
+      "name": "OpenAI Chat Model5",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        960,
+        1520
+      ],
+      "id": "1d4c6cac-5eca-4c08-8ae7-32e48c058e45",
+      "name": "Identificador de idioma"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1040,
+        1260
+      ],
+      "id": "1aec88cd-f132-42ec-8c48-51a89a4d6e08",
+      "name": "OpenAI Chat Model6",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        960,
+        1080
+      ],
+      "id": "bd224235-03ed-4d25-bd73-2cbffbb81b0d",
+      "name": "Analizador de sentimiento"
+    },
+    {
+      "parameters": {
+        "numberInputs": 6
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        2040,
+        -560
+      ],
+      "id": "0aa4374c-782a-4711-bec5-bb3f0bc20cce",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2320,
+        -500
+      ],
+      "id": "7ae08da0-2c2c-4b83-b2c6-ee46159b7a75",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1,
+      "position": [
+        3140,
+        -200
+      ],
+      "id": "55b65c06-9dce-411c-bb7f-7470e1d4d1b5",
+      "name": "Think"
+    },
+    {
+      "parameters": {
+        "numberInputs": 4
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        2060,
+        1120
+      ],
+      "id": "09484892-77fd-4c69-8904-4aa72a9998a0",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2280,
+        1140
+      ],
+      "id": "768e781b-c5a0-41e0-bd24-9e8d94e75d3d",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        2680,
+        1140
+      ],
+      "id": "c5e0e550-ff54-42a5-a405-9dc379ab4081",
+      "name": "Detector de incidencias técnicas"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2800,
+        1340
+      ],
+      "id": "237acc41-2189-47e2-b27f-d54b798ead00",
+      "name": "OpenAI Chat Model7",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2820,
+        1900
+      ],
+      "id": "bfcd3b2f-72d0-4ef8-83b1-f8d6d769ba24",
+      "name": "OpenAI Chat Model8",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        2700,
+        1720
+      ],
+      "id": "3f9ccb41-d96c-4f05-ae3b-e983c4921bd3",
+      "name": "Detector de clientes enfadados"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2860,
+        2460
+      ],
+      "id": "9ea01c81-08f7-4984-b5e8-a02153f78410",
+      "name": "OpenAI Chat Model9",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        2740,
+        2280
+      ],
+      "id": "2dcc4bed-e21f-4618-a28a-e3aaf96dbcb0",
+      "name": "Detector de intervención humana"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "96cce7b4-fc50-4901-97b3-a04e14db99b6",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3080,
+        1140
+      ],
+      "id": "e44ecb92-ef84-47ad-bc10-723ce4cab46c",
+      "name": "If1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3400,
+        1260
+      ],
+      "id": "21cd447d-be8e-4d5c-acea-cd196ba031f7",
+      "name": "No Operation, do nothing4"
+    },
+    {
+      "parameters": {
+        "sendTo": "averistech@gmail.com",
+        "subject": "Test",
+        "message": "Test",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        3400,
+        1020
+      ],
+      "id": "9d391085-198a-4e2d-bba1-291321cc8670",
+      "name": "Gmail",
+      "webhookId": "8a41fda2-bd16-43c5-8698-370a495df0ff",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BwWjplhZQVpEPVPV",
+          "name": "Gmail daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "96cce7b4-fc50-4901-97b3-a04e14db99b6",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3120,
+        1720
+      ],
+      "id": "6620d137-4c3f-4971-be2b-c678e74ec59e",
+      "name": "If2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3440,
+        1840
+      ],
+      "id": "4e52e272-af54-4c9a-a866-ddfe556a205f",
+      "name": "No Operation, do nothing5"
+    },
+    {
+      "parameters": {
+        "sendTo": "averistech@gmail.com",
+        "subject": "Test",
+        "message": "Test",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        3440,
+        1600
+      ],
+      "id": "fdecf9b7-69f1-4497-b2f0-5d1dbc49c4f8",
+      "name": "Gmail1",
+      "webhookId": "8a41fda2-bd16-43c5-8698-370a495df0ff",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BwWjplhZQVpEPVPV",
+          "name": "Gmail daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "96cce7b4-fc50-4901-97b3-a04e14db99b6",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3140,
+        2280
+      ],
+      "id": "0aaf64f4-c25c-4102-80f2-e6235c7d932e",
+      "name": "If5"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3460,
+        2400
+      ],
+      "id": "49191727-a04d-4f1a-98d1-356e0b83c920",
+      "name": "No Operation, do nothing6"
+    },
+    {
+      "parameters": {
+        "sendTo": "averistech@gmail.com",
+        "subject": "Test",
+        "message": "Test",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        3460,
+        2160
+      ],
+      "id": "4e65632a-fbb7-46c2-947f-83086b6faa9d",
+      "name": "Gmail2",
+      "webhookId": "8a41fda2-bd16-43c5-8698-370a495df0ff",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BwWjplhZQVpEPVPV",
+          "name": "Gmail daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        2840,
+        -200
+      ],
+      "id": "91e74080-ebcb-4f12-a418-32877152b3d5",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolWikipedia",
+      "typeVersion": 1,
+      "position": [
+        3000,
+        -200
+      ],
+      "id": "f85d111a-71ee-4a6d-a238-dc1680bfed3b",
+      "name": "Wikipedia"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        3280,
+        -200
+      ],
+      "id": "a643c9f3-7edd-472b-89b7-5694b76c76b5",
+      "name": "Calculator"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        100,
+        420
+      ],
+      "id": "f1d04197-9edf-447f-aba4-decd35ee17c5",
+      "name": "Aggregate2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2600,
+        -500
+      ],
+      "id": "9252afbe-6678-40d7-955a-c3a55f3a7732",
+      "name": "Edit Fields9"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "55302120-b639-4224-a3ff-866b94290bd0",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2060,
+        420
+      ],
+      "id": "b1f6b84a-ca4d-4835-aa54-258d00ff849a",
+      "name": "If3"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2340,
+        520
+      ],
+      "id": "f426efa0-90c5-451e-ae86-e8fe541b8a87",
+      "name": "No Operation, do nothing7"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2340,
+        320
+      ],
+      "id": "e8dea54f-c524-4d5e-85dd-e2593b8a847a",
+      "name": "Edit Fields12"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "Averis",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+        "messageText": "={{ $json.output.parte_1 }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        2600,
+        320
+      ],
+      "id": "1baef002-c89f-4793-953e-88314712f300",
+      "name": "Evolution API4",
+      "credentials": {
+        "evolutionApi": {
+          "id": "YP0S0lKXr4ZWl2EW",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        2960,
+        320
+      ],
+      "id": "76ef8cdc-537c-406b-b8bd-5ce9d18311c5",
+      "name": "Resumidor de encuestas"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        3080,
+        500
+      ],
+      "id": "f7930818-7fe8-49dd-93e6-522558a0041e",
+      "name": "OpenAI Chat Model10",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "averistech@gmail.com",
+        "subject": "Test",
+        "message": "Test",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        3400,
+        320
+      ],
+      "id": "db56e596-20cd-4407-b6ba-cc6e69ee2714",
+      "name": "Gmail3",
+      "webhookId": "8a41fda2-bd16-43c5-8698-370a495df0ff",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "BwWjplhZQVpEPVPV",
+          "name": "Gmail daniel@averis.es"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "timestamp"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        420
+      ],
+      "id": "7c555599-b51f-4655-8fff-34a2d9a6f3ab",
+      "name": "Sort"
+    }
+  ],
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "OpenAI1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File1": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields7": {
+      "main": [
+        [
+          {
+            "node": "Convert to File2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File2": {
+      "main": [
+        [
+          {
+            "node": "OpenAI2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Redis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields5": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Edit Fields6": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Edit Fields8": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auto-fixing Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Auto-fixing Output Parser",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Auto-fixing Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Redis1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis1": {
+      "main": [
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields11",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields10": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields11": {
+      "main": [
+        [
+          {
+            "node": "Redis2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        []
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Evolution API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Docs": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evolution API": {
+      "main": [
+        [
+          {
+            "node": "If Parte ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Parte ": {
+      "main": [
+        [
+          {
+            "node": "Wait4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If Parte 4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Parte 4": {
+      "main": [
+        [
+          {
+            "node": "Wait3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait3": {
+      "main": [
+        [
+          {
+            "node": "Evolution API2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait4": {
+      "main": [
+        [
+          {
+            "node": "Evolution API1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evolution API1": {
+      "main": [
+        [
+          {
+            "node": "If Parte 4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evolution API2": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Sort",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resumidor de texto": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Resumidor de texto",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Identificador de privacidad",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Conversación cerrada",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Clasificador de intención",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Identificador de idioma",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model6": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analizador de sentimiento",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Identificador de privacidad": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Conversación cerrada": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 2
+          },
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clasificador de intención": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 3
+          },
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Analizador de sentimiento": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 4
+          },
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Identificador de idioma": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 5
+          },
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Detector de incidencias técnicas",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Detector de clientes enfadados",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Detector de intervención humana",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model7": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Detector de incidencias técnicas",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model8": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Detector de clientes enfadados",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model9": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Detector de intervención humana",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detector de incidencias técnicas": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Gmail1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detector de clientes enfadados": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If5": {
+      "main": [
+        [
+          {
+            "node": "Gmail2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detector de intervención humana": {
+      "main": [
+        [
+          {
+            "node": "If5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wikipedia": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate2": {
+      "main": [
+        [
+          {
+            "node": "Resumidor de texto",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Identificador de privacidad",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Conversación cerrada",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Clasificador de intención",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Analizador de sentimiento",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Identificador de idioma",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields9": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields12",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields12": {
+      "main": [
+        [
+          {
+            "node": "Evolution API4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model10": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Resumidor de encuestas",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resumidor de encuestas": {
+      "main": [
+        [
+          {
+            "node": "Gmail3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evolution API4": {
+      "main": [
+        []
+      ]
+    },
+    "Sort": {
+      "main": [
+        [
+          {
+            "node": "Aggregate2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "3d27e5ad-c6ca-4d03-a51e-2b1d63b7dea9",
+  "triggerCount": 1,
+  "tags": [
+    {
+      "createdAt": "2025-04-23T20:54:02.682Z",
+      "updatedAt": "2025-04-23T20:54:02.682Z",
+      "id": "sPdc51YFSDyYeZsT",
+      "name": "Averis"
+    },
+    {
+      "createdAt": "2025-04-23T20:54:09.108Z",
+      "updatedAt": "2025-04-23T20:54:09.108Z",
+      "id": "g0Y4unH76zW0VzkQ",
+      "name": "WhatsApp"
+    },
+    {
+      "createdAt": "2025-04-23T20:59:57.136Z",
+      "updatedAt": "2025-04-23T20:59:57.136Z",
+      "id": "Xq0NhXBZ2HnDESQS",
+      "name": "Agente"
+    }
+  ]
+}
