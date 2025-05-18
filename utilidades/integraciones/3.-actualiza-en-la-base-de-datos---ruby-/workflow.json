@@ -1,0 +1,403 @@
+{
+  "createdAt": "2025-04-29T12:10:49.183Z",
+  "updatedAt": "2025-04-29T12:11:30.901Z",
+  "id": "5GIh21fQIHBrKdnB",
+  "name": "3. Actualiza en la base de datos - Ruby",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {}
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1kB1PdiQ9hSXyilabG-06aVus4NXXRbmM",
+          "mode": "list",
+          "cachedResultName": "Kamexa Policies - DEMO",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1kB1PdiQ9hSXyilabG-06aVus4NXXRbmM"
+        },
+        "event": "fileUpdated",
+        "options": {}
+      },
+      "id": "b8f8252b-361a-49c5-be1f-e7dad37683e0",
+      "name": "File Updated",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        120,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "tableId": "documents",
+        "filterType": "string",
+        "filterString": "=metadata->>file_id=like.*{{ $json.id }}*"
+      },
+      "id": "7d269108-2441-49e0-b00d-8657483f826e",
+      "name": "Delete Row(s)",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        380,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b4433ac7-0b70-4405-a564-f3f78f784470",
+              "name": "file_id",
+              "value": "={{ $('File Updated').item.json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cc7165d2-9753-4eec-b9e7-5115038c0d82",
+      "name": "Get FIle ID",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        660,
+        260
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "51826982-828a-4e84-9666-c95057191eaf",
+      "name": "Reformat",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        860,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Get FIle ID').item.json.file_id }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "text/plain"
+            }
+          }
+        }
+      },
+      "id": "19b5b288-e149-42a8-82e7-b1db658686c8",
+      "name": "Download File",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1100,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Update File in Knowledge Base \n",
+        "height": 80,
+        "width": 640,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "91915a9e-5486-45f5-b333-ac0015de0cb5",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Get File to Update\n \n",
+        "height": 260,
+        "width": 280,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        160
+      ],
+      "typeVersion": 1,
+      "id": "576b2105-4f98-4432-aaa2-4d05da1179c5",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Delete Embeddings in Database \n",
+        "height": 260,
+        "width": 280,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        300,
+        160
+      ],
+      "typeVersion": 1,
+      "id": "0dbdcb73-83d7-4e94-b5a9-dea94ae0a81a",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Fix Formatting\n",
+        "height": 260,
+        "width": 400,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        620,
+        160
+      ],
+      "typeVersion": 1,
+      "id": "29eb3906-9236-4ef6-8825-e21fcf1e8629",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Extract File Text\n\n",
+        "height": 260,
+        "width": 420,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1040,
+        160
+      ],
+      "typeVersion": 1,
+      "id": "c9745099-3027-4abb-87a2-388974ef34b3",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Update Vector Database\n\n",
+        "height": 580,
+        "width": 600,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1500,
+        160
+      ],
+      "typeVersion": 1,
+      "id": "91dffd76-1930-4a21-9a00-df142bd7fb42",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "chunkSize": 300,
+        "chunkOverlap": 50,
+        "options": {}
+      },
+      "id": "23ebe28c-b8ac-46a0-bb4d-c68a8b6d0471",
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        1900,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "id": "c9a4edb5-3719-4339-ab01-0d1c0edc36c5",
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "3b54aba1-a6b6-4729-b144-fea875382fc0",
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.1,
+      "position": [
+        1620,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "file_id",
+                "value": "={{ $('Reformat').item.json.file_id }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "72dcf861-9dd2-4549-975a-63ddb382cbd0",
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "id": "4e185138-ba7b-48ef-8751-b4272671550b",
+      "name": "Supabase Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        1640,
+        260
+      ]
+    }
+  ],
+  "connections": {
+    "File Updated": {
+      "main": [
+        [
+          {
+            "node": "Delete Row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Row(s)": {
+      "main": [
+        [
+          {
+            "node": "Get FIle ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get FIle ID": {
+      "main": [
+        [
+          {
+            "node": "Reformat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reformat": {
+      "main": [
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "437c9983-7c35-4255-9774-b2f1f6f9b17a",
+  "triggerCount": 0,
+  "tags": []
+}
