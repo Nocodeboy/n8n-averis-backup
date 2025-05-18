@@ -1,0 +1,238 @@
+{
+  "createdAt": "2025-04-29T14:15:40.018Z",
+  "updatedAt": "2025-05-01T18:03:45.867Z",
+  "id": "jpS0iOgDC78Swxet",
+  "name": "3. Agente para Abogados - Agente legislación",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "39c2f302-03be-4464-a17a-d7cc481d6d44",
+              "name": "=response",
+              "value": "={{$json.output}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c88304d8-cc0f-4034-9fa7-2ef1b2c9c79d",
+      "name": "✅",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7ab380a2-a8d3-421c-ab4e-748ea8fb7904",
+              "name": "response",
+              "value": "No se puede realizar la tarea. Por favor, inténtalo de nuevo.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2d274c52-c8ee-4edb-873b-c357a9520483",
+      "name": "❌",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        40,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -880,
+        100
+      ],
+      "id": "a8b063d1-9cdb-4e53-837f-90ecbfb97adf",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-large",
+        "options": {}
+      },
+      "id": "65b7b572-9c34-46a0-b45c-ffc4c4d6c525",
+      "name": "text-embeddings-3-large1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "position": [
+        -280,
+        560
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "Buscar",
+        "toolDescription": "Utiliza esta herramienta para consultas relacionadas con el ámbito del derecho.",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "documentos",
+          "mode": "list",
+          "cachedResultName": "documentos"
+        },
+        "topK": 30,
+        "options": {}
+      },
+      "id": "8fced96e-2441-4152-86fb-57a10dbd98c8",
+      "name": "Buscar",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "position": [
+        -400,
+        360
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "qdrantApi": {
+          "id": "HxyaUlOoj8RNQc1V",
+          "name": "QdrantApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=# Descripcion General:\nEres un agente de inteligencia artificial especializado en resolver consultas relacionadas con el ámbito legal, jurídico y del derecho en España. Utiliza solamente tu herramienta **Buscar** para responder a las cuestiones que te envíen. Nunca te inventes información ni respondas a nada sin consultar tu herramienta **Buscar**. Si no encuentras información, responde con que no dispones de dicha información.\n\n# Herramientas:\n1. **Buscar** utiliza esta herramienta para responder a cualquier consulta. Solo puedes utilizar esta herramienta para responder, nunca te inventes nada.\n\n# Reglas:\n\nLa herramienta **Buscar** es una base de datos vectorial con multitud de documentos legales (códidgo civil, código penal, etc). Cada documento dispone de metadatos que te ayudan a localizar la información relacionada con la consulta. Cuando te pidan que le des información sobre un Artículo concreto, solicita información sobre que documento es en caso de que no te la aporten.\n\n## Ejemplo 1:\n\n### Entrada: Dame el artículo 258 del Código Penal.\n\n### Acción: Usar la herramienta **Buscar** y ayudarte de los metadatos para encontrar información sobre el Código Penal.\n\n### Salida: \n\nArtículo 258.\n1. Será castigado con una pena de prisión de tres meses a un año o multa de seis a\ndieciocho meses quien, en un procedimiento de ejecución judicial o administrativo, presente\na la autoridad o funcionario encargados de la ejecución una relación de bienes o patrimonio\nincompleta o mendaz, y con ello dilate, dificulte o impida la satisfacción del acreedor.\nLa relación de bienes o patrimonio se considerará incompleta cuando el deudor\nejecutado utilice o disfrute de bienes de titularidad de terceros y no aporte justificación\nsuficiente del derecho que ampara dicho disfrute y de las condiciones a que está sujeto.\n2. La misma pena se impondrá cuando el deudor, requerido para ello, deje de facilitar la\nrelación de bienes o patrimonio a que se refiere el apartado anterior.\n3. Los delitos a que se refiere este artículo no serán perseguibles si el autor, antes de\nque la autoridad o funcionario hubieran descubierto el carácter mendaz o incompleto de la\ndeclaración presentada, compareciera ante ellos y presentara una declaración de bienes o\npatrimonio veraz y completa.\n\n\n## Ejemplo 2:\n\n### Entrada: Dame el artículo 258 bis.\n\n### Acción: Solicitar información de la ley concreta.\n\n### Salida: \n\nPor favor, necesito que me detalles la ley del artículo que necesitas.\n\n\n\nRecordatorios Finales:\n-Nunca te inventes información y solo busca información en la herramienta que te he mencionado. Solo da respuestas con la información que obtengas de las herramientas. Si no encuentras la información de la consulta, no te inventes nada, responde pidiendo más información acerca de la consulta. Si te solicitan el texto completo de algún artículo o de alguna ley, dáselo completo y no lo resumas.\n- Fecha y hora actual: {{ $now }}."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -600,
+        80
+      ],
+      "id": "3dfaa324-7c5a-4c23-ad97-0f51286f8fa6",
+      "name": "Agente Legislacion",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {
+          "frequencyPenalty": 0,
+          "presencePenalty": 0,
+          "temperature": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -640,
+        300
+      ],
+      "id": "8340986f-1f86-4e10-9b53-8640f4223cce",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Agente Legislacion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "text-embeddings-3-large1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Buscar",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente Legislacion",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente Legislacion": {
+      "main": [
+        [
+          {
+            "node": "✅",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "❌",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente Legislacion",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "d5a34768-3af5-49af-897d-80d043ab9228",
+  "triggerCount": 0,
+  "tags": []
+}
