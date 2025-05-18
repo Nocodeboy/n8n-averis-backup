@@ -1,0 +1,1362 @@
+{
+  "createdAt": "2025-05-14T18:18:47.562Z",
+  "updatedAt": "2025-05-14T18:21:57.496Z",
+  "id": "XWoDXobFgIeQX7Ig",
+  "name": "Subida de recursos a Airtable - Averis",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Recursos Averis",
+        "formDescription": "Analiza, documenta y guarda workflows en Airtable",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Nombre del workflow",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Descripción / Instrucciones",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "JSON Workflow",
+              "fieldType": "file",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Plataforma",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "n8n"
+                  },
+                  {
+                    "option": "Make"
+                  }
+                ]
+              },
+              "multiselect": true,
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "¿Desplegado?",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Sí"
+                  },
+                  {
+                    "option": "No"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "URL Despliegue"
+            },
+            {
+              "fieldLabel": "Captura",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": ".jpg, .png"
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": true,
+          "buttonLabel": "Enviar",
+          "ignoreBots": true,
+          "customCss": ":root {\n\t--font-family: 'Open Sans', sans-serif;\n\t--font-weight-normal: 400;\n\t--font-weight-bold: 600;\n\n\t/* Tipografía */\n\t--font-size-body: 12px;\n\t--font-size-label: 14px;\n\t--font-size-header: 20px;\n\t--font-size-input: 14px;\n\t--font-size-paragraph: 14px;\n\t--font-size-link: 12px;\n\t--font-size-error: 12px;\n\t--font-size-subheader: 14px;\n\n\t/* Colores Averis */\n\t--color-background: #020b1f;\n\t--color-card-bg: #0c142e;\n\t--color-card-border: #1b2a49;\n\t--color-card-shadow: rgba(0, 68, 255, 0.08);\n\t--color-link: #3399ff;\n\t--color-header: #ffffff;\n\t--color-label: #d2d6e7;\n\t--color-input-border: #2f4065;\n\t--color-input-text: #d2d6e7;\n\t--color-focus-border: #3399ff;\n\t--color-submit-btn-bg: #2262f0;\n\t--color-submit-btn-text: #ffffff;\n\t--color-error: #ea1f30;\n\t--color-required: #ff6d5a;\n\t--color-clear-button-bg: #334466;\n\t--color-html-text: #eaeefb;\n\t--color-html-link: #3399ff;\n\t--color-header-subtext: #a2acc7;\n\t--color-test-notice-text: #ffe08a;\n\t--color-test-notice-bg: #1a1f3a;\n\t--color-test-notice-border: #2d3a61;\n\n\t/* Bordes */\n\t--border-radius-card: 10px;\n\t--border-radius-input: 8px;\n\t--border-radius-clear-btn: 50%;\n\n\t/* Espaciado */\n\t--padding-container-top: 32px;\n\t--padding-card: 24px;\n\t--padding-form-input: 14px;\n\t--margin-bottom-card: 20px;\n\n\t/* Dimensiones */\n\t--container-width: 480px;\n\t--submit-btn-height: 48px;\n\n\t/* Otros */\n\t--box-shadow-card: 0px 4px 24px 0px var(--color-card-shadow);\n\t--opacity-placeholder: 0.5;\n}"
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -3140,
+        400
+      ],
+      "id": "67b46c90-8391-4baf-ae40-0c9e257a3758",
+      "name": "On form submission",
+      "webhookId": "0c5c8b39-06a7-4d07-95be-b729d2a9eb6f"
+    },
+    {
+      "parameters": {
+        "jsCode": "let results = [];\nconst items = $(\"On form submission\").all();\n\nfor (const item of items) {\n    const archivo = item.binary[\"JSON_Workflow\"];\n\n    if (archivo) {\n        results.push({\n            json: {\n                fileName: archivo.fileName,\n                tipo: \"JSON Workflow\"\n            },\n            binary: {\n                data: archivo\n            }\n        });\n    }\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2060,
+        400
+      ],
+      "id": "cbb91e64-75fd-43ff-9eae-3f3e65027cf1",
+      "name": "Split out binary1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Formatea el nombre de este workflow profesional. Para el nombre del flujo, usa mayúsculas donde corresponda y minúsculas, debe ser descriptivo y breve. Devuelve solo el nombre, nada mas.\n\nNombre: {{ $json['Nombre del workflow'] }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "Eres un experto en el mercado de soluciones de IA y tu tarea es renombrar correctamente estos flujos para que podamos organizarlos correctamente. \n\n#IMPORTANTE:\n\n- Devuelve tu output siempre en español de España. \n- Devuelve únicamente el nombre del flujo\n- El nombre debe ser breve, descriptivo y coherente"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -2880,
+        400
+      ],
+      "id": "8850cfdd-c8f3-4b06-b489-ee19f0a0e459",
+      "name": "Renombra el workflow"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-001",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -2800,
+        580
+      ],
+      "id": "9ff693c2-2747-4e82-bf72-7b9a03287e70",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "iNiz53Yy3AWmTq9X",
+          "name": "Gemini API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=- `Nombre`:{{ $json.nombre }}\n- `Descripción`:{{ $json.descripcion }}\n- 'Plataforma': {{ $json.plataforma }}\n- `URL del Workflow`:{{ $json.url_workflow }}\n- 'Herramientas, tipo: {{ $json.herramientas_y_tipo }}\n- Estimacion de precio: {{ $json.precio }}",
+        "options": {
+          "systemMessage": "Eres un agente especializado en documentar workflows de automatización para registrarlos en una base de Airtable.\n\nRecibes siempre seis valores desde un formulario:\n\nNombre\n\nDescripción\n\nURL del Workflow (en Google Drive)\n\nHerramientas principales, tipo (Agente, Workflow) y plataforma (n8n, Make o ambas)\n\nEstimacion de precio y justificación\n\nTu tarea es generar automáticamente un objeto JSON con toda la información necesaria para crear un registro en Airtable. No debes pedir información adicional al usuario. Completa el resto de campos usando tu criterio profesional y comercial, infiriendo lo que sea necesario.\n\n🟢 Estructura esperada del JSON:\n\n\n{\n  \"Nombre\": \"[Nombre recibido, mejorado si es necesario]\",\n  \"Descripción\": \"[Reescribe la descripción con tono profesional, integrando beneficios y pasos si están incluidos]\",\n  \"Captura\": \"No disponible\",\n  \"Plataforma\": \"[n8n o Make]\",\n  \"Tipo\": \"Automatización\",\n  \"Tarea principal\": \"[Deduce la categoría principal y añade varios tags. p. ej., Onboarding, Facturación, CRM, BBDD, Atención al cliente etc.]\",\n  \"Herramientas principales\": \"[Enumera herramientas involucradas si se deducen, separadas por coma]\",\n  \"Complejidad\": \"[🟩🟩🟩🟩 | 🟨🟨🟨🟨 | 🟥🟥🟥🟥]\",\n  \"Valor\": \"[⭐️⭐️⭐️ | ⭐️⭐️⭐️⭐️ | ⭐️⭐️⭐️⭐️⭐️]\",\n  \"URL del Workflow\": \"[URL proporcionada]\",\n  \"Instrucciones de implementación\": \"[Extrae o genera pasos claros para desplegar el flujo]\",\n  \"Desplegado\": \"No\",\n  \"URL de despliegue\": \"\",\n  \"Privacidad\": \"Privado\",\n  \"Valor estimado en el mercado\": \"[ej. 1000€ - 3000€]\",\n  \"Justificación del valor\": \"[Una línea justificando el valor]\",\n  \"Aplicaciones\": \"[Casos de uso o sectores donde encaja]\",\n  \"Nichos potenciales\": \"[Segmentos específicos donde puede escalarse o revenderse]\"\n}\n⚠️ IMPORTANTE:\nDevuelve únicamente este objeto JSON. No incluyas ningún texto adicional, ni cabeceras, ni comillas escapadas. El resultado será usado directamente como entrada para el nodo “Create Record” de Airtable en n8n."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        240,
+        0
+      ],
+      "id": "0658110f-4ad6-4af4-ab2d-dff210ffe9a0",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4.1",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        280,
+        220
+      ],
+      "id": "7667c6d3-4714-4498-a53f-106ae704e307",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "TaWLwZCIMo3j9GPj",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7c41437a-d858-4c36-ad80-13674f8ab869",
+              "name": "nombre",
+              "value": "={{ $('Renombra el workflow').item.json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "e23ce40e-f247-4704-8927-59f1ad58e32c",
+              "name": "descripcion",
+              "value": "={{ $('On form submission').item.json['Descripción / Instrucciones'] }}",
+              "type": "string"
+            },
+            {
+              "id": "a93d8365-fcfe-494b-bd46-feb3c18d6760",
+              "name": "url_workflow",
+              "value": "={{ $('Subir Workflow').item.json.webViewLink }}",
+              "type": "string"
+            },
+            {
+              "id": "767c8aa8-c706-438c-8422-741b9d559148",
+              "name": "url_captura",
+              "value": "={{ $('Subir Captura').item.json.webViewLink }}",
+              "type": "string"
+            },
+            {
+              "id": "2080ce05-a53b-41b5-abee-f642788b0cac",
+              "name": "plataforma",
+              "value": "={{ $('On form submission').item.json.Plataforma }}",
+              "type": "array"
+            },
+            {
+              "id": "7bc2825a-4614-4431-9aa1-a372748f914b",
+              "name": "herramientas_y_tipo",
+              "value": "={{ $('Basic LLM Chain').item.json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "90aaa736-fb65-4cec-aef3-8c9c24907be4",
+              "name": "precio",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "413fe41b-a3f8-4641-8ed7-4b7936146da5",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Paso 1: Obtener y parsear el JSON generado por el agente\nconst jsonString = items[0].json.output;\nlet parsed;\n\ntry {\n  parsed = JSON.parse(jsonString);\n} catch (error) {\n  throw new Error(\"El JSON generado por el agente no es válido. Detalles: \" + error.message);\n}\n\n// Paso 2: Normalizar campos multiselección en arrays\nconst multiSelectCampos = [\n  \"Plataforma\",\n  \"Tarea principal\",\n  \"Herramientas principales\",\n  \"Tipo\"\n];\n\nmultiSelectCampos.forEach(campo => {\n  const valor = parsed[campo];\n  if (typeof valor === \"string\") {\n    parsed[campo] = valor\n      .split(\",\")\n      .map(entry => entry.trim())\n      .filter(Boolean);\n  }\n});\n\n// Paso 3: Separar campo de justificación si viene como cadena conjunta\nif (parsed.Justificación) {\n  const match = parsed.Justificación.match(/^Valor\\s*:\\s*'([^']+)',\\s*Justificación\\s*:\\s*'(.*?)'$/);\n  if (match) {\n    parsed[\"Valor estimado\"] = match[1];\n    parsed[\"Justificación del valor\"] = match[2];\n    delete parsed.Justificación;\n  }\n}\n\n// Paso 4: Devolver el objeto limpio y listo para Airtable\nreturn [{ json: parsed }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        0
+      ],
+      "id": "9b8f4920-b031-4d32-b8a3-066b0e71cd06",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appBRhBJ9GWZtMNbZ",
+          "mode": "list",
+          "cachedResultName": "Averis AI - Development Lab",
+          "cachedResultUrl": "https://airtable.com/appBRhBJ9GWZtMNbZ"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblQ4pRmStmhc5d19",
+          "mode": "list",
+          "cachedResultName": "⚡️ Workflows",
+          "cachedResultUrl": "https://airtable.com/appBRhBJ9GWZtMNbZ/tblQ4pRmStmhc5d19"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nombre": "={{ $json.Nombre }}",
+            "Descripción": "={{ $json['Descripción'] }}",
+            "Captura": "=[\n  {\n    \"url\": \"https://drive.google.com/uc?export=download&id={{ $('Subir Captura').item.json.id }}\"\n  }\n]",
+            "Plataforma": "={{ $json.Plataforma }}",
+            "Tipo": "={{ $json.Tipo }}",
+            "Tarea principal": "={{ $json['Tarea principal'] }}",
+            "Herramientas principales": "={{ $json['Herramientas principales'] }}",
+            "Complejidad": "={{ $json.Complejidad }}",
+            "Valor": "={{ $json.Valor }}",
+            "URL del Workflow/s": "={{ $json['URL del Workflow'] }}",
+            "Instrucciones de Implementación": "={{ $json['Instrucciones de implementación'] }}",
+            "URL de Despliegue": "={{ $json['URL de despliegue'] }}",
+            "Desplegado": "={{ $json.Desplegado }}",
+            "Estimación de valor en el mercado": "={{ $json['Valor estimado en el mercado'] }}",
+            "Aplicaciones": "={{ $json.Aplicaciones }}",
+            "Ideas de Nicho": "={{ $json['Nichos potenciales'] }}",
+            "Justificación del valor": "={{ $json['Justificación del valor'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Nombre",
+              "displayName": "Nombre",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Descripción",
+              "displayName": "Descripción",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Captura",
+              "displayName": "Captura",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Plataforma",
+              "displayName": "Plataforma",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "options": [
+                {
+                  "name": "n8n",
+                  "value": "n8n"
+                },
+                {
+                  "name": "Make",
+                  "value": "Make"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Tipo",
+              "displayName": "Tipo",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "options": [
+                {
+                  "name": "Agente",
+                  "value": "Agente"
+                },
+                {
+                  "name": "Automatización",
+                  "value": "Automatización"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Tarea principal",
+              "displayName": "Tarea principal",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "options": [
+                {
+                  "name": "Automatización General",
+                  "value": "Automatización General"
+                },
+                {
+                  "name": "CRM",
+                  "value": "CRM"
+                },
+                {
+                  "name": "Analista",
+                  "value": "Analista"
+                },
+                {
+                  "name": "Email / Comunicación",
+                  "value": "Email / Comunicación"
+                },
+                {
+                  "name": "Scraping",
+                  "value": "Scraping"
+                },
+                {
+                  "name": " Reportes / Análisis",
+                  "value": " Reportes / Análisis"
+                },
+                {
+                  "name": "Multifunción",
+                  "value": "Multifunción"
+                },
+                {
+                  "name": "Atención al Cliente",
+                  "value": "Atención al Cliente"
+                },
+                {
+                  "name": "Integración de Sistemas",
+                  "value": "Integración de Sistemas"
+                },
+                {
+                  "name": "E-commerce",
+                  "value": "E-commerce"
+                },
+                {
+                  "name": "Marketing",
+                  "value": "Marketing"
+                },
+                {
+                  "name": "Gestión de Calendario",
+                  "value": "Gestión de Calendario"
+                },
+                {
+                  "name": "Seguridad / Backups",
+                  "value": "Seguridad / Backups"
+                },
+                {
+                  "name": "Finanzas / Facturación",
+                  "value": "Finanzas / Facturación"
+                },
+                {
+                  "name": "Documentos / Archivos",
+                  "value": "Documentos / Archivos"
+                },
+                {
+                  "name": "IA / NLP / GPT",
+                  "value": "IA / NLP / GPT"
+                },
+                {
+                  "name": "Soluciones para negocios",
+                  "value": "Soluciones para negocios"
+                },
+                {
+                  "name": "Gestión de reuniones",
+                  "value": "Gestión de reuniones"
+                },
+                {
+                  "name": "Optimización de procesos",
+                  "value": "Optimización de procesos"
+                },
+                {
+                  "name": "Optimización de tareas recurrentes",
+                  "value": "Optimización de tareas recurrentes"
+                },
+                {
+                  "name": "Validación de procesos",
+                  "value": "Validación de procesos"
+                },
+                {
+                  "name": "Validación y test de entorno",
+                  "value": "Validación y test de entorno"
+                },
+                {
+                  "name": "Onboarding y SOPs (Procedimientos Operativos Estandarizados)",
+                  "value": "Onboarding y SOPs (Procedimientos Operativos Estandarizados)"
+                },
+                {
+                  "name": "Automatización de pruebas",
+                  "value": "Automatización de pruebas"
+                },
+                {
+                  "name": "Testing automático de procesos",
+                  "value": "Testing automático de procesos"
+                },
+                {
+                  "name": "Testing y validación de workflows",
+                  "value": "Testing y validación de workflows"
+                },
+                {
+                  "name": "Testing y validación de flujos",
+                  "value": "Testing y validación de flujos"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Herramientas principales",
+              "displayName": "Herramientas principales",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "options": [
+                {
+                  "name": "Telegram",
+                  "value": "Telegram"
+                },
+                {
+                  "name": "WhatsApp",
+                  "value": "WhatsApp"
+                },
+                {
+                  "name": "EvolutionAPI",
+                  "value": "EvolutionAPI"
+                },
+                {
+                  "name": "OpenAI",
+                  "value": "OpenAI"
+                },
+                {
+                  "name": "Airtable",
+                  "value": "Airtable"
+                },
+                {
+                  "name": "Notion",
+                  "value": "Notion"
+                },
+                {
+                  "name": "Gmail",
+                  "value": "Gmail"
+                },
+                {
+                  "name": "Drive",
+                  "value": "Drive"
+                },
+                {
+                  "name": "Slack",
+                  "value": "Slack"
+                },
+                {
+                  "name": "Anthropic",
+                  "value": "Anthropic"
+                },
+                {
+                  "name": "Stripe",
+                  "value": "Stripe"
+                },
+                {
+                  "name": "OpenRouter",
+                  "value": "OpenRouter"
+                },
+                {
+                  "name": "SerpApi",
+                  "value": "SerpApi"
+                },
+                {
+                  "name": "FireCrawl",
+                  "value": "FireCrawl"
+                },
+                {
+                  "name": "Sheets",
+                  "value": "Sheets"
+                },
+                {
+                  "name": "Calendar",
+                  "value": "Calendar"
+                },
+                {
+                  "name": "Dropbox",
+                  "value": "Dropbox"
+                },
+                {
+                  "name": "Docs",
+                  "value": "Docs"
+                },
+                {
+                  "name": "Shopify",
+                  "value": "Shopify"
+                },
+                {
+                  "name": "WooCommerce",
+                  "value": "WooCommerce"
+                },
+                {
+                  "name": "ElevenLabs",
+                  "value": "ElevenLabs"
+                },
+                {
+                  "name": "Postgres",
+                  "value": "Postgres"
+                },
+                {
+                  "name": "Redis",
+                  "value": "Redis"
+                },
+                {
+                  "name": "Github",
+                  "value": "Github"
+                },
+                {
+                  "name": "n8n",
+                  "value": "n8n"
+                },
+                {
+                  "name": "Google Drive",
+                  "value": "Google Drive"
+                },
+                {
+                  "name": "Email",
+                  "value": "Email"
+                },
+                {
+                  "name": "Formularios",
+                  "value": "Formularios"
+                },
+                {
+                  "name": "Make",
+                  "value": "Make"
+                },
+                {
+                  "name": "n8n Core",
+                  "value": "n8n Core"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Complejidad",
+              "displayName": "Complejidad",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "🟩🟩🟩🟩",
+                  "value": "🟩🟩🟩🟩"
+                },
+                {
+                  "name": "🟨🟨🟨🟨",
+                  "value": "🟨🟨🟨🟨"
+                },
+                {
+                  "name": "🟥🟥🟥🟥",
+                  "value": "🟥🟥🟥🟥"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Valor",
+              "displayName": "Valor",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Básico",
+                  "value": "Básico"
+                },
+                {
+                  "name": "⭐️⭐️⭐️",
+                  "value": "⭐️⭐️⭐️"
+                },
+                {
+                  "name": "⭐️⭐️⭐️⭐️",
+                  "value": "⭐️⭐️⭐️⭐️"
+                },
+                {
+                  "name": "⭐️⭐️⭐️⭐️⭐️",
+                  "value": "⭐️⭐️⭐️⭐️⭐️"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "URL del Workflow/s",
+              "displayName": "URL del Workflow/s",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Instrucciones de Implementación",
+              "displayName": "Instrucciones de Implementación",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Desplegado",
+              "displayName": "Desplegado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Sí",
+                  "value": "Sí"
+                },
+                {
+                  "name": "No",
+                  "value": "No"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "URL de Despliegue",
+              "displayName": "URL de Despliegue",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "🔐",
+              "displayName": "🔐",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Privado",
+                  "value": "Privado"
+                },
+                {
+                  "name": "Público",
+                  "value": "Público"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Estimación de valor en el mercado",
+              "displayName": "Estimación de valor en el mercado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Justificación del valor",
+              "displayName": "Justificación del valor",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Aplicaciones",
+              "displayName": "Aplicaciones",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Ideas de Nicho",
+              "displayName": "Ideas de Nicho",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        860,
+        0
+      ],
+      "id": "96ea03d6-0a83-4984-b0f6-4a9a1b0e14b5",
+      "name": "Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HF9Z3ewHMQS69DqJ",
+          "name": "Airtable Daniel"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1b997842-86f3-4bce-b8d2-e8d73387dae1",
+              "name": "nombre",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "d0c7dfbc-4474-486a-9836-ae80ada3b588",
+              "name": "Plataforma/s",
+              "value": "={{ $('On form submission').item.json['Plataforma/s'] }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2520,
+        400
+      ],
+      "id": "8e90b88f-6be1-4826-9a40-6cccc3cc5029",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "jsCode": "let results = [];\nconst items = $(\"On form submission\").all();\n\nfor (const item of items) {\n    const archivo = item.binary[\"Captura\"];\n\n    if (archivo) {\n        results.push({\n            json: {\n                fileName: archivo.fileName,\n                tipo: \"Captura\"\n            },\n            binary: {\n                data: archivo\n            }\n        });\n    }\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1400,
+        400
+      ],
+      "id": "6ab73aec-a79e-4edc-b198-8fbbe3b43fbe",
+      "name": "Split out binary2"
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "=data",
+        "name": "={{ $json.fileName }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Crea Carpeta Workflow').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1860,
+        400
+      ],
+      "id": "b1bdf81a-12a4-43d2-88b9-dd65fa7e561c",
+      "name": "Subir Workflow",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "CmyDLQoxYdr0aKik",
+          "name": "Google Daniel Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "=data",
+        "name": "={{ $json.fileName }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Crea Carpeta Imagen').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -840,
+        520
+      ],
+      "id": "e31ae740-0f6f-4086-adf6-e68b7c770cb1",
+      "name": "Subir Captura",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "CmyDLQoxYdr0aKik",
+          "name": "Google Daniel Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "=Captura_{{ $('Renombra el workflow').item.json.text }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Crea Carpeta Workflow').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1620,
+        400
+      ],
+      "id": "f4549b09-a625-48e3-9242-119fec90ea47",
+      "name": "Crea Carpeta Imagen",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "CmyDLQoxYdr0aKik",
+          "name": "Google Daniel Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "={{ $('Renombra el workflow').item.json.text }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1asE8x_Eru57iZeQhjWB2JXIuQPHAZXOs",
+          "mode": "list",
+          "cachedResultName": "Workflows Documentados Airtable",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1asE8x_Eru57iZeQhjWB2JXIuQPHAZXOs"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -2300,
+        400
+      ],
+      "id": "555a1b60-31ae-43af-872c-21b4433bf7e7",
+      "name": "Crea Carpeta Workflow",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "CmyDLQoxYdr0aKik",
+          "name": "Google Daniel Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "reader",
+            "type": "anyone"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -600,
+        520
+      ],
+      "id": "6edd0c87-d2a3-4ba6-9e38-34d03c38d62e",
+      "name": "Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "CmyDLQoxYdr0aKik",
+          "name": "Google Daniel Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "text": "Describe brevemente el workflow mostrado en la imagen, indicando las herramientas principales utilizadas (como Airtable, Google Drive, Notion, etc.), y especifica si el nodo representa un Agente o una Automatización. Si tiene ambas y estas seguro que tiene un agente, indica Agente. La salida debe ser muy breve, en formato de lista separada por comas. ",
+        "inputType": "base64",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -140,
+        520
+      ],
+      "id": "62ea6d61-f44d-42a5-b2fc-945e285338f5",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1060,
+        400
+      ],
+      "id": "6ff45561-1f55-4667-b0db-8412cea759eb",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Nombre: {{ $('Edit Fields1').item.json.nombre }}\n\nDescripción: {{ $('On form submission').item.json['Descripción / Instrucciones'] }}\n\nContenido: {{ $json.content }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Eres un analista profesional especializado en pricing de soluciones de automatización e inteligencia artificial, con experiencia en agencias tecnológicas de alto rendimiento.\n\nVas a recibir tres inputs:\n\nNombre del workflow o agente\n\nDescripción / instrucciones del cliente.\n\nContenido técnico.\n\nTu tarea es:\n\nAnalizar los tres inputs e interpretar el tipo de solución: complejidad, vertical de negocio, nivel de personalización y herramientas utilizadas (ej. WhatsApp, CRM, scraping, automatización interna, etc.).\n\nEstimar el valor real de mercado de esta solución en euros, dando un rango de precios (ej. \"Entre 1.200 € y 3.000 €\").\n\nJustificar tu estimación con base en:\n\nEl esfuerzo técnico.\n\nEl valor empresarial aportado.\n\nLa fase de relación con el cliente.\n\nEl tipo de cliente.\n\nEl modelo más adecuado (proyecto, suscripción, mixto).\n\n🧾 El resultado debe seguir exactamente este formato:\n\n\nValor: 'Entre XX € y XX €', Justificación: '...'\n\n📌 Reglas clave:\n\nSé claro, profesional y directo.\n\nEl valor mínimo para un agente básico en Whatsapp es 1.200 €.\n\nSoluciones más integradas pueden alcanzar entre 2.000 € y 6.000 €, o más si implican escalabilidad, ahorro crítico de tiempo o integración con sistemas sensibles.\n\nNo uses palabras en inglés. Usa castellano normativo.\n\nNo uses la palabra \"costo\", sino \"coste\".\n\nTu objetivo es ayudar a agencias jóvenes a valorarse correctamente y entender el impacto de lo que ofrecen.\n\n"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        380,
+        680
+      ],
+      "id": "25950fa2-1dee-40d2-b11d-f180e22f8de9",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-001",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        800,
+        820
+      ],
+      "id": "b952866e-12cf-4b38-a996-26ab3f91d57a",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "iNiz53Yy3AWmTq9X",
+          "name": "Gemini API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let results = [];\nconst items = $(\"On form submission\").all();\n\nfor (const item of items) {\n    const archivo = item.binary[\"Captura\"];\n\n    if (archivo) {\n        results.push({\n            json: {\n                fileName: archivo.fileName,\n                tipo: \"Captura\"\n            },\n            binary: {\n                data: archivo\n            }\n        });\n    }\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -380,
+        520
+      ],
+      "id": "f8cf84b9-9e62-49ac-862e-68230075ae57",
+      "name": "Split out binary"
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Renombra el workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split out binary1": {
+      "main": [
+        [
+          {
+            "node": "Subir Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Renombra el workflow",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Renombra el workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Crea Carpeta Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split out binary2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Subir Workflow": {
+      "main": [
+        [
+          {
+            "node": "Crea Carpeta Imagen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Subir Captura": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crea Carpeta Imagen": {
+      "main": [
+        [
+          {
+            "node": "Split out binary2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crea Carpeta Workflow": {
+      "main": [
+        [
+          {
+            "node": "Split out binary1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Split out binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Subir Captura",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split out binary": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "9073b643-b2ac-45cd-8ba3-c40f3e02b7c1",
+  "triggerCount": 1,
+  "tags": [
+    {
+      "createdAt": "2025-04-23T20:54:02.682Z",
+      "updatedAt": "2025-04-23T20:54:02.682Z",
+      "id": "sPdc51YFSDyYeZsT",
+      "name": "Averis"
+    },
+    {
+      "createdAt": "2025-05-14T18:18:41.977Z",
+      "updatedAt": "2025-05-14T18:18:41.977Z",
+      "id": "HFDiKoZVgNR09RIm",
+      "name": "Airtable"
+    }
+  ]
+}
