@@ -1,0 +1,893 @@
+{
+  "createdAt": "2025-05-03T10:47:49.351Z",
+  "updatedAt": "2025-05-03T19:47:09.593Z",
+  "id": "Mo11RJPGYIbJKihe",
+  "name": "Scrape Trustpilot Reviews with DeepSeek, Analyze Sentiment with OpenAI",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "fieldToSplitOut": "recensioni",
+        "options": {}
+      },
+      "id": "34a85699-1f61-4227-87b0-f2c5ccb74726",
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        780,
+        100
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "text": "=You need to extract the review from the following HTML: {{ $json.recensione }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "autore",
+              "description": "Extract the name of the review author",
+              "required": true
+            },
+            {
+              "name": "valutazione",
+              "type": "number",
+              "description": "Extract the rating given to the review (from 1 to 5)",
+              "required": true
+            },
+            {
+              "name": "data",
+              "description": "Extract review date in YYYY-MM-DD format",
+              "required": true
+            },
+            {
+              "name": "titolo",
+              "description": "Extract the review title",
+              "required": true
+            },
+            {
+              "name": "testo",
+              "description": "Extract the review text",
+              "required": true
+            },
+            {
+              "name": "n_recensioni",
+              "type": "number",
+              "description": "Extract the total number of reviews made by the user",
+              "required": true
+            },
+            {
+              "name": "nazione",
+              "description": "Extract the country of the user who wrote the review. Must be two characters",
+              "required": true
+            }
+          ]
+        },
+        "options": {
+          "systemPromptTemplate": "You are a review expert. You need to extract only the required information and report it without changing anything.\nAll the required information is in the text."
+        }
+      },
+      "id": "be3c7ffd-3109-464d-871c-ecfed4d3f0a2",
+      "name": "Information Extractor",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "position": [
+        20,
+        620
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "ab666549-4eec-40e2-a702-0575c094a2d4",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.Valutazione }}",
+              "rightValue": "={{ $('Split Out').item.json.recensioni.replace('/reviews/','') }}"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "b24d6fd1-44fd-40da-8edd-49c8bc12fb83",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        520,
+        380
+      ],
+      "executeOnce": false,
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {},
+      "id": "d3250e86-09a1-4a67-ab47-4ad08b94167c",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        -240,
+        100
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "id": "71e3a3ec-11c6-4667-828a-5261cbd07246",
+      "name": "Limit1",
+      "type": "n8n-nodes-base.limit",
+      "position": [
+        1000,
+        100
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "Change to the name of the company registered on Trustpilot and the maximum number of pages to scrape",
+        "height": 245.55481727574733,
+        "width": 212.25249169435213
+      },
+      "id": "25b9eb6b-2e91-46b0-ad33-ce8d7a281a29",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "Extract all information with DeepSeek (remember to change base_url with https://api.deepseek.com/v1)",
+        "height": 177,
+        "width": 381
+      },
+      "id": "99c8e55f-9e95-4072-8c08-272bc48828ef",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        560
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "Check if the review has already been saved to Google Drive",
+        "height": 195.84053156146172,
+        "width": 501.28903654485043
+      },
+      "id": "a295f29e-35b1-4a5e-af4e-29a01fe75557",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        220,
+        320
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "Analyze review sentiment",
+        "height": 177.34219269102988,
+        "width": 301.27574750830576
+      },
+      "id": "9aa71455-a84e-44d5-8f63-764cb5024fe4",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        500,
+        560
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "556e201d-242a-4c0e-bc13-787c2b60f800",
+              "name": "company_id",
+              "type": "string",
+              "value": "COMPANY"
+            },
+            {
+              "id": "a1f239df-df08-41d8-8b78-d6502266a581",
+              "name": "max_page",
+              "type": "number",
+              "value": 2
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "005fcddd-23a7-4179-a87c-6bdd9f3e8a1e",
+      "name": "Set Parameters",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        20,
+        100
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "url": "=https://it.trustpilot.com/review/{{ $json.company_id }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "sort",
+              "value": "recency"
+            }
+          ]
+        },
+        "options": {
+          "pagination": {
+            "pagination": {
+              "parameters": {
+                "parameters": [
+                  {
+                    "name": "page",
+                    "value": "={{ $pageCount + 1 }}"
+                  }
+                ]
+              },
+              "limitPagesFetched": true,
+              "maxRequests": "={{ $json.max_page }}",
+              "requestInterval": 5000
+            }
+          }
+        }
+      },
+      "id": "cdc4322a-b606-4de1-b1f5-a98994728681",
+      "name": "Get reviews",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        260,
+        100
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "recensioni",
+              "cssSelector": "article section a",
+              "returnValue": "attribute",
+              "attribute": "href",
+              "returnArray": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "05ebc3c7-5f36-41d8-99e3-136a85951121",
+      "name": "Extract",
+      "type": "n8n-nodes-base.html",
+      "position": [
+        520,
+        100
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1QZhQqg79-HVBQh8Y2ihMq67UIYIRrJFKLQalcFvtDaY",
+          "cachedResultUrl": "",
+          "cachedResultName": "Trustpilot Review"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "",
+          "cachedResultName": "Foglio1"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Id",
+              "lookupValue": "={{ $('Split Out').item.json.recensioni.replace('/reviews/','') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "894c0c37-b001-4246-b3ce-8f4165892085",
+      "name": "Get rows",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        260,
+        380
+      ],
+      "typeVersion": 4.5
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1QZhQqg79-HVBQh8Y2ihMq67UIYIRrJFKLQalcFvtDaY",
+          "cachedResultUrl": "",
+          "cachedResultName": "Trustpilot Reviews"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "",
+          "cachedResultName": "Foglio1"
+        },
+        "columns": {
+          "value": {
+            "Id": "={{ $('Split Out').item.json.recensioni.replace('/reviews/','') }}"
+          },
+          "schema": [
+            {
+              "id": "Id",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "Id",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Data",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Data",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nome",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Nome",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Titolo",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Titolo",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Testo",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Testo",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Località",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Località",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "N. Recensioni",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "N. Recensioni",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "URL",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "URL",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Valutazione",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Valutazione",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Sentiment",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "Sentiment",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "Id"
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "02b7d41e-2acf-46a4-9808-fea25e1cd469",
+      "name": "Get Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        20,
+        380
+      ],
+      "executeOnce": false,
+      "typeVersion": 4.5
+    },
+    {
+      "parameters": {
+        "url": "=https://it.trustpilot.com{{ $('Split Out').item.json.recensioni }}",
+        "options": {}
+      },
+      "id": "dd17eaa1-7e15-4bb2-8746-5e60e118ad8a",
+      "name": "Get Single review",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        780,
+        360
+      ],
+      "typeVersion": 4.2,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "recensione",
+              "cssSelector": "article",
+              "returnArray": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "79106452-b7c2-4401-b884-06b8b5e97b09",
+      "name": "Extract review",
+      "type": "n8n-nodes-base.html",
+      "position": [
+        1000,
+        360
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1QZhQqg79-HVBQh8Y2ihMq67UIYIRrJFKLQalcFvtDaY",
+          "cachedResultUrl": "",
+          "cachedResultName": "Trustpilot Reviews"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "",
+          "cachedResultName": "Foglio1"
+        },
+        "columns": {
+          "value": {
+            "Id": "={{ $('Split Out').item.json.recensioni.replace('/reviews/','') }}",
+            "URL": "=https://it.trustpilot.com{{ $('Split Out').item.json.recensioni }}",
+            "Data": "={{ $('Information Extractor').item.json.output.data }}",
+            "Nome": "={{ $json.output.autore }}",
+            "Testo": "={{ $('Information Extractor').item.json.output.testo }}",
+            "Titolo": "={{ $('Information Extractor').item.json.output.titolo }}",
+            "Località": "={{ $('Information Extractor').item.json.output.nazione }}",
+            "Sentiment": "={{ $json.sentimentAnalysis.category }}",
+            "Valutazione": "={{ $('Information Extractor').item.json.output.valutazione }}",
+            "N. Recensioni": "={{ $('Information Extractor').item.json.output.n_recensioni }}"
+          },
+          "schema": [
+            {
+              "id": "Id",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "Id",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Data",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Data",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nome",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Nome",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Titolo",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Titolo",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Testo",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Testo",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Località",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Località",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "N. Recensioni",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "N. Recensioni",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "URL",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "URL",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Valutazione",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Valutazione",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Sentiment",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "Sentiment",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "Id"
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "ee61e60b-1289-4748-827b-5298c5a24c02",
+      "name": "Update sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        980,
+        600
+      ],
+      "typeVersion": 4.5
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.output.testo }}",
+        "options": {
+          "categories": "Positive, Neutral, Negative",
+          "systemPromptTemplate": "You are highly intelligent and accurate sentiment analyzer. Analyze the sentiment of the provided text. Categorize it into one of the following: {categories}. Use the provided formatting instructions. Only output the JSON."
+        }
+      },
+      "id": "b83f6201-ea75-4fa9-92fe-e63a662f35e1",
+      "name": "Sentiment Analysis",
+      "type": "@n8n/n8n-nodes-langchain.sentimentAnalysis",
+      "position": [
+        520,
+        620
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "model": "deepseek-reasoner",
+        "options": {
+          "baseURL": "https://api.deepseek.com/v1"
+        }
+      },
+      "id": "16f1c307-ebfa-41d8-be76-b47ca92bf8ba",
+      "name": "DeepSeek Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        0,
+        800
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "2d3eb4e6-a3ba-4442-9442-3d978d45e3c2",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        500,
+        800
+      ],
+      "typeVersion": 1.1
+    }
+  ],
+  "connections": {
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get Single review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit1": {
+      "main": [
+        [
+          {
+            "node": "Get Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get rows": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Limit1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get reviews": {
+      "main": [
+        [
+          {
+            "node": "Extract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract review": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Parameters": {
+      "main": [
+        [
+          {
+            "node": "Get reviews",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Get rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Single review": {
+      "main": [
+        [
+          {
+            "node": "Extract review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sentiment Analysis": {
+      "main": [
+        [
+          {
+            "node": "Update sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Set Parameters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "4cbefc07-19bc-4f69-b6f6-d9c4d12a462b",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-05-03T10:47:27.085Z",
+      "updatedAt": "2025-05-03T10:47:27.085Z",
+      "id": "Ma93LeBm775tJmza",
+      "name": "OpenAI"
+    },
+    {
+      "createdAt": "2025-05-03T10:47:27.093Z",
+      "updatedAt": "2025-05-03T10:47:27.093Z",
+      "id": "JEPRa0iUM3CB0nH6",
+      "name": "Google Drive"
+    }
+  ]
+}
