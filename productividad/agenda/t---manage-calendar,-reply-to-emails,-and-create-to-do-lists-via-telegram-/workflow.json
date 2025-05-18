@@ -1,0 +1,907 @@
+{
+  "createdAt": "2025-05-01T07:30:27.059Z",
+  "updatedAt": "2025-05-01T07:47:44.159Z",
+  "id": "CmoSlaBOeC6AAsVc",
+  "name": "T - Manage Calendar, Reply to Emails, and Create To-Do Lists via Telegram",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -220,
+        320
+      ],
+      "id": "0ca75670-00b6-46da-996a-b1834f94d3b5",
+      "name": "Telegram Trigger",
+      "webhookId": "9f6f53e6-885f-4e06-8455-5394c151de4d"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "427fd0a5-3651-4ed4-9598-383fb4205710",
+                    "leftValue": "={{ $json.message.voice.file_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "voice"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        0,
+        320
+      ],
+      "id": "d59f3b7f-6e5f-42b5-b211-eef652fe8db0",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "61f54588-1104-494a-b28f-e175129206bc",
+              "name": "text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        220
+      ],
+      "id": "e5337578-cdc4-478a-856a-6dd5ce17ada4",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        220,
+        420
+      ],
+      "id": "1b70ee1c-3b0a-4dda-b397-063d743ae34a",
+      "name": "Telegram",
+      "webhookId": "2b5ff1f8-aa2f-4dde-bab4-d1f71b5f3361"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        440,
+        420
+      ],
+      "id": "1983854c-823d-42b8-9e2c-573119ae1cce",
+      "name": "OpenAI"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "=You are a helpful assistant.\n\nYou have access to a Gmail Account where you can read unread messages in the inbox.\n\nYou also have access to GMail Send tool which allows you to send emails to anyone.\n\nYou also have Access to the Google Calendar tool that allows you to create, delet and read any events in the calendera. The current time and date is: {{ $now }}. Make sure to set the start and end time for any event you create accordingly.\n\nYou also have access to the Google Sheet Tool that allows you to read, create new rows and update rows of the Google Sheet. Always provide the due date of any task you save into the Google Sheet in the following format: YYYY-MM-DDTHH:mm:ss.sss±HH:MM (ISO 8601 with milliseconds and timezone). For example: 2025-01-28T19:09:18.910+01:00. Do not use any other format.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        700,
+        220
+      ],
+      "id": "4cde9aad-da58-4744-a7d3-396a98ec755e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "claude-3-5-sonnet-20241022",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.2,
+      "position": [
+        640,
+        420
+      ],
+      "id": "2b9cee73-7d4f-4272-a756-d17636c961bf",
+      "name": "Anthropic Chat Model"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Switch').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1140,
+        220
+      ],
+      "id": "997cd8b2-bc67-4770-8e4a-03391ee1b118",
+      "name": "Telegram1",
+      "webhookId": "55f47bc3-d431-48ab-b7f9-5f1221c14b7f"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 20,
+        "filters": {
+          "labelIds": [
+            "INBOX",
+            "UNREAD"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        840,
+        580
+      ],
+      "id": "0807381f-33af-4026-8a7f-4b1b13181bc0",
+      "name": "Gmail - Get Many",
+      "webhookId": "3a2e66ae-720f-4c14-88d3-f566d5ee176b"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $fromAI(\"to\",\"raw email adress of the recipient\")}}",
+        "subject": "={{ $fromAI(\"subject\",\"subject line for the email\")}}",
+        "emailType": "text",
+        "message": "={{ $fromAI(\"body\",\"the body of the email\")}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        980,
+        580
+      ],
+      "id": "29677b8f-fb51-4c2b-80c0-949cda7666c3",
+      "name": "Gmail - Send",
+      "webhookId": "bf1a9181-84e7-4f89-9e46-55c8413809c8"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "fabislearning@gmail.com",
+          "mode": "list",
+          "cachedResultName": "fabislearning@gmail.com"
+        },
+        "start": "={{ $fromAI(\"start\",\"date and time for when the event should start\") }}",
+        "end": "={{ $fromAI(\"end\",\"date and time for when the event should end\") }}",
+        "additionalFields": {
+          "summary": "={{ $fromAI(\"title\",\"title of the event\") }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1280,
+        580
+      ],
+      "id": "8176c116-4500-4b72-941b-9b76403efe4d",
+      "name": "Calendar Create"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "fabislearning@gmail.com",
+          "mode": "list",
+          "cachedResultName": "fabislearning@gmail.com"
+        },
+        "limit": 20,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1140,
+        580
+      ],
+      "id": "ef823f1d-cd56-4367-8733-dfdf1ac42986",
+      "name": "Calendar Read"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "=fabislearning@gmail.com",
+          "mode": "id",
+          "__regex": "(^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*)"
+        },
+        "eventId": "={{ $fromAI(\"id\",\"the id of the event\") }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1400,
+        540
+      ],
+      "id": "06f5cf9d-f904-4d00-919d-a6e9b10220aa",
+      "name": "Google Calendar"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1XjfxhMqTkE9qd0PFPeUnIRrib2-DWZqyPHiHO_zn3_8",
+          "mode": "list",
+          "cachedResultName": "AI Agent Test 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XjfxhMqTkE9qd0PFPeUnIRrib2-DWZqyPHiHO_zn3_8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XjfxhMqTkE9qd0PFPeUnIRrib2-DWZqyPHiHO_zn3_8/edit#gid=0"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "detectAutomatically",
+              "readRowsUntil": "firstEmptyRow"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        740,
+        760
+      ],
+      "id": "e62c4218-22ef-4132-ac52-eb20da549aab",
+      "name": "Google Sheets"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1XjfxhMqTkE9qd0PFPeUnIRrib2-DWZqyPHiHO_zn3_8",
+          "mode": "list",
+          "cachedResultName": "AI Agent Test 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XjfxhMqTkE9qd0PFPeUnIRrib2-DWZqyPHiHO_zn3_8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XjfxhMqTkE9qd0PFPeUnIRrib2-DWZqyPHiHO_zn3_8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Task Name": "={{ $fromAI(\"task_name\",\"the description of the task\")}}",
+            "Due Date": "={{ $fromAI(\"due_date\",\"the due date and time of the task when it should be completed\")}}",
+            "Status": "={{ $fromAI(\"status\",\"the current status of the task like pending or completed\")}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Task Name",
+              "displayName": "Task Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Due Date",
+              "displayName": "Due Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        580,
+        760
+      ],
+      "id": "3a5cad5e-daf7-4aaa-a747-6d40cb64d40f",
+      "name": "Google Sheets1"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1XjfxhMqTkE9qd0PFPeUnIRrib2-DWZqyPHiHO_zn3_8",
+          "mode": "list",
+          "cachedResultName": "AI Agent Test 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XjfxhMqTkE9qd0PFPeUnIRrib2-DWZqyPHiHO_zn3_8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XjfxhMqTkE9qd0PFPeUnIRrib2-DWZqyPHiHO_zn3_8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "={{ $fromAI(\"status\",\"the current status of the task like pending or completed\")}}",
+            "Due Date": "={{ $fromAI(\"due_date\",\"the due date and time of the task when it should be completed\")}}",
+            "Task Name": "={{ $fromAI(\"task_name\",\"the description of the task\")}}"
+          },
+          "matchingColumns": [
+            "Task Name"
+          ],
+          "schema": [
+            {
+              "id": "Task Name",
+              "displayName": "Task Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Due Date",
+              "displayName": "Due Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.5,
+      "position": [
+        420,
+        780
+      ],
+      "id": "e8077c5f-fdd4-444e-af32-b11e3482fc85",
+      "name": "Google Sheets2"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1XjfxhMqTkE9qd0PFPeUnIRrib2-DWZqyPHiHO_zn3_8",
+          "mode": "list",
+          "cachedResultName": "AI Agent Test 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XjfxhMqTkE9qd0PFPeUnIRrib2-DWZqyPHiHO_zn3_8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XjfxhMqTkE9qd0PFPeUnIRrib2-DWZqyPHiHO_zn3_8/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "=Status",
+              "lookupValue": "pending"
+            },
+            {
+              "lookupColumn": "Reminder Sent"
+            }
+          ]
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRange"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        220,
+        0
+      ],
+      "id": "7f884598-5340-4745-9be7-afa2e6d4d0ad",
+      "name": "Google Sheets3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const currentTime = new Date().getTime(); // Current time\nconst reminderTime = currentTime + 30 * 60 * 1000; // 30 minutes from now\n\nreturn items\n  .map(item => {\n    const dueDateString = item.json[\"Due Date\"]; // Original due date string\n    let normalizedDate;\n\n    // Normalize the date format\n    if (dueDateString.includes(\"T\")) {\n      // Already in ISO 8601 format, no change needed\n      normalizedDate = dueDateString;\n    } else if (dueDateString.match(/^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$/)) {\n      // Convert \"YYYY-MM-DD HH:mm:ss\" to \"YYYY-MM-DDTHH:mm:ss\"\n      normalizedDate = dueDateString.replace(\" \", \"T\");\n    } else {\n      // Unsupported format, log an error and exclude it\n      console.error(`Unsupported date format: ${dueDateString}`);\n      return null;\n    }\n\n    // Parse the normalized date\n    const dueDate = new Date(normalizedDate).getTime();\n\n    // Check if the date is valid\n    if (isNaN(dueDate)) {\n      console.error(`Invalid date after normalization: ${dueDateString}`);\n      return null;\n    }\n\n    // Add the normalized date to the item for debugging purposes\n    item.json[\"Normalized Due Date\"] = normalizedDate;\n\n    // Filter: Include tasks due within the next 30 minutes\n    if (dueDate <= reminderTime && dueDate > currentTime) {\n      return item; // Include this task\n    } else {\n      return null; // Exclude this task\n    }\n  })\n  .filter(item => item !== null); // Remove invalid or excluded tasks\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "40530250-c101-43f0-b5e7-6161010caecd",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "chatId": "7276868977",
+        "text": "={{$json.message}}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        880,
+        0
+      ],
+      "id": "9a18d3a1-35d3-4315-833e-66db7dcc65ac",
+      "name": "Telegram2",
+      "webhookId": "fb537166-6c65-4ef6-8b37-184344d57bf7"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n    const taskName = item.json[\"Task Name\"];\n    const dueDate = new Date(item.json[\"Due Date\"]);\n\n    // Format the date to \"January 28, 2025 at 3:28 PM\"\n    const formattedDate = dueDate.toLocaleString(\"en-US\", {\n        month: \"long\", // Full month name\n        day: \"numeric\", // Numeric day\n        year: \"numeric\", // Full year\n        hour: \"numeric\", // Hour (12-hour format)\n        minute: \"2-digit\", // Two-digit minutes\n        hour12: true // Use 12-hour clock (AM/PM)\n    });\n\n    // Create a new message format\n    return {\n        json: {\n            message: `Reminder: Task \"${taskName}\" is due on ${formattedDate}.`\n        }\n    };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        0
+      ],
+      "id": "eb9393ee-718a-442b-a1c9-eff0ffab855d",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1XjfxhMqTkE9qd0PFPeUnIRrib2-DWZqyPHiHO_zn3_8",
+          "mode": "list",
+          "cachedResultName": "AI Agent Test 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XjfxhMqTkE9qd0PFPeUnIRrib2-DWZqyPHiHO_zn3_8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XjfxhMqTkE9qd0PFPeUnIRrib2-DWZqyPHiHO_zn3_8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Reminder Sent": "=Yes",
+            "Due Date": "={{ $('Code').item.json['Due Date'] }}"
+          },
+          "matchingColumns": [
+            "Due Date"
+          ],
+          "schema": [
+            {
+              "id": "Task Name",
+              "displayName": "Task Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Due Date",
+              "displayName": "Due Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Reminder Sent",
+              "displayName": "Reminder Sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1100,
+        0
+      ],
+      "id": "0deafa93-e5b4-41c8-9822-eca6f68872fe",
+      "name": "Google Sheets4"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c36105d9-60d2-4e05-87a3-d10dc0a7c969",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail - Get Many": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail - Send": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calendar Create": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calendar Read": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets2": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets3": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Telegram2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "15421411-6591-4509-9e67-655f8b9fa26b",
+  "triggerCount": 0,
+  "tags": []
+}
