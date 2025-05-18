@@ -1,0 +1,210 @@
+{
+  "createdAt": "2025-05-08T19:49:25.991Z",
+  "updatedAt": "2025-05-14T15:43:22.915Z",
+  "id": "9Jx63Debq9R79Fa5",
+  "name": "3. Recordatorio de citas - Agente IA Avanzado para Clínica Dental - WhatsApp",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "sseEndpoint": "https://engaging-seahorse-19.rshare.io/mcp/82a7a338-618c-44f5-a1c3-f2e32b6b4833/mcp/:tool/gmail/sse"
+      },
+      "id": "24d2d694-f482-41bc-99ac-4148fa304e37",
+      "name": "MCP GMAIL",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "position": [
+        80,
+        280
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "sseEndpoint": "https://engaging-seahorse-19.rshare.io/mcp/ceb17fa5-1937-405f-8000-ea3be7d2b032/mcp/:tool/calendar/sse"
+      },
+      "id": "e28ba346-2b0e-47ca-aecc-46b7d060938f",
+      "name": "MCP CALENDAR",
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "position": [
+        -80,
+        280
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "id": "c71fe78e-cb30-4e43-9f0d-18902a41a8fb",
+      "name": "OpenAI Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        -320,
+        280
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "lid4f6Emqj7mGAPQ",
+          "name": "OpenAi API Averis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "instanceName": "Averis",
+        "options_Create_instance": {}
+      },
+      "id": "2fc73daf-d28c-4621-a0c5-31f6597a3c4e",
+      "name": "REMINDER",
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "position": [
+        200,
+        -40
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "evolutionApi": {
+          "id": "YP0S0lKXr4ZWl2EW",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "2125f65e-4580-4cde-afa3-8e5807a4f2ad",
+      "name": "Daily Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        -540,
+        0
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Today is {{ $now }}. You are an agent specialized in appointment confirmation for the clinic. Your main tasks are:\n\nList the events scheduled for the next day in the MCP Calendar.\n\nObtain the phone number from the description of each event.\n\nSend a confirmation message using the “relembraAGENDAMENTO” tool, asking the patient if they confirm the appointment or prefer to reschedule.\n\nImportant:\n\nYou do not receive responses directly; the patient's response is handled by another agent.\n",
+        "options": {
+          "systemMessage": ""
+        }
+      },
+      "id": "db1f835b-2ae3-4452-b629-571b99cc2f6e",
+      "name": "Confirmación de asistencia",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        -180,
+        -40
+      ],
+      "typeVersion": 1.8
+    }
+  ],
+  "connections": {
+    "MCP GMAIL": {
+      "ai_tool": [
+        [
+          {
+            "node": "Confirmación de asistencia",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP CALENDAR": {
+      "ai_tool": [
+        [
+          {
+            "node": "Confirmación de asistencia",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Confirmación de asistencia",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Trigger": {
+      "main": [
+        [
+          {
+            "node": "Confirmación de asistencia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirmación de asistencia": {
+      "main": [
+        [
+          {
+            "node": "REMINDER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "48f97185-31c5-4b68-adae-6fd37723c4cd",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-05-08T19:41:18.280Z",
+      "updatedAt": "2025-05-08T19:41:18.280Z",
+      "id": "DBSjqtJWnEDAdOjR",
+      "name": "Booking"
+    },
+    {
+      "createdAt": "2025-05-01T08:00:35.375Z",
+      "updatedAt": "2025-05-01T08:00:35.375Z",
+      "id": "mnFs5ZQ4LARCnZcQ",
+      "name": "Clínicas"
+    },
+    {
+      "createdAt": "2025-04-23T20:54:02.682Z",
+      "updatedAt": "2025-04-23T20:54:02.682Z",
+      "id": "sPdc51YFSDyYeZsT",
+      "name": "Averis"
+    },
+    {
+      "createdAt": "2025-04-27T18:42:31.149Z",
+      "updatedAt": "2025-04-27T18:42:31.149Z",
+      "id": "yCzirQ8grCnJYX3H",
+      "name": "Whatsapp"
+    }
+  ]
+}
